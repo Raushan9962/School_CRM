@@ -10,7 +10,7 @@ exports.createAttendance = async (req, res) => {
     }
 };
 
-exports.getAllAttendances = async (req, res) => {
+exports.getAllAttendance = async (req, res) => {
     try {
         const results = await Attendance.findAll();
         res.status(200).json(results);

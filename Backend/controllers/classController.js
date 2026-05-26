@@ -10,7 +10,7 @@ exports.createClass = async (req, res) => {
     }
 };
 
-exports.getAllClasss = async (req, res) => {
+exports.getAllClasses = async (req, res) => {
     try {
         const results = await Class.findAll();
         res.status(200).json(results);

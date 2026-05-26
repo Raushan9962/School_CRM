@@ -33,6 +33,7 @@ exports.login = async (req, res) => {
                 email: user.email,
                 id: user.id,
                 role: user.roleName, // From the JOIN
+                schoolId: user.school_id || null,
             };
             
             const token = jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret', {

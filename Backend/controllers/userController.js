@@ -12,6 +12,7 @@ exports.createUser = async (req, res) => {
             name, email, phone, password, roleName, 
             gender, dob, address,
             schoolName, schoolCode, schoolEmail, schoolPhone, schoolAddress, city, state, country, pincode, schoolLogo, schoolWebsite,
+            planId, billingCycle,
             employeeId, qualification, experience, joiningDate, salary, department,
             classId, admissionNo, rollNumber, section, fatherName, motherName, parentPhone, parentEmail, admissionDate, transportRequired,
             subject, classAssigned,
@@ -45,7 +46,7 @@ exports.createUser = async (req, res) => {
                 await client.query('ROLLBACK');
                 return res.status(400).json({ success: false, message: "Missing required school details" });
             }
-            const schoolData = { name: schoolName, code: schoolCode, email: schoolEmail, phone: schoolPhone, address: schoolAddress, city, state, country, pincode, logo: schoolLogo, website: schoolWebsite };
+            const schoolData = { name: schoolName, code: schoolCode, email: schoolEmail, phone: schoolPhone, address: schoolAddress, city, state, country, pincode, logo: schoolLogo, website: schoolWebsite, planId, billingCycle };
             const newSchool = await School.create(schoolData, client);
             finalSchoolId = newSchool.id;
         } else {

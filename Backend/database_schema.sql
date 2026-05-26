@@ -307,3 +307,32 @@ CREATE TABLE IF NOT EXISTS timetables (
     end_time TIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- Subscriptions Table
+CREATE TABLE IF NOT EXISTS subscription_plans (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    max_students INTEGER,
+    monthly_price NUMERIC(10, 2) NOT NULL,
+    yearly_price NUMERIC(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- (Note: Schools table needs plan_id, billing_cycle, and subscription_status columns)
+-- ALTER TABLE schools ADD COLUMN plan_id INTEGER REFERENCES subscription_plans(id) ON DELETE SET NULL;
+-- ALTER TABLE schools ADD COLUMN billing_cycle VARCHAR(20) DEFAULT 'Monthly';
+-- ALTER TABLE schools ADD COLUMN subscription_status VARCHAR(50) DEFAULT 'Active';
+
+INSERT INTO subscription_plans (name, max_students, monthly_price, yearly_price) 
+VALUES 
+('Up to 50', 50, 500.00, 5000.00),
+('Up to 100', 100, 900.00, 9000.00),
+('Up to 200', 200, 1600.00, 16000.00),
+('Up to 400', 400, 3000.00, 30000.00),
+('Up to 500', 500, 3500.00, 35000.00),
+('Up to 1000', 1000, 6000.00, 60000.00),
+('Up to 1500', 1500, 8500.00, 85000.00),
+('Up to 2000', 2000, 11000.00, 110000.00),
+('2000+ (Unlimited)', NULL, 15000.00, 150000.00)
+ON CONFLICT DO NOTHING;
