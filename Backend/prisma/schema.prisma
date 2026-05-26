@@ -12,6 +12,7 @@ datasource db {
 model User {
   id         Int       @id @default(autoincrement())
   name       String
+  username   String?   @unique
   email      String    @unique
   phone      String?   @unique
   password   String
@@ -19,16 +20,22 @@ model User {
   schoolId   Int?
   isActive   Boolean   @default(true)
   image      String?
+  gender     String?
+  dob        DateTime?
+  address    String?
   createdAt  DateTime  @default(now())
 
   role       Role      @relation(fields: [roleId], references: [id])
   school     School?   @relation(fields: [schoolId], references: [id])
 
-  student    Student?
-  teacher    Teacher?
-  parent     Parent?
-  // accountant Accountant?
-  // librarian  Librarian?
+  student          Student?
+  teacher          Teacher?
+  parent           Parent?
+  principal        Principal?
+  accountant       Accountant?
+  librarian        Librarian?
+  transportManager TransportManager?
+  receptionist     Receptionist?
 }
 
 model Role {
@@ -41,37 +48,52 @@ model Role {
 model School {
   id        Int      @id @default(autoincrement())
   name      String
+  code      String?  @unique
   address   String
+  city      String?
+  state     String?
+  country   String?
+  pincode   String?
   phone     String
   email     String
   logo      String?
+  website   String?
   createdAt DateTime @default(now())
 
-  users     User[]
-  students  Student[]
-  teachers  Teacher[]
-  classes   Class[]
+  users             User[]
+  students          Student[]
+  teachers          Teacher[]
+  principals        Principal[]
+  accountants       Accountant[]
+  librarians        Librarian[]
+  transportManagers TransportManager[]
+  receptionists     Receptionist[]
+  classes           Class[]
 }
 
 //student management
 model Student {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @unique
-  schoolId    Int
-  classId     Int
-  admissionNo String   @unique
-  rollNumber  String?
-  dob         DateTime
-  gender      String
-  bloodGroup  String?
-  address     String
-  photo       String
-  qrCode      String?
-  createdAt   DateTime @default(now())
+  id                Int      @id @default(autoincrement())
+  userId            Int      @unique
+  schoolId          Int
+  classId           Int
+  admissionNo       String   @unique
+  rollNumber        String?
+  section           String?
+  fatherName        String?
+  motherName        String?
+  parentPhone       String?
+  parentEmail       String?
+  admissionDate     DateTime @default(now())
+  transportRequired Boolean  @default(false)
+  photo             String?
+  qrCode            String?
+  createdAt         DateTime @default(now())
 
-  user        User         @relation(fields: [userId], references: [id])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   school      School       @relation(fields: [schoolId], references: [id])
   class       Class        @relation(fields: [classId], references: [id])
+  parents     Parent[]
 
   attendance  Attendance[]
   fees        Fee[]
@@ -85,8 +107,10 @@ model Parent {
   userId     Int     @unique
   occupation String?
   relation   String
+  studentId  Int?
 
-  user       User    @relation(fields: [userId], references: [id])
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  student    Student? @relation(fields: [studentId], references: [id])
 }
 
 model Teacher {
@@ -96,12 +120,83 @@ model Teacher {
   employeeId    String   @unique
   qualification String?
   experience    Int?
+  subject       String?
+  classAssigned String?
+  joiningDate   DateTime @default(now())
+  salary        Float?
 
-  user          User       @relation(fields: [userId], references: [id])
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   school        School?    @relation(fields: [schoolId], references: [id])
   subjects      Subject[]
   homeworks     Homework[]
   timetables    Timetable[]
+}
+
+model Principal {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  schoolId      Int
+  employeeId    String   @unique
+  qualification String?
+  experience    Int?
+  joiningDate   DateTime @default(now())
+  department    String?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school        School   @relation(fields: [schoolId], references: [id])
+}
+
+model Accountant {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  schoolId      Int
+  employeeId    String   @unique
+  qualification String?
+  experience    Int?
+  joiningDate   DateTime @default(now())
+  salary        Float?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school        School   @relation(fields: [schoolId], references: [id])
+}
+
+model Librarian {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  schoolId      Int
+  employeeId    String   @unique
+  qualification String?
+  experience    Int?
+  joiningDate   DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school        School   @relation(fields: [schoolId], references: [id])
+}
+
+model TransportManager {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  schoolId        Int
+  employeeId      String   @unique
+  vehicleAssigned String?
+  routeAssigned   String?
+  licenseNumber   String?
+  joiningDate     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school        School   @relation(fields: [schoolId], references: [id])
+}
+
+model Receptionist {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  schoolId      Int
+  employeeId    String   @unique
+  joiningDate   DateTime @default(now())
+  salary        Float?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school        School   @relation(fields: [schoolId], references: [id])
 }
 
 model Class {

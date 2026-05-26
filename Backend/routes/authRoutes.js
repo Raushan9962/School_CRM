@@ -4,8 +4,6 @@ const authController = require('../controllers/authController');
 const { auth } = require('../middleware/auth'); // Import auth middleware
 
 // Public Routes
-router.post('/sendotp', authController.sendOTP);
-router.post('/signup', authController.signUp);
 router.post('/login', authController.login);
 
 // Protected Routes
