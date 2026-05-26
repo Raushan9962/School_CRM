@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const HostelRoom = require('../models/HostelRoom');
 
 exports.createHostelRoom = async (req, res) => {
     try {
-        const item = await prisma.hostelRoom.create({ data: req.body });
-        res.status(201).json({ message: 'HostelRoom created successfully', item });
+        const result = await HostelRoom.create(req.body);
+        res.status(201).json({ message: 'HostelRoom created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating hostelRoom' });
@@ -12,34 +12,30 @@ exports.createHostelRoom = async (req, res) => {
 
 exports.getAllHostelRooms = async (req, res) => {
     try {
-        const items = await prisma.hostelRoom.findMany();
-        res.status(200).json(items);
+        const results = await HostelRoom.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching hostelRooms' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getHostelRoomById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.hostelRoom.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'HostelRoom not found' });
-        res.status(200).json(item);
+        const result = await HostelRoom.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'HostelRoom not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching hostelRoom' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateHostelRoom = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.hostelRoom.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'HostelRoom updated successfully', item });
+        const result = await HostelRoom.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'HostelRoom not found' });
+        res.status(200).json({ message: 'HostelRoom updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating hostelRoom' });
@@ -48,8 +44,8 @@ exports.updateHostelRoom = async (req, res) => {
 
 exports.deleteHostelRoom = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.hostelRoom.delete({ where: { id: parseInt(id) } });
+        const result = await HostelRoom.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'HostelRoom not found' });
         res.status(200).json({ message: 'HostelRoom deleted successfully' });
     } catch (error) {
         console.error(error);

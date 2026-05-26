@@ -1,60 +1,54 @@
-const prisma = require('../config/prismaClient');
+const Attendance = require('../models/Attendance');
 
-exports.markAttendance = async (req, res) => {
+exports.createAttendance = async (req, res) => {
     try {
-        const { studentId, date, status } = req.body;
-        const attendance = await prisma.attendance.create({
-            data: { studentId, date: new Date(date), status }
-        });
-        res.status(201).json({ message: 'Attendance marked successfully', attendance });
+        const result = await Attendance.create(req.body);
+        res.status(201).json({ message: 'Attendance created successfully', data: result });
     } catch (error) {
-        res.status(500).json({ error: 'Error marking attendance' });
+        console.error(error);
+        res.status(500).json({ error: 'Error creating attendance' });
     }
 };
 
-exports.getAllAttendance = async (req, res) => {
+exports.getAllAttendances = async (req, res) => {
     try {
-        const attendanceRecords = await prisma.attendance.findMany({ include: { student: true } });
-        res.status(200).json(attendanceRecords);
+        const results = await Attendance.findAll();
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching attendance' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
-exports.getAttendanceByStudent = async (req, res) => {
+exports.getAttendanceById = async (req, res) => {
     try {
-        const { studentId } = req.params;
-        const attendance = await prisma.attendance.findMany({
-            where: { studentId: parseInt(studentId) },
-        });
-        res.status(200).json(attendance);
+        const result = await Attendance.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Attendance not found' });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching attendance for student' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateAttendance = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updates = req.body;
-        if (updates.date) updates.date = new Date(updates.date);
-
-        const attendance = await prisma.attendance.update({
-            where: { id: parseInt(id) },
-            data: updates
-        });
-        res.status(200).json({ message: 'Attendance updated successfully', attendance });
+        const result = await Attendance.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Attendance not found' });
+        res.status(200).json({ message: 'Attendance updated successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error updating attendance' });
     }
 };
 
 exports.deleteAttendance = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.attendance.delete({ where: { id: parseInt(id) } });
+        const result = await Attendance.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Attendance not found' });
         res.status(200).json({ message: 'Attendance deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error deleting attendance' });
     }
 };

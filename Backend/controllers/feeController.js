@@ -1,69 +1,54 @@
-const prisma = require('../config/prismaClient');
+const Fee = require('../models/Fee');
 
 exports.createFee = async (req, res) => {
     try {
-        const { studentId, amount, dueDate, status, paymentMethod, paidAmount } = req.body;
-        const fee = await prisma.fee.create({
-            data: { 
-                studentId, 
-                amount, 
-                dueDate: new Date(dueDate), 
-                status, 
-                paymentMethod,
-                paidAmount: paidAmount || 0
-            }
-        });
-        res.status(201).json({ message: 'Fee record created successfully', fee });
+        const result = await Fee.create(req.body);
+        res.status(201).json({ message: 'Fee created successfully', data: result });
     } catch (error) {
-        res.status(500).json({ error: 'Error creating fee record' });
+        console.error(error);
+        res.status(500).json({ error: 'Error creating fee' });
     }
 };
 
 exports.getAllFees = async (req, res) => {
     try {
-        const fees = await prisma.fee.findMany({ include: { student: true } });
-        res.status(200).json(fees);
+        const results = await Fee.findAll();
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching fees' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getFeeById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const fee = await prisma.fee.findUnique({
-            where: { id: parseInt(id) },
-            include: { student: true }
-        });
-        if (!fee) return res.status(404).json({ error: 'Fee record not found' });
-        res.status(200).json(fee);
+        const result = await Fee.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Fee not found' });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching fee details' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateFee = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updates = req.body;
-        if (updates.dueDate) updates.dueDate = new Date(updates.dueDate);
-
-        const fee = await prisma.fee.update({
-            where: { id: parseInt(id) },
-            data: updates
-        });
-        res.status(200).json({ message: 'Fee record updated successfully', fee });
+        const result = await Fee.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Fee not found' });
+        res.status(200).json({ message: 'Fee updated successfully', data: result });
     } catch (error) {
-        res.status(500).json({ error: 'Error updating fee record' });
+        console.error(error);
+        res.status(500).json({ error: 'Error updating fee' });
     }
 };
 
 exports.deleteFee = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.fee.delete({ where: { id: parseInt(id) } });
-        res.status(200).json({ message: 'Fee record deleted successfully' });
+        const result = await Fee.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Fee not found' });
+        res.status(200).json({ message: 'Fee deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting fee record' });
+        console.error(error);
+        res.status(500).json({ error: 'Error deleting fee' });
     }
 };

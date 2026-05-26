@@ -1,241 +1,130 @@
-const prisma = require('../config/prismaClient');
+const pool = require('../config/db');
+const { Role, School, User, Student, Parent, Teacher, Principal, Accountant, Librarian, TransportManager, Receptionist } = require('../models');
 const bcrypt = require('bcrypt');
 const { canManageRole } = require('../middleware/rbac');
 
 exports.createUser = async (req, res) => {
+    const client = await pool.connect();
     try {
+        await client.query('BEGIN');
+        
         const { 
             name, email, phone, password, roleName, 
-            gender, dob, address, // Generic fields
-            // School Admin / Super Admin
+            gender, dob, address,
             schoolName, schoolCode, schoolEmail, schoolPhone, schoolAddress, city, state, country, pincode, schoolLogo, schoolWebsite,
-            // Generic profile fields
             employeeId, qualification, experience, joiningDate, salary, department,
-            // Student specific fields
             classId, admissionNo, rollNumber, section, fatherName, motherName, parentPhone, parentEmail, admissionDate, transportRequired,
-            // Teacher specific fields
             subject, classAssigned,
-            // Parent specific fields
             occupation, relation, studentId,
-            // Transport specific fields
             vehicleAssigned, routeAssigned, licenseNumber
         } = req.body;
         
-        const creatorRole = req.user.role; // Injected by auth middleware
+        const creatorRole = req.user.role;
 
-        // 1. Check Role Hierarchy using our helper
+        // 1. Check Role Hierarchy
         if (!canManageRole(creatorRole, roleName)) {
-            return res.status(403).json({
-                success: false,
-                message: `Unauthorized: ${creatorRole} cannot create a ${roleName} account.`
-            });
+            await client.query('ROLLBACK');
+            return res.status(403).json({ success: false, message: `Unauthorized: ${creatorRole} cannot create a ${roleName} account.` });
         }
 
         // 2. Validate Role Existence
-        let role = await prisma.role.findUnique({ where: { name: roleName } });
+        let role = await Role.findByName(roleName, client);
+        let roleId;
         if (!role) {
-            // Auto-seed the role if it doesn't exist for convenience
-            role = await prisma.role.create({ data: { name: roleName } });
+            let newRole = await Role.create(roleName, client);
+            roleId = newRole.id;
+        } else {
+            roleId = role.id;
         }
 
-        // 3. Handle School Creation for School Admin
-        let finalSchoolId = req.user.schoolId; // Inherit by default
+        // 3. Handle School Creation
+        let finalSchoolId = req.user.schoolId;
         
         if (roleName === "School Admin") {
             if (!schoolName || !schoolEmail || !schoolPhone || !schoolAddress) {
-                return res.status(400).json({ success: false, message: "Missing required school details for creating School Admin" });
+                await client.query('ROLLBACK');
+                return res.status(400).json({ success: false, message: "Missing required school details" });
             }
-            const newSchool = await prisma.school.create({
-                data: {
-                    name: schoolName,
-                    code: schoolCode,
-                    email: schoolEmail,
-                    phone: schoolPhone,
-                    address: schoolAddress,
-                    city,
-                    state,
-                    country,
-                    pincode,
-                    logo: schoolLogo,
-                    website: schoolWebsite
-                }
-            });
+            const schoolData = { name: schoolName, code: schoolCode, email: schoolEmail, phone: schoolPhone, address: schoolAddress, city, state, country, pincode, logo: schoolLogo, website: schoolWebsite };
+            const newSchool = await School.create(schoolData, client);
             finalSchoolId = newSchool.id;
         } else {
-            // For other roles, they must belong to a school (except maybe Super Admin, but they aren't created here)
             if (!finalSchoolId && req.body.schoolId) {
                 finalSchoolId = parseInt(req.body.schoolId);
             }
         }
 
-        // 4. Hash Password (use default if not provided)
-        const plainPassword = password || "123456"; // Default fallback
+        // 4. Hash Password
+        const plainPassword = password || "123456";
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-        // 5. Create the core User record
+        // 5. Create Core User
         const image = `https://api.dicebear.com/5.x/initials/svg?seed=${name}`;
-        
-        const userData = {
-            name,
-            email,
-            phone,
-            password: hashedPassword,
-            roleId: role.id,
-            schoolId: finalSchoolId,
-            image,
-            gender,
-            dob: dob ? new Date(dob) : null,
-            address
-        };
+        const userData = { name, email, phone, password: hashedPassword, roleId, schoolId: finalSchoolId, image, gender, dob: dob || null, address };
+        const newUser = await User.create(userData, client);
+        const userId = newUser.id;
 
-        const newUser = await prisma.user.create({ data: userData });
-
-        // 6. Handle Specific Profile Creation based on Role
+        // 6. Handle Specific Profile Creation
         let profileRecord = null;
-        
         try {
             if (roleName === "Student") {
-                if (!classId || !admissionNo) {
-                    throw new Error("Missing required student profile fields");
-                }
-                profileRecord = await prisma.student.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        classId: parseInt(classId),
-                        admissionNo,
-                        rollNumber,
-                        section,
-                        fatherName,
-                        motherName,
-                        parentPhone,
-                        parentEmail,
-                        admissionDate: admissionDate ? new Date(admissionDate) : undefined,
-                        transportRequired: transportRequired === true || transportRequired === 'true',
-                        photo: image
-                    }
-                });
+                if (!classId || !admissionNo) throw new Error("Missing student fields");
+                const data = { userId, schoolId: finalSchoolId, classId, admissionNo, rollNumber, section, fatherName, motherName, parentPhone, parentEmail, admissionDate: admissionDate || null, transportRequired: transportRequired === true || transportRequired === 'true', photo: image };
+                profileRecord = await Student.create(data, client);
             } else if (roleName === "Parent") {
-                profileRecord = await prisma.parent.create({
-                    data: {
-                        userId: newUser.id,
-                        occupation,
-                        relation: relation || 'Parent',
-                        studentId: studentId ? parseInt(studentId) : null
-                    }
-                });
+                const data = { userId, occupation, relation: relation || 'Parent', studentId: studentId || null };
+                profileRecord = await Parent.create(data, client);
             } else if (roleName === "Teacher") {
-                profileRecord = await prisma.teacher.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `TCH-${Date.now()}`,
-                        qualification,
-                        experience: experience ? parseInt(experience) : null,
-                        subject,
-                        classAssigned,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined,
-                        salary: salary ? parseFloat(salary) : null
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `TCH-${Date.now()}`, qualification, experience: experience || null, subject, classAssigned, joiningDate: joiningDate || null, salary: salary || null };
+                profileRecord = await Teacher.create(data, client);
             } else if (roleName === "Principal") {
-                profileRecord = await prisma.principal.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `PRIN-${Date.now()}`,
-                        qualification,
-                        experience: experience ? parseInt(experience) : null,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined,
-                        department
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `PRIN-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, department };
+                profileRecord = await Principal.create(data, client);
             } else if (roleName === "Accountant") {
-                profileRecord = await prisma.accountant.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `ACC-${Date.now()}`,
-                        qualification,
-                        experience: experience ? parseInt(experience) : null,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined,
-                        salary: salary ? parseFloat(salary) : null
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `ACC-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, salary: salary || null };
+                profileRecord = await Accountant.create(data, client);
             } else if (roleName === "Librarian") {
-                profileRecord = await prisma.librarian.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `LIB-${Date.now()}`,
-                        qualification,
-                        experience: experience ? parseInt(experience) : null,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `LIB-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null };
+                profileRecord = await Librarian.create(data, client);
             } else if (roleName === "Transport Manager") {
-                profileRecord = await prisma.transportManager.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `TM-${Date.now()}`,
-                        vehicleAssigned,
-                        routeAssigned,
-                        licenseNumber,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `TM-${Date.now()}`, vehicleAssigned, routeAssigned, licenseNumber, joiningDate: joiningDate || null };
+                profileRecord = await TransportManager.create(data, client);
             } else if (roleName === "Receptionist") {
-                profileRecord = await prisma.receptionist.create({
-                    data: {
-                        userId: newUser.id,
-                        schoolId: newUser.schoolId,
-                        employeeId: employeeId || `REC-${Date.now()}`,
-                        joiningDate: joiningDate ? new Date(joiningDate) : undefined,
-                        salary: salary ? parseFloat(salary) : null
-                    }
-                });
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `REC-${Date.now()}`, joiningDate: joiningDate || null, salary: salary || null };
+                profileRecord = await Receptionist.create(data, client);
             }
-        } catch (profileError) {
-            // Rollback user creation if profile fails
-            await prisma.user.delete({ where: { id: newUser.id } });
-            console.error(profileError);
-            return res.status(400).json({ success: false, message: profileError.message || "Failed to create specific profile details" });
+        } catch (err) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ success: false, message: err.message || "Failed to create profile" });
         }
 
+        await client.query('COMMIT');
+        
         res.status(201).json({
             success: true,
             message: `${roleName} account created successfully.`,
-            user: {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                role: roleName,
-                plainPassword // Return password so Admin can give it to the user
-            },
+            user: { id: userId, name, email, role: roleName, plainPassword },
             profile: profileRecord
         });
 
     } catch (error) {
+        await client.query('ROLLBACK');
         console.error(error);
         res.status(500).json({ success: false, message: "Failed to create user account" });
+    } finally {
+        client.release();
     }
 };
 
-// Seed Roles utility endpoint
 exports.seedRoles = async (req, res) => {
     try {
-        const roles = [
-            "Super Admin", "School Admin", "Principal", "Teacher", 
-            "Student", "Parent", "Accountant", "Librarian", 
-            "Transport Manager", "Receptionist"
-        ];
-
+        const roles = ["Super Admin", "School Admin", "Principal", "Teacher", "Student", "Parent", "Accountant", "Librarian", "Transport Manager", "Receptionist"];
         const created = [];
         for (const role of roles) {
-            const exists = await prisma.role.findUnique({ where: { name: role } });
-            if (!exists) {
-                created.push(await prisma.role.create({ data: { name: role } }));
+            let roleRecord = await Role.findByName(role);
+            if (!roleRecord) {
+                let newRole = await Role.create(role);
+                created.push(newRole);
             }
         }
         res.status(200).json({ success: true, message: "Roles seeded", created });

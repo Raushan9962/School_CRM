@@ -1,12 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Teacher = require('../models/Teacher');
 
 exports.createTeacher = async (req, res) => {
     try {
-        const { userId, employeeId, qualification, experience } = req.body;
-        const teacher = await prisma.teacher.create({
-            data: { userId, employeeId, qualification, experience }
-        });
-        res.status(201).json({ message: 'Teacher created successfully', teacher });
+        const result = await Teacher.create(req.body);
+        res.status(201).json({ message: 'Teacher created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating teacher' });
@@ -15,46 +12,43 @@ exports.createTeacher = async (req, res) => {
 
 exports.getAllTeachers = async (req, res) => {
     try {
-        const teachers = await prisma.teacher.findMany({ include: { user: true, subjects: true } });
-        res.status(200).json(teachers);
+        const results = await Teacher.findAll();
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching teachers' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getTeacherById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const teacher = await prisma.teacher.findUnique({
-            where: { id: parseInt(id) },
-            include: { user: true, subjects: true, timetables: true }
-        });
-        if (!teacher) return res.status(404).json({ error: 'Teacher not found' });
-        res.status(200).json(teacher);
+        const result = await Teacher.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Teacher not found' });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching teacher details' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateTeacher = async (req, res) => {
     try {
-        const { id } = req.params;
-        const teacher = await prisma.teacher.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Teacher updated successfully', teacher });
+        const result = await Teacher.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Teacher not found' });
+        res.status(200).json({ message: 'Teacher updated successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error updating teacher' });
     }
 };
 
 exports.deleteTeacher = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.teacher.delete({ where: { id: parseInt(id) } });
+        const result = await Teacher.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Teacher not found' });
         res.status(200).json({ message: 'Teacher deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error deleting teacher' });
     }
 };

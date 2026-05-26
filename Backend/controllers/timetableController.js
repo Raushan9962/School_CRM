@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Timetable = require('../models/Timetable');
 
 exports.createTimetable = async (req, res) => {
     try {
-        const item = await prisma.timetable.create({ data: req.body });
-        res.status(201).json({ message: 'Timetable created successfully', item });
+        const result = await Timetable.create(req.body);
+        res.status(201).json({ message: 'Timetable created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating timetable' });
@@ -12,34 +12,30 @@ exports.createTimetable = async (req, res) => {
 
 exports.getAllTimetables = async (req, res) => {
     try {
-        const items = await prisma.timetable.findMany();
-        res.status(200).json(items);
+        const results = await Timetable.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching timetables' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getTimetableById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.timetable.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Timetable not found' });
-        res.status(200).json(item);
+        const result = await Timetable.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Timetable not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching timetable' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateTimetable = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.timetable.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Timetable updated successfully', item });
+        const result = await Timetable.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Timetable not found' });
+        res.status(200).json({ message: 'Timetable updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating timetable' });
@@ -48,8 +44,8 @@ exports.updateTimetable = async (req, res) => {
 
 exports.deleteTimetable = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.timetable.delete({ where: { id: parseInt(id) } });
+        const result = await Timetable.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Timetable not found' });
         res.status(200).json({ message: 'Timetable deleted successfully' });
     } catch (error) {
         console.error(error);

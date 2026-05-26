@@ -1,62 +1,54 @@
-const prisma = require('../config/prismaClient');
+const Exam = require('../models/Exam');
 
 exports.createExam = async (req, res) => {
     try {
-        const { name, examDate } = req.body;
-        const exam = await prisma.exam.create({
-            data: { name, examDate: new Date(examDate) }
-        });
-        res.status(201).json({ message: 'Exam created successfully', exam });
+        const result = await Exam.create(req.body);
+        res.status(201).json({ message: 'Exam created successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error creating exam' });
     }
 };
 
 exports.getAllExams = async (req, res) => {
     try {
-        const exams = await prisma.exam.findMany({ include: { results: true } });
-        res.status(200).json(exams);
+        const results = await Exam.findAll();
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching exams' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getExamById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const exam = await prisma.exam.findUnique({
-            where: { id: parseInt(id) },
-            include: { results: true }
-        });
-        if (!exam) return res.status(404).json({ error: 'Exam not found' });
-        res.status(200).json(exam);
+        const result = await Exam.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Exam not found' });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching exam details' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateExam = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updates = req.body;
-        if (updates.examDate) updates.examDate = new Date(updates.examDate);
-
-        const exam = await prisma.exam.update({
-            where: { id: parseInt(id) },
-            data: updates
-        });
-        res.status(200).json({ message: 'Exam updated successfully', exam });
+        const result = await Exam.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Exam not found' });
+        res.status(200).json({ message: 'Exam updated successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error updating exam' });
     }
 };
 
 exports.deleteExam = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.exam.delete({ where: { id: parseInt(id) } });
+        const result = await Exam.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Exam not found' });
         res.status(200).json({ message: 'Exam deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error deleting exam' });
     }
 };

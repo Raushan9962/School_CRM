@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Result = require('../models/Result');
 
 exports.createResult = async (req, res) => {
     try {
-        const item = await prisma.result.create({ data: req.body });
-        res.status(201).json({ message: 'Result created successfully', item });
+        const result = await Result.create(req.body);
+        res.status(201).json({ message: 'Result created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating result' });
@@ -12,34 +12,30 @@ exports.createResult = async (req, res) => {
 
 exports.getAllResults = async (req, res) => {
     try {
-        const items = await prisma.result.findMany();
-        res.status(200).json(items);
+        const results = await Result.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching results' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getResultById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.result.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Result not found' });
-        res.status(200).json(item);
+        const result = await Result.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Result not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching result' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateResult = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.result.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Result updated successfully', item });
+        const result = await Result.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Result not found' });
+        res.status(200).json({ message: 'Result updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating result' });
@@ -48,8 +44,8 @@ exports.updateResult = async (req, res) => {
 
 exports.deleteResult = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.result.delete({ where: { id: parseInt(id) } });
+        const result = await Result.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Result not found' });
         res.status(200).json({ message: 'Result deleted successfully' });
     } catch (error) {
         console.error(error);

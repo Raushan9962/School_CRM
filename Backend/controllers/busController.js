@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Bus = require('../models/Bus');
 
 exports.createBus = async (req, res) => {
     try {
-        const item = await prisma.bus.create({ data: req.body });
-        res.status(201).json({ message: 'Bus created successfully', item });
+        const result = await Bus.create(req.body);
+        res.status(201).json({ message: 'Bus created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating bus' });
@@ -12,34 +12,30 @@ exports.createBus = async (req, res) => {
 
 exports.getAllBuss = async (req, res) => {
     try {
-        const items = await prisma.bus.findMany();
-        res.status(200).json(items);
+        const results = await Bus.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching buss' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getBusById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.bus.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Bus not found' });
-        res.status(200).json(item);
+        const result = await Bus.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Bus not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching bus' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateBus = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.bus.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Bus updated successfully', item });
+        const result = await Bus.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Bus not found' });
+        res.status(200).json({ message: 'Bus updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating bus' });
@@ -48,8 +44,8 @@ exports.updateBus = async (req, res) => {
 
 exports.deleteBus = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.bus.delete({ where: { id: parseInt(id) } });
+        const result = await Bus.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Bus not found' });
         res.status(200).json({ message: 'Bus deleted successfully' });
     } catch (error) {
         console.error(error);

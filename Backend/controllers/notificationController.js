@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Notification = require('../models/Notification');
 
 exports.createNotification = async (req, res) => {
     try {
-        const item = await prisma.notification.create({ data: req.body });
-        res.status(201).json({ message: 'Notification created successfully', item });
+        const result = await Notification.create(req.body);
+        res.status(201).json({ message: 'Notification created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating notification' });
@@ -12,34 +12,30 @@ exports.createNotification = async (req, res) => {
 
 exports.getAllNotifications = async (req, res) => {
     try {
-        const items = await prisma.notification.findMany();
-        res.status(200).json(items);
+        const results = await Notification.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching notifications' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getNotificationById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.notification.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Notification not found' });
-        res.status(200).json(item);
+        const result = await Notification.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Notification not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching notification' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateNotification = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.notification.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Notification updated successfully', item });
+        const result = await Notification.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Notification not found' });
+        res.status(200).json({ message: 'Notification updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating notification' });
@@ -48,8 +44,8 @@ exports.updateNotification = async (req, res) => {
 
 exports.deleteNotification = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.notification.delete({ where: { id: parseInt(id) } });
+        const result = await Notification.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Notification not found' });
         res.status(200).json({ message: 'Notification deleted successfully' });
     } catch (error) {
         console.error(error);

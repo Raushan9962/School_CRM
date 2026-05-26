@@ -1,59 +1,54 @@
-const prisma = require('../config/prismaClient');
+const Class = require('../models/Class');
 
 exports.createClass = async (req, res) => {
     try {
-        const { name, section, schoolId } = req.body;
-        const newClass = await prisma.class.create({
-            data: { name, section, schoolId }
-        });
-        res.status(201).json({ message: 'Class created successfully', class: newClass });
+        const result = await Class.create(req.body);
+        res.status(201).json({ message: 'Class created successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error creating class' });
     }
 };
 
-exports.getAllClasses = async (req, res) => {
+exports.getAllClasss = async (req, res) => {
     try {
-        const classes = await prisma.class.findMany({ include: { school: true } });
-        res.status(200).json(classes);
+        const results = await Class.findAll();
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching classes' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getClassById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const cls = await prisma.class.findUnique({
-            where: { id: parseInt(id) },
-            include: { students: true, timetables: true }
-        });
-        if (!cls) return res.status(404).json({ error: 'Class not found' });
-        res.status(200).json(cls);
+        const result = await Class.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Class not found' });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching class details' });
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateClass = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updatedClass = await prisma.class.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Class updated successfully', class: updatedClass });
+        const result = await Class.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Class not found' });
+        res.status(200).json({ message: 'Class updated successfully', data: result });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error updating class' });
     }
 };
 
 exports.deleteClass = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.class.delete({ where: { id: parseInt(id) } });
+        const result = await Class.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Class not found' });
         res.status(200).json({ message: 'Class deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error deleting class' });
     }
 };

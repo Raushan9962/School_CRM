@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Book = require('../models/Book');
 
 exports.createBook = async (req, res) => {
     try {
-        const item = await prisma.book.create({ data: req.body });
-        res.status(201).json({ message: 'Book created successfully', item });
+        const result = await Book.create(req.body);
+        res.status(201).json({ message: 'Book created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating book' });
@@ -12,34 +12,30 @@ exports.createBook = async (req, res) => {
 
 exports.getAllBooks = async (req, res) => {
     try {
-        const items = await prisma.book.findMany();
-        res.status(200).json(items);
+        const results = await Book.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching books' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getBookById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.book.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Book not found' });
-        res.status(200).json(item);
+        const result = await Book.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Book not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching book' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateBook = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.book.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Book updated successfully', item });
+        const result = await Book.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Book not found' });
+        res.status(200).json({ message: 'Book updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating book' });
@@ -48,8 +44,8 @@ exports.updateBook = async (req, res) => {
 
 exports.deleteBook = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.book.delete({ where: { id: parseInt(id) } });
+        const result = await Book.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Book not found' });
         res.status(200).json({ message: 'Book deleted successfully' });
     } catch (error) {
         console.error(error);

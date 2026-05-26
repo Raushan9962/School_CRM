@@ -1,9 +1,9 @@
-const prisma = require('../config/prismaClient');
+const Inventory = require('../models/Inventory');
 
 exports.createInventory = async (req, res) => {
     try {
-        const item = await prisma.inventory.create({ data: req.body });
-        res.status(201).json({ message: 'Inventory created successfully', item });
+        const result = await Inventory.create(req.body);
+        res.status(201).json({ message: 'Inventory created successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating inventory' });
@@ -12,34 +12,30 @@ exports.createInventory = async (req, res) => {
 
 exports.getAllInventorys = async (req, res) => {
     try {
-        const items = await prisma.inventory.findMany();
-        res.status(200).json(items);
+        const results = await Inventory.findAll();
+        res.status(200).json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching inventorys' });
+        res.status(500).json({ error: 'Error fetching records' });
     }
 };
 
 exports.getInventoryById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.inventory.findUnique({ where: { id: parseInt(id) } });
-        if (!item) return res.status(404).json({ error: 'Inventory not found' });
-        res.status(200).json(item);
+        const result = await Inventory.findById(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Inventory not found' });
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching inventory' });
+        res.status(500).json({ error: 'Error fetching details' });
     }
 };
 
 exports.updateInventory = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await prisma.inventory.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.status(200).json({ message: 'Inventory updated successfully', item });
+        const result = await Inventory.update(req.params.id, req.body);
+        if (!result) return res.status(404).json({ error: 'Inventory not found' });
+        res.status(200).json({ message: 'Inventory updated successfully', data: result });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error updating inventory' });
@@ -48,8 +44,8 @@ exports.updateInventory = async (req, res) => {
 
 exports.deleteInventory = async (req, res) => {
     try {
-        const { id } = req.params;
-        await prisma.inventory.delete({ where: { id: parseInt(id) } });
+        const result = await Inventory.delete(req.params.id);
+        if (!result) return res.status(404).json({ error: 'Inventory not found' });
         res.status(200).json({ message: 'Inventory deleted successfully' });
     } catch (error) {
         console.error(error);
