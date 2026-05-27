@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS timetables (
 -- Subscriptions Table
 CREATE TABLE IF NOT EXISTS subscription_plans (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     max_students INTEGER,
     monthly_price NUMERIC(10, 2) NOT NULL,
     yearly_price NUMERIC(10, 2) NOT NULL,

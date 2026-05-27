@@ -19,10 +19,11 @@ exports.auth = async (req, res, next) => {
             const decode = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
             req.user = decode; // Attach decoded token payload (email, id, role) to req.user
         } catch (error) {
-            return res.status(401).json({
-                success: false,
-                message: "Token is invalid"
-            });
+            console.error('JWT Verification Error:', error.message);
+            const message = error.name === 'TokenExpiredError' 
+                ? "Token has expired, please login again" 
+                : "Token is invalid";
+            return res.status(401).json({ success: false, message });
         }
 
         next();

@@ -24,6 +24,7 @@ const eventRoutes = require('./eventRoutes');
 const certificateRoutes = require('./certificateRoutes');
 const subscriptionRoutes = require('./subscriptionRoutes');
 const adminRoutes = require('./adminRoutes');
+const superAdminRoutes = require('./superAdminRoutes');
 
 // API routes mapping
 router.use('/auth', authRoutes);
@@ -49,5 +50,6 @@ router.use('/events', eventRoutes);
 router.use('/certificates', certificateRoutes);
 router.use('/subscriptions', subscriptionRoutes);
 router.use('/admin', adminRoutes);
+router.use('/super-admin', superAdminRoutes);
 
 module.exports = router;

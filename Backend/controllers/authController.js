@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
             };
             
             const token = jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret', {
-                expiresIn: "2h",
+                expiresIn: "7d",
             });
             
             // Set token and remove password from response object

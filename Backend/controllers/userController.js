@@ -104,7 +104,7 @@ exports.createUser = async (req, res) => {
         res.status(201).json({
             success: true,
             message: `${roleName} account created successfully.`,
-            user: { id: userId, name, email, role: roleName, plainPassword },
+            user: { id: userId, name, email, role: roleName },
             profile: profileRecord
         });
 
@@ -132,5 +132,56 @@ exports.seedRoles = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: "Failed to seed roles" });
+    }
+};
+
+// GET all School Admins with their School details (Super Admin only)
+exports.getAllSchoolAdmins = async (req, res) => {
+    try {
+        if (req.user.role !== 'Super Admin') {
+            return res.status(403).json({ success: false, message: 'Access denied. Super Admin only.' });
+        }
+
+        const result = await pool.query(`
+            SELECT 
+                u.id AS admin_id,
+                u.name AS admin_name,
+                u.email AS admin_email,
+                u.phone AS admin_phone,
+                u.gender,
+                u.dob,
+                u.address AS admin_address,
+                u.image,
+                u.created_at AS registered_at,
+                s.id AS school_id,
+                s.name AS school_name,
+                s.code AS school_code,
+                s.email AS school_email,
+                s.phone AS school_phone,
+                s.address AS school_address,
+                s.city,
+                s.state,
+                s.country,
+                s.pincode,
+                s.website AS school_website,
+                s.billing_cycle,
+                sp.name AS plan_name,
+                sp.max_students
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            LEFT JOIN schools s ON u.school_id = s.id
+            LEFT JOIN subscription_plans sp ON s.plan_id = sp.id
+            WHERE r.name = 'School Admin'
+            ORDER BY u.created_at DESC
+        `);
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows.length,
+            data: result.rows
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to fetch school admins' });
     }
 };
