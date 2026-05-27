@@ -18,11 +18,16 @@ const StudentLogin = () => {
       });
 
       if (res.data.success) {
-        // Successful login
-        // In a real app, you'd store tokens or user state here
-        console.log("Logged in:", res.data.user);
-        // Navigate to student dashboard (to be built)
-        navigate('/dashboard'); 
+        // Store JWT token and user info in localStorage
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        const role = res.data.user?.role;
+        // Route based on role
+        if (role === 'Super Admin') {
+          navigate('/SuperAdmin');
+        } else {
+          navigate('/SuperAdmin'); // fallback
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
