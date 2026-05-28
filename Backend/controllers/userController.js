@@ -138,7 +138,8 @@ exports.seedRoles = async (req, res) => {
 // GET all School Admins with their School details (Super Admin only)
 exports.getAllSchoolAdmins = async (req, res) => {
     try {
-        if (req.user.role !== 'Super Admin') {
+        const role = req.user?.role?.toLowerCase().replace(/\s+/g, '');
+        if (role !== 'superadmin') {
             return res.status(403).json({ success: false, message: 'Access denied. Super Admin only.' });
         }
 
@@ -183,5 +184,35 @@ exports.getAllSchoolAdmins = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to fetch school admins' });
+    }
+};
+
+// GET users for a specific school (School Admin only)
+exports.getSchoolUsers = async (req, res) => {
+    try {
+        if (req.user.role !== 'School Admin') {
+            return res.status(403).json({ success: false, message: 'Access denied. School Admin only.' });
+        }
+
+        const schoolId = req.user.schoolId;
+
+        const result = await pool.query(`
+            SELECT 
+                u.id, u.name, u.email, u.phone, u.gender, u.dob, u.image, u.is_active, u.created_at,
+                r.name as role
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.school_id = $1 AND r.name != 'School Admin'
+            ORDER BY u.created_at DESC
+        `, [schoolId]);
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows.length,
+            data: result.rows
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to fetch school users' });
     }
 };

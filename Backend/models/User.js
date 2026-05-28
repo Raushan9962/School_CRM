@@ -3,9 +3,10 @@ const pool = require('../config/db');
 class User {
     static async findByEmailWithRole(email, client = pool) {
         const res = await client.query(
-            `SELECT u.*, r.name as "roleName" 
+            `SELECT u.*, r.name as "roleName", s.name as "schoolName"
              FROM users u 
              LEFT JOIN roles r ON u.role_id = r.id 
+             LEFT JOIN schools s ON u.school_id = s.id
              WHERE u.email = $1`,
             [email]
         );

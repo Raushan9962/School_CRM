@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import StudentLogin from './pages/StudentLogin';
 import SuperAdmin from './pages/SuperAdmin/SuperAdmin';
 import SchoolRegister from './pages/SuperAdmin/SchoolRegister';
+import SchoolAdminDashboard from './pages/SchoolAdmin/SchoolAdminDashboard';
 import './App.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/SuperAdmin" element={<SuperAdmin />} />
       <Route path="/register-school" element={<SchoolRegister />} />
+      <Route path="/SchoolAdminDashboard" element={<SchoolAdminDashboard />} />
     </Routes>
   );
 }

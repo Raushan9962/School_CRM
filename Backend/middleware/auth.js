@@ -18,6 +18,7 @@ exports.auth = async (req, res, next) => {
         try {
             const decode = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
             req.user = decode; // Attach decoded token payload (email, id, role) to req.user
+            console.log('JWT Decode:', decode);
         } catch (error) {
             console.error('JWT Verification Error:', error.message);
             const message = error.name === 'TokenExpiredError' 

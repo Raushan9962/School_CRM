@@ -13,4 +13,7 @@ router.post('/create', auth, userController.createUser);
 // Super Admin: Get all registered School Admins with full details
 router.get('/school-admins', auth, userController.getAllSchoolAdmins);
 
+// School Admin: Get all registered users for their school
+router.get('/school-users', auth, userController.getSchoolUsers);
+
 module.exports = router;

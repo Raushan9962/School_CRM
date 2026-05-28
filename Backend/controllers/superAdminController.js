@@ -1,8 +1,8 @@
 const pool = require('../config/db');
 
-// Helper: ensure Super Admin
 const guardSuperAdmin = (req, res) => {
-    if (req.user.role !== 'Super Admin') {
+    const role = req.user?.role?.toLowerCase().replace(/\s+/g, '');
+    if (role !== 'superadmin') {
         res.status(403).json({ success: false, message: 'Access denied. Super Admin only.' });
         return false;
     }
@@ -128,6 +128,9 @@ exports.getExpiringSoon = async (req, res) => {
             JOIN subscription_plans sp ON s.plan_id = sp.id
             JOIN users u ON u.school_id = s.id
             JOIN roles r ON u.role_id = r.id AND r.name = 'School Admin'
+            GROUP BY s.id, s.name, s.email, s.phone, s.city, s.billing_cycle,
+                     sp.name, sp.monthly_price, sp.yearly_price,
+                     u.name, u.email, u.phone, s.created_at
             HAVING
                 CASE
                     WHEN s.billing_cycle = 'Monthly'
@@ -136,9 +139,6 @@ exports.getExpiringSoon = async (req, res) => {
                         THEN (s.created_at + INTERVAL '1 year'  * CEIL(EXTRACT(EPOCH FROM (NOW() - s.created_at)) / (365.0 * 86400)))
                     ELSE NULL
                 END BETWEEN NOW() AND NOW() + INTERVAL '30 days'
-            GROUP BY s.id, s.name, s.email, s.phone, s.city, s.billing_cycle,
-                     sp.name, sp.monthly_price, sp.yearly_price,
-                     u.name, u.email, u.phone, s.created_at
             ORDER BY next_renewal_date ASC
         `);
 

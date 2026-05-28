@@ -1206,6 +1206,125 @@ const UsersView = () => {
   );
 };
 
+// ── School Admins View ──────────────────────────────────────────────────────────
+const SchoolAdminsView = ({ schoolAdmins }) => {
+  const [search, setSearch] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+
+  const filtered = schoolAdmins.filter(a =>
+    [a.admin_name, a.admin_email, a.school_name, a.city].some(v => v?.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-extrabold text-slate-800">School Admins (Detailed)</h2>
+          <p className="text-slate-400 text-sm mt-1">Detailed profiles of all School Admins</p>
+        </div>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400">{icons.search}</span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search admins..."
+            className="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-300 bg-white w-64" />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-slate-100 text-xs text-slate-500">
+          Showing <span className="font-bold text-slate-700">{filtered.length}</span> administrators
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <tr>
+                <th className="px-4 py-3 whitespace-nowrap">#</th>
+                <th className="px-4 py-3 whitespace-nowrap">Admin Info</th>
+                <th className="px-4 py-3 whitespace-nowrap">Contact</th>
+                <th className="px-4 py-3 whitespace-nowrap">School Managed</th>
+                <th className="px-4 py-3 whitespace-nowrap">Joined Date</th>
+                <th className="px-4 py-3 whitespace-nowrap">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.length === 0 ? (
+                <tr><td colSpan={6} className="text-center py-10 text-slate-400">No school admins found</td></tr>
+              ) : filtered.map((admin, i) => (
+                <React.Fragment key={admin.admin_id || i}>
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 text-slate-400 font-semibold">{i + 1}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <img src={admin.image || `https://api.dicebear.com/5.x/initials/svg?seed=${admin.admin_name}`} alt="" className="w-9 h-9 rounded-full border-2 border-slate-100" />
+                        <div>
+                          <p className="font-bold text-slate-800">{admin.admin_name}</p>
+                          <p className="text-xs text-slate-400">{admin.gender || 'Unknown'} · {admin.dob ? new Date(admin.dob).toLocaleDateString() : 'No DOB'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-slate-700">{admin.admin_email}</p>
+                      <p className="text-xs text-slate-500">{admin.admin_phone || 'No Phone'}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-semibold text-indigo-700">{admin.school_name || 'Not Assigned'}</p>
+                      <p className="text-xs text-slate-400">{admin.city || ''}</p>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">{formatDate(admin.registered_at)}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => setExpandedId(expandedId === admin.admin_id ? null : admin.admin_id)}
+                        className="text-xs font-semibold text-slate-600 border border-slate-200 rounded-md px-2.5 py-1.5 hover:bg-slate-50 transition-colors">
+                        {expandedId === admin.admin_id ? 'Hide Details' : 'Full Profile'}
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  {expandedId === admin.admin_id && (
+                    <tr>
+                      <td colSpan={6} className="bg-slate-50/50 px-5 py-4 border-b border-slate-200">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Admin Personal Details */}
+                          <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-3">👤 Personal Information</p>
+                            <div className="grid grid-cols-2 gap-y-2 text-sm">
+                              <div className="text-slate-500">Gender</div>
+                              <div className="font-medium text-slate-800">{admin.gender || '—'}</div>
+                              <div className="text-slate-500">Date of Birth</div>
+                              <div className="font-medium text-slate-800">{admin.dob ? formatDate(admin.dob) : '—'}</div>
+                              <div className="text-slate-500">Address</div>
+                              <div className="font-medium text-slate-800">{admin.admin_address || '—'}</div>
+                            </div>
+                          </div>
+
+                          {/* Associated School Details */}
+                          <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-3">🏫 School Details</p>
+                            <div className="grid grid-cols-2 gap-y-2 text-sm">
+                              <div className="text-slate-500">School Name</div>
+                              <div className="font-medium text-slate-800">{admin.school_name || '—'}</div>
+                              <div className="text-slate-500">School Code</div>
+                              <div className="font-medium text-slate-800">{admin.school_code || '—'}</div>
+                              <div className="text-slate-500">Location</div>
+                              <div className="font-medium text-slate-800">{admin.city || '—'}, {admin.state || '—'}</div>
+                              <div className="text-slate-500">Subscription Plan</div>
+                              <div className="font-medium text-slate-800">
+                                {admin.plan_name ? <Badge text={admin.plan_name} color="purple" /> : '—'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SIDEBAR NAV CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1233,6 +1352,7 @@ const NAV_GROUPS = [
   {
     group: 'MANAGE',
     items: [
+      { id: 'schoolAdmins', label: 'School Admins', icon: icons.check },
       { id: 'users', label: 'User Handles', icon: icons.users },
       { id: 'settings', label: 'Settings', icon: icons.settings },
     ]
@@ -1269,6 +1389,7 @@ export default function SuperAdmin() {
       case 'revenue': return <RevenueView />;
       case 'txn': return <TransactionsView schoolAdmins={schoolAdmins} />;
       case 'expiring': return <ExpiringSoonView />;
+      case 'schoolAdmins': return <SchoolAdminsView schoolAdmins={schoolAdmins} />;
       case 'users': return <UsersView />;
       case 'settings': return (
         <div>

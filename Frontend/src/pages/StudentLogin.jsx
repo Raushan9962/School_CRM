@@ -21,12 +21,15 @@ const StudentLogin = () => {
         // Store JWT token and user info in localStorage
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
-        const role = res.data.user?.role;
+        const rawRole = res.data.user?.role || res.data.user?.roleName || '';
+        const role = rawRole.toLowerCase().replace(/\s+/g, '');
         // Route based on role
-        if (role === 'Super Admin') {
+        if (role === 'superadmin') {
           navigate('/SuperAdmin');
+        } else if (role === 'schooladmin') {
+          navigate('/SchoolAdminDashboard');
         } else {
-          navigate('/SuperAdmin'); // fallback
+          navigate('/'); // fallback or student dashboard
         }
       }
     } catch (err) {
