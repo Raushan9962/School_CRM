@@ -21,10 +21,9 @@ exports.getDashboardStats = async (req, res) => {
             pool.query(`SELECT COUNT(*) AS total FROM schools`),
             // Total users by role
             pool.query(`
-                SELECT r.name AS role, COUNT(u.id) AS count
+                SELECT u.role_name AS role, COUNT(u.id) AS count
                 FROM users u
-                JOIN roles r ON u.role_id = r.id
-                GROUP BY r.name
+                GROUP BY u.role_name
             `),
             // Revenue: sum of plan prices per school billing
             pool.query(`
@@ -126,8 +125,7 @@ exports.getExpiringSoon = async (req, res) => {
                 END AS next_renewal_date
             FROM schools s
             JOIN subscription_plans sp ON s.plan_id = sp.id
-            JOIN users u ON u.school_id = s.id
-            JOIN roles r ON u.role_id = r.id AND r.name = 'School Admin'
+            JOIN users u ON u.school_id = s.id AND u.role_name = 'School Admin'
             GROUP BY s.id, s.name, s.email, s.phone, s.city, s.billing_cycle,
                      sp.name, sp.monthly_price, sp.yearly_price,
                      u.name, u.email, u.phone, s.created_at
@@ -192,8 +190,7 @@ exports.getTransactions = async (req, res) => {
             FROM transactions t
             JOIN schools s          ON t.school_id = s.id
             LEFT JOIN subscription_plans sp ON t.plan_id = sp.id
-            LEFT JOIN users u        ON u.school_id = s.id
-            LEFT JOIN roles r        ON u.role_id = r.id AND r.name = 'School Admin'
+            LEFT JOIN users u        ON u.school_id = s.id AND u.role_name = 'School Admin'
             ${whereClause}
             ORDER BY t.created_at DESC
         `, params);
@@ -319,10 +316,9 @@ exports.getAllUsers = async (req, res) => {
         const result = await pool.query(`
             SELECT
                 u.id, u.name, u.email, u.phone, u.is_active, u.created_at,
-                r.name AS role_name,
+                u.role_name AS role_name,
                 s.name AS school_name
             FROM users u
-            JOIN roles r ON u.role_id = r.id
             LEFT JOIN schools s ON u.school_id = s.id
             ORDER BY u.created_at DESC
         `);
@@ -369,7 +365,7 @@ exports.getSchools = async (req, res) => {
                 u.email AS admin_email
             FROM schools s
             LEFT JOIN subscription_plans sp ON s.plan_id = sp.id
-            LEFT JOIN users u ON u.school_id = s.id AND u.role_id = (SELECT id FROM roles WHERE name = 'School Admin' LIMIT 1)
+            LEFT JOIN users u ON u.school_id = s.id AND u.role_name = 'School Admin'
             ORDER BY s.created_at DESC
         `);
         res.json({ success: true, data: result.rows });

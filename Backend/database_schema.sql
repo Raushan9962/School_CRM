@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(50) UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role_id INTEGER REFERENCES roles(id) ON DELETE RESTRICT,
+    role_name VARCHAR(100) NOT NULL,
     school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
     is_active BOOLEAN DEFAULT TRUE,
     image TEXT,

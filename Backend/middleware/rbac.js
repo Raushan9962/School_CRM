@@ -31,34 +31,60 @@ exports.authorizeRoles = (...allowedRoles) => {
 };
 
 // Hierarchy Check: Prevent lower roles from managing higher roles
-exports.canManageRole = (creatorRole, targetRole) => {
-    const roleHierarchy = {
-        "Super Admin": 100,
-        "School Admin": 90,
-        "Principal": 80,
-        "Accountant": 70,
-        "Transport Manager": 70,
-        "Librarian": 70,
-        "Receptionist": 70,
-        "Teacher": 60,
-        "Student": 10,
-        "Parent": 10
-    };
-
-    const creatorLevel = roleHierarchy[creatorRole] || 0;
-    const targetLevel = roleHierarchy[targetRole] || 0;
-
-    // Special Rules Based on User's Request:
-    // 1. Super Admin creates School Admin
-    if (creatorRole === "Super Admin" && targetRole === "School Admin") return true;
+exports.canManageRole = (creatorRoleRaw, targetRole) => {
+    const creatorRole = creatorRoleRaw?.toLowerCase().replace(/\s+/g, '');
     
-    // 2. School Admin creates Principal
-    if (creatorRole === "School Admin" && targetRole === "Principal") return true;
+    // Super Admin can create School Admin
+    if (creatorRole === "superadmin" && targetRole === "School Admin") return true;
 
-    // 3. Principal creates Staff, Students, and Parents
+    // School Admin can create ANY of the 8 roles below them
+    const schoolAdminTargets = [
+        "Principal", "Teacher", "Student", "Parent", 
+        "Accountant", "Librarian", "Transport Manager", "Receptionist"
+    ];
+    if (creatorRole === "schooladmin" && schoolAdminTargets.includes(targetRole)) return true;
+
+    // Principal creates Staff, Students, and Parents
     const principalTargets = ["Teacher", "Student", "Parent", "Accountant", "Librarian", "Transport Manager", "Receptionist"];
-    if (creatorRole === "Principal" && principalTargets.includes(targetRole)) return true;
+    if (creatorRole === "principal" && principalTargets.includes(targetRole)) return true;
 
     // Fail otherwise
     return false;
+};
+
+// Check specific module permissions
+const permissions = require('../config/permissions');
+
+exports.checkPermission = (moduleName, action) => {
+    return (req, res, next) => {
+        try {
+            if (!req.user || !req.user.role) {
+                return res.status(401).json({ success: false, message: "Unauthenticated" });
+            }
+            
+            // Normalize role matching to handle DB variants like "superAdmin", "School Admin"
+            const userRoleRaw = req.user.role;
+            // Map the raw role to the exact keys in permissions.js
+            let exactRole = Object.keys(permissions).find(r => r.toLowerCase().replace(/\s+/g, '') === userRoleRaw.toLowerCase().replace(/\s+/g, ''));
+            
+            if (!exactRole) {
+                return res.status(403).json({ success: false, message: "Invalid role" });
+            }
+
+            const rolePerms = permissions[exactRole];
+            
+            if (rolePerms._all && rolePerms._all.includes(action)) {
+                return next();
+            }
+
+            const modulePerms = rolePerms[moduleName];
+            if (!modulePerms || !modulePerms.includes(action)) {
+                return res.status(403).json({ success: false, message: `Access denied. ${exactRole} does not have '${action}' permission for '${moduleName}'` });
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Permission authorization failed" });
+        }
+    };
 };
