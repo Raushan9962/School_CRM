@@ -60,7 +60,7 @@ exports.createUser = async (req, res) => {
 
         // 5. Create Core User
         const image = `https://api.dicebear.com/5.x/initials/svg?seed=${name}`;
-        const userData = { name, email, phone, password: hashedPassword, roleName: targetRoleName, schoolId: finalSchoolId, image, gender, dob: dob || null, address };
+        const userData = { name, email, phone: phone || null, password: hashedPassword, roleName: targetRoleName, schoolId: finalSchoolId, image, gender, dob: dob || null, address };
         const newUser = await User.create(userData, client);
         const userId = newUser.id;
 
@@ -122,7 +122,7 @@ exports.createUser = async (req, res) => {
     } catch (error) {
         await client.query('ROLLBACK');
         console.error(error);
-        res.status(500).json({ success: false, message: "Failed to create user account" });
+        res.status(500).json({ success: false, message: "Failed to create user account", error: error.message });
     } finally {
         client.release();
     }

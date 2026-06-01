@@ -28,6 +28,8 @@ const StudentLogin = () => {
           navigate('/SuperAdmin');
         } else if (role === 'schooladmin') {
           navigate('/SchoolAdminDashboard');
+        } else if (role === 'principal') {
+          navigate('/PrincipalDashboard');
         } else {
           navigate('/'); // fallback or student dashboard
         }
@@ -43,7 +45,7 @@ const StudentLogin = () => {
         VidyaSetu
       </Link>
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-6">Student Login</h2>
+        <h2 className="text-2xl font-bold text-center text-blue-900 mb-6">Portal Login</h2>
         
         {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm text-center">{error}</div>}
 

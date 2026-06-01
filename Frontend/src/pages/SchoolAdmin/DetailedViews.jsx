@@ -940,3 +940,538 @@ export const StudentFeesHistoryView = () => {
         </div>
     );
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal Profile Management (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalProfileView = () => {
+    const [principal, setPrincipal] = useState({
+        name: 'Dr. Ramesh Kumar',
+        emp_id: 'PRN-2022-001',
+        gender: 'Male',
+        dob: '1975-08-14',
+        phone: '9876543210',
+        email: 'ramesh.principal@vidyasetu.in',
+        address: 'Sector 15, Rohini, New Delhi, 110085',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        designation: 'Principal',
+        joining_date: '2022-04-10',
+        qualification: 'Ph.D. in Education Management, M.Sc. Physics',
+        experience: '22',
+        department: 'Academic Administration',
+        status: 'Active'
+    });
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [editForm, setEditForm] = useState({ ...principal });
+
+    const handleSaveProfile = (e) => {
+        e.preventDefault();
+        setPrincipal(prev => ({ ...prev, ...editForm }));
+        setIsEditModalOpen(false);
+    };
+
+    const handleStatusToggle = () => {
+        setPrincipal(prev => ({
+            ...prev,
+            status: prev.status === 'Active' ? 'Inactive' : 'Active'
+        }));
+    };
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6 bg-gradient-to-r from-indigo-900 to-indigo-950 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex items-center gap-4">
+                    <img src={principal.image} alt="" className="w-16 h-16 rounded-full border-2 border-white object-cover" />
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-bold">{principal.name}</h2>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${principal.status === 'Active' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>{principal.status}</span>
+                        </div>
+                        <p className="text-sm text-indigo-200">{principal.designation} • Emp ID: {principal.emp_id}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <button onClick={() => { setEditForm({ ...principal }); setIsEditModalOpen(true); }} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                        ✏️ Edit Profile
+                    </button>
+                    <button onClick={() => setIsPasswordModalOpen(true)} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                        🔑 Reset Password
+                    </button>
+                    <button onClick={handleStatusToggle} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${principal.status === 'Active' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}>
+                        {principal.status === 'Active' ? 'Deactivate Account' : 'Activate Account'}
+                    </button>
+                </div>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">Personal Information</h3>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Gender</span><span className="font-semibold text-gray-900">{principal.gender}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Date of Birth</span><span className="font-semibold text-gray-900">{new Date(principal.dob).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Mobile Number</span><span className="font-semibold text-gray-900">{principal.phone}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Email Address</span><span className="font-semibold text-gray-900">{principal.email}</span></div>
+                        <div className="flex justify-between py-1.5"><span className="text-gray-500 text-left">Full Address</span><span className="font-semibold text-gray-900 text-right w-2/3">{principal.address}</span></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">Professional Information</h3>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Designation</span><span className="font-semibold text-indigo-600 font-bold">{principal.designation}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Joining Date</span><span className="font-semibold text-gray-900">{new Date(principal.joining_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Qualification</span><span className="font-semibold text-gray-900">{principal.qualification}</span></div>
+                        <div className="flex justify-between py-1.5 border-b border-gray-50"><span className="text-gray-500">Experience</span><span className="font-semibold text-gray-900">{principal.experience} Years</span></div>
+                        <div className="flex justify-between py-1.5"><span className="text-gray-500">Department</span><span className="font-semibold text-gray-900">{principal.department}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-150 flex items-center justify-between bg-gray-50/50">
+                            <h3 className="font-bold text-lg text-gray-800">Edit Principal Profile</h3>
+                            <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">✕</button>
+                        </div>
+                        <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Principal Name *</label>
+                                    <input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Email Address *</label>
+                                    <input value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Mobile Number *</label>
+                                    <input value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Gender</label>
+                                    <select value={editForm.gender} onChange={e => setEditForm({ ...editForm, gender: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Qualification</label>
+                                    <input value={editForm.qualification} onChange={e => setEditForm({ ...editForm, qualification: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Experience (years)</label>
+                                    <input value={editForm.experience} onChange={e => setEditForm({ ...editForm, experience: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+                                </div>
+                                <div className="col-span-2">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Address</label>
+                                    <input value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                                <button type="submit" className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">Save Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isPasswordModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-150 flex items-center justify-between bg-gray-50/50">
+                            <h3 className="font-bold text-lg text-gray-800">Reset CRM Password</h3>
+                            <button onClick={() => setIsPasswordModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">✕</button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <p className="text-xs text-gray-500">Generating a new secure password for the Principal account. They will be prompted to change it upon next login.</p>
+                            <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold text-sm tracking-wide text-indigo-700 select-all">
+                                vidya_prn_reset_9962
+                            </div>
+                            <div className="pt-4 border-t border-gray-100 flex justify-end">
+                                <button onClick={() => { alert('Password Reset successful!'); setIsPasswordModalOpen(false); }} className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm w-full">Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal Documents View (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalDocumentsView = () => {
+    const [documents, setDocuments] = useState([
+        { id: 1, name: 'Aadhaar_Card.pdf', size: '1.2 MB' },
+        { id: 2, name: 'PhD_Degree_Certificate.pdf', size: '2.4 MB' },
+        { id: 3, name: 'Appointment_Letter_Ramesh.pdf', size: '1.8 MB' }
+    ]);
+    const [newDocName, setNewDocName] = useState('');
+
+    const handleDocUpload = (e) => {
+        e.preventDefault();
+        if (!newDocName.trim()) return;
+        setDocuments(prev => [...prev, { id: Date.now(), name: newDocName, size: '512 KB' }]);
+        setNewDocName('');
+    };
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">Principal's Official Documents</h3>
+            <form onSubmit={handleDocUpload} className="flex gap-2 mb-6 max-w-md">
+                <input value={newDocName} onChange={e => setNewDocName(e.target.value)} type="text" placeholder="e.g. PhD_Cert.pdf" className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-indigo-500 focus:border-indigo-500 flex-1" />
+                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition-colors">Upload Document</button>
+            </form>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {documents.map(d => (
+                    <div key={d.id} className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl">📄</span>
+                            <div>
+                                <p className="text-xs font-bold text-gray-800 truncate w-36" title={d.name}>{d.name}</p>
+                                <p className="text-[10px] text-gray-500">{d.size}</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setDocuments(prev => prev.filter(x => x.id !== d.id))} className="text-red-500 hover:text-red-700 font-bold text-xs p-1">Remove</button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal Attendance & Leave View (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalAttendanceView = () => {
+    const [leaves, setLeaves] = useState({
+        allowed: 24,
+        used: 6,
+        pending: [
+            { id: 101, from: '2026-06-12', to: '2026-06-14', days: 3, reason: 'National Educators Conference', status: 'Pending' }
+        ],
+        history: [
+            { id: 98, from: '2026-01-10', to: '2026-01-12', days: 3, reason: 'Family emergency', status: 'Approved' },
+            { id: 99, from: '2026-03-05', to: '2026-03-05', days: 1, reason: 'Personal checkup', status: 'Approved' }
+        ]
+    });
+
+    const handleLeaveAction = (id, action) => {
+        const leave = leaves.pending.find(l => l.id === id);
+        if (!leave) return;
+
+        const updatedPending = leaves.pending.filter(l => l.id !== id);
+        const updatedHistory = [...leaves.history, { ...leave, status: action }];
+        const updatedUsed = action === 'Approved' ? leaves.used + leave.days : leaves.used;
+
+        setLeaves({
+            ...leaves,
+            used: updatedUsed,
+            pending: updatedPending,
+            history: updatedHistory
+        });
+    };
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-indigo-50 p-4 border border-indigo-100 rounded-xl text-center">
+                    <p className="text-3xl font-extrabold text-indigo-700">96.8%</p>
+                    <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mt-1">Average Attendance</p>
+                </div>
+                <div className="bg-emerald-50 p-4 border border-emerald-100 rounded-xl text-center">
+                    <p className="text-3xl font-extrabold text-emerald-700">{leaves.allowed - leaves.used}</p>
+                    <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mt-1">Remaining Leaves</p>
+                </div>
+                <div className="bg-amber-50 p-4 border border-amber-100 rounded-xl text-center">
+                    <p className="text-3xl font-extrabold text-amber-700">{leaves.used}</p>
+                    <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mt-1">Used Leaves</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">Pending Leave Applications</h3>
+                {leaves.pending.length === 0 ? (
+                    <p className="text-sm text-gray-500">No pending leave requests.</p>
+                ) : (
+                    leaves.pending.map(l => (
+                        <div key={l.id} className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <p className="font-bold text-gray-800 text-sm">{l.reason}</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Dates: <strong>{l.from}</strong> to <strong>{l.to}</strong> ({l.days} days)
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button onClick={() => handleLeaveAction(l.id, 'Approved')} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs">Approve</button>
+                                <button onClick={() => handleLeaveAction(l.id, 'Rejected')} className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs">Reject</button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            <div>
+                <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">Leave Request History</h3>
+                <div className="space-y-2">
+                    {leaves.history.map(l => (
+                        <div key={l.id} className="p-3 bg-white border border-gray-100 rounded-xl flex justify-between items-center text-xs shadow-sm">
+                            <div>
+                                <span className="font-bold text-gray-800">{l.reason}</span>
+                                <span className="text-gray-400 mx-2">•</span>
+                                <span className="text-gray-500">{l.from} to {l.to} ({l.days} days)</span>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${l.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>{l.status}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal Salary & Payroll View (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalSalaryView = () => {
+    const [salary, setSalary] = useState({
+        basic: 95000,
+        hra: 38000,
+        da: 14250,
+        ta: 8000,
+        medical: 5000,
+        pf: 11400,
+        tax: 15000,
+        bonuses: 10000,
+        deductions: 2500
+    });
+
+    const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
+    const [salaryForm, setSalaryForm] = useState({ ...salary });
+
+    const handleSaveSalary = (e) => {
+        e.preventDefault();
+        setSalary(salaryForm);
+        setIsSalaryModalOpen(false);
+    };
+
+    const totalSalaryGross = salary.basic + salary.hra + salary.da + salary.ta + salary.medical + salary.bonuses;
+    const totalDeductions = salary.pf + salary.tax + salary.deductions;
+    const netTakeHome = totalSalaryGross - totalDeductions;
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                <h3 className="font-extrabold text-gray-900">Principal Salary Configuration</h3>
+                <button onClick={() => { setSalaryForm({ ...salary }); setIsSalaryModalOpen(true); }} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition-colors">
+                    Update Salary Structure
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-5">
+                    <h4 className="font-bold text-emerald-800 text-sm mb-3">Earnings & Allowances</h4>
+                    <div className="space-y-2 text-xs">
+                        <div className="flex justify-between"><span className="text-gray-600">Basic Pay</span><span className="font-bold text-gray-900">₹{salary.basic.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">HRA Allowance</span><span className="font-bold text-gray-900">₹{salary.hra.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Dearness Allowance (DA)</span><span className="font-bold text-gray-900">₹{salary.da.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Travel Allowance (TA)</span><span className="font-bold text-gray-900">₹{salary.ta.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Medical Allowance</span><span className="font-bold text-gray-900">₹{salary.medical.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Performance Bonus</span><span className="font-bold text-emerald-600">+ ₹{salary.bonuses.toLocaleString()}</span></div>
+                        <div className="border-t border-emerald-200 pt-2 flex justify-between font-bold text-emerald-950 text-sm">
+                            <span>Gross Monthly Salary</span>
+                            <span>₹{totalSalaryGross.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-red-50/50 border border-red-100 rounded-xl p-5">
+                    <h4 className="font-bold text-red-800 text-sm mb-3">Deductions & Taxes</h4>
+                    <div className="space-y-2 text-xs">
+                        <div className="flex justify-between"><span className="text-gray-600">Provident Fund (PF) Contribution</span><span className="font-bold text-gray-900">₹{salary.pf.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Income Tax / TDS Deductions</span><span className="font-bold text-gray-900">₹{salary.tax.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Other Custom Deductions</span><span className="font-bold text-red-600">- ₹{salary.deductions.toLocaleString()}</span></div>
+                        <div className="border-t border-red-200 pt-2 flex justify-between font-bold text-red-950 text-sm mt-10">
+                            <span>Total Deductions</span>
+                            <span>₹{totalDeductions.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex justify-between items-center">
+                <div>
+                    <h4 className="font-extrabold text-indigo-900 text-sm">Net Monthly Take-Home Salary</h4>
+                    <p className="text-[10px] text-indigo-500">Credited to registered bank account automatically</p>
+                </div>
+                <span className="text-2xl font-black text-indigo-700">₹{netTakeHome.toLocaleString()}</span>
+            </div>
+
+            {isSalaryModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-150 flex items-center justify-between bg-gray-50/50">
+                            <h3 className="font-bold text-lg text-gray-800">Update Principal Salary Structure</h3>
+                            <button onClick={() => setIsSalaryModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">✕</button>
+                        </div>
+                        <form onSubmit={handleSaveSalary} className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Basic Salary (₹)</label>
+                                    <input type="number" value={salaryForm.basic} onChange={e => setSalaryForm({ ...salaryForm, basic: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">HRA Allowance (₹)</label>
+                                    <input type="number" value={salaryForm.hra} onChange={e => setSalaryForm({ ...salaryForm, hra: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Dearness Allowance (₹)</label>
+                                    <input type="number" value={salaryForm.da} onChange={e => setSalaryForm({ ...salaryForm, da: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Travel Allowance (₹)</label>
+                                    <input type="number" value={salaryForm.ta} onChange={e => setSalaryForm({ ...salaryForm, ta: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Medical Allowance (₹)</label>
+                                    <input type="number" value={salaryForm.medical} onChange={e => setSalaryForm({ ...salaryForm, medical: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">PF Contribution (₹)</label>
+                                    <input type="number" value={salaryForm.pf} onChange={e => setSalaryForm({ ...salaryForm, pf: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Income Tax Deduction (₹)</label>
+                                    <input type="number" value={salaryForm.tax} onChange={e => setSalaryForm({ ...salaryForm, tax: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 mb-1">Bonuses / Increments (₹)</label>
+                                    <input type="number" value={salaryForm.bonuses} onChange={e => setSalaryForm({ ...salaryForm, bonuses: Number(e.target.value) })} className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                                <button type="button" onClick={() => setIsSalaryModalOpen(false)} className="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                                <button type="submit" className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal Academic Reports View (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalAcademicsView = () => {
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
+            <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2">Principal Academic Performance Reports</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 className="font-bold text-sm text-gray-800 mb-3">Academic & Admission Stats</h4>
+                    <div className="space-y-4">
+                        <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                            <h4 className="font-bold text-xs text-gray-500 uppercase tracking-widest">New Registrations this term</h4>
+                            <p className="text-2xl font-black text-indigo-600 mt-2">48 registrations</p>
+                            <p className="text-[10px] text-gray-500 mt-1">94% target conversion</p>
+                        </div>
+                        <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                            <h4 className="font-bold text-xs text-gray-500 uppercase tracking-widest">Passing Benchmark Rating</h4>
+                            <p className="text-2xl font-black text-emerald-600 mt-2">91.2% Overall Pass rate</p>
+                            <p className="text-[10px] text-gray-500 mt-1">Top performing subject: Physics</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 className="font-bold text-sm text-gray-800 mb-3">Staff Evaluation Logs</h4>
+                    <div className="space-y-3">
+                        <div className="p-3 bg-white border border-gray-150 rounded-xl text-xs flex justify-between">
+                            <span className="font-semibold text-gray-700">Teacher Performance Score</span>
+                            <span className="font-black text-indigo-600">89.4 / 100</span>
+                        </div>
+                        <div className="p-3 bg-white border border-gray-150 rounded-xl text-xs flex justify-between">
+                            <span className="font-semibold text-gray-700">Student Feedback Rating</span>
+                            <span className="font-black text-emerald-600">4.7 / 5.0</span>
+                        </div>
+                        <div className="p-3 bg-white border border-gray-150 rounded-xl text-xs flex justify-between">
+                            <span className="font-semibold text-gray-700">CRM Activity Score</span>
+                            <span className="font-black text-indigo-600">Active Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Principal CRM Access & Activity Logs View (School Admin Console)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PrincipalLogsView = () => {
+    const [permissions, setPermissions] = useState({
+        manageTimetables: true,
+        approvePromotions: true,
+        viewFinancialReports: false,
+        approveLeaves: true,
+        manageAnnouncements: true
+    });
+
+    const handlePermissionToggle = (key) => {
+        setPermissions(prev => ({ ...prev, [key]: !prev[key] }));
+    };
+
+    const logs = [
+        { time: '2026-05-30 09:15 AM', action: 'Logged in to Principal CRM Portal' },
+        { time: '2026-05-29 02:30 PM', action: 'Approved leave request for Sunita Verma' },
+        { time: '2026-05-29 11:00 AM', action: 'Modified timetable for Class 10-A' },
+        { time: '2026-05-28 04:00 PM', action: 'Published announcement: Summer Vacation Notice' }
+    ];
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">CRM Authorization Policies</h3>
+                <div className="space-y-4">
+                    {[
+                        { key: 'manageTimetables', label: 'Modify Weekly Timetables & Classes', desc: 'Allows editing classroom schedules' },
+                        { key: 'approvePromotions', label: 'Approve End of Term Student Promotions', desc: 'Authorize promotion requests' },
+                        { key: 'viewFinancialReports', label: 'Access School Salaries & Finance Audits', desc: 'Read accountant salary ledgers' },
+                        { key: 'approveLeaves', label: 'Approve Teacher Leave Requests', desc: 'Allows signing off staff leaves' },
+                        { key: 'manageAnnouncements', label: 'Publish Notices and Announcements', desc: 'Send alerts to students & parents' },
+                    ].map(p => (
+                        <div key={p.key} className="flex justify-between items-start p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                            <div>
+                                <p className="font-bold text-sm text-gray-800">{p.label}</p>
+                                <p className="text-[10px] text-gray-500">{p.desc}</p>
+                            </div>
+                            <button onClick={() => handlePermissionToggle(p.key)} className={`w-11 h-6 rounded-full border-none cursor-pointer transition-all relative ${permissions[p.key] ? 'bg-indigo-600' : 'bg-gray-300'}`}>
+                                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${permissions[p.key] ? 'left-5.5' : 'left-0.5'}`} style={{ left: permissions[p.key] ? '22px' : '2px' }} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <h3 className="font-extrabold text-gray-900 border-b border-gray-100 pb-2 mb-4">CRM Login History & Actions</h3>
+                <div className="space-y-3">
+                    {logs.map((log, i) => (
+                        <div key={i} className="p-3 bg-white border border-gray-100 rounded-xl flex gap-3 text-xs shadow-sm">
+                            <span className="text-gray-400 font-bold">{log.time}</span>
+                            <span className="text-gray-800 font-semibold">{log.action}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
