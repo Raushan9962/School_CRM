@@ -1,30 +1,24 @@
 import React, { useState, useEffect } from 'react';
 
-const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
-const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
-
 const ClassManagement = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ className: '', section: '', capacity: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    section: ''
+  });
 
   const fetchClasses = async () => {
-    setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/principal/classes', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('API not ready');
-      const json = await res.json();
-      setClasses(json.data);
+      const res = await fetch('http://localhost:5000/api/principal/classes');
+      const data = await res.json();
+      setClasses(data.data || []);
+      setLoading(false);
     } catch (err) {
-      setClasses([
-        { id: 1, className: 'Class 10', section: 'A', teacher: 'Mr. Vivek Singh', strength: 45 },
-        { id: 2, className: 'Class 10', section: 'B', teacher: 'Mrs. Neha Roy', strength: 42 }
-      ]);
-    } finally {
+      console.error("Failed to fetch classes", err);
       setLoading(false);
     }
   };
@@ -33,92 +27,122 @@ const ClassManagement = () => {
     fetchClasses();
   }, []);
 
-  const handleAddClass = async (e) => {
-    e.preventDefault();
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCreateNew = () => {
+    setEditingId(null);
+    setFormData({ name: '', section: '' });
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (cls) => {
+    setEditingId(cls.id);
+    setFormData({ name: cls.name, section: cls.section });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this class?")) return;
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/classes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          className: formData.className,
-          section: formData.section,
-          capacity: formData.capacity,
-          classTeacherId: null
-        })
+      await fetch(`http://localhost:5000/api/principal/classes/${id}`, {
+        method: 'DELETE'
       });
-      if(res.ok) {
-        setShowModal(false);
-        setFormData({ className: '', section: '', capacity: '' });
-        fetchClasses();
-      } else {
-        alert('Failed to create class.');
-      }
-    } catch(err) {
-      alert('Error connecting to backend.');
-      console.error(err);
+      fetchClasses();
+    } catch (err) {
+      console.error("Failed to delete class", err);
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        // Update
+        await fetch(`http://localhost:5000/api/principal/classes/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+      } else {
+        // Create
+        await fetch('http://localhost:5000/api/principal/classes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+      }
+      setIsModalOpen(false);
+      fetchClasses();
+    } catch (err) {
+      console.error("Failed to save class", err);
+    }
+  };
+
+  if (loading) return <div>Loading classes...</div>;
+
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Class Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        <ActionBtn text="Create Class" icon="✏️" onClick={() => setShowModal(true)} />
-        <ActionBtn text="Assign Teachers" icon="👨‍🏫" />
-        <ActionBtn text="Manage Schedules" icon="📅" />
-      </div>
-      
-      <div className="glass-panel" style={panelStyle}>
-        <h3 style={panelTitleStyle}>Active Classes</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading classes...</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                <th style={{ padding: '12px' }}>Class Name</th>
-                <th style={{ padding: '12px' }}>Section</th>
-                <th style={{ padding: '12px' }}>Class Teacher</th>
-                <th style={{ padding: '12px' }}>Strength (Capacity)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {classes.map((c, idx) => (
-                <tr key={c.id || idx} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#1e293b', fontWeight: '500' }}>
-                  <td style={{ padding: '12px' }}>{c.className}</td>
-                  <td style={{ padding: '12px', color: '#64748b' }}>{c.section}</td>
-                  <td style={{ padding: '12px' }}>{c.teacher}</td>
-                  <td style={{ padding: '12px', color: '#6366f1', fontWeight: '700' }}>{c.strength}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+    <div className="animate-fade-in" style={{ padding: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', margin: 0 }}>Class Management</h2>
+        <button 
+          onClick={handleCreateNew}
+          style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <span>➕</span> Add New Class
+        </button>
       </div>
 
-      {showModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 100, backdropFilter: 'blur(4px)'
-        }}>
-          <div className="animate-fade-in" style={{ background: 'white', padding: '32px', borderRadius: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Create New Class</h3>
-            <form onSubmit={handleAddClass} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Class Name (e.g. Class 10)</label>
-                <input required type="text" value={formData.className} onChange={e => setFormData({...formData, className: e.target.value})} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+      <div style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.5)', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead style={{ background: 'rgba(241, 245, 249, 0.8)' }}>
+            <tr>
+              <th style={{ padding: '16px 24px', color: '#64748b', fontWeight: '600', fontSize: '14px', borderBottom: '1px solid #e2e8f0' }}>ID</th>
+              <th style={{ padding: '16px 24px', color: '#64748b', fontWeight: '600', fontSize: '14px', borderBottom: '1px solid #e2e8f0' }}>Class Name</th>
+              <th style={{ padding: '16px 24px', color: '#64748b', fontWeight: '600', fontSize: '14px', borderBottom: '1px solid #e2e8f0' }}>Section</th>
+              <th style={{ padding: '16px 24px', color: '#64748b', fontWeight: '600', fontSize: '14px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {classes.map(cls => (
+              <tr key={cls.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                <td style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px' }}>#{cls.id}</td>
+                <td style={{ padding: '16px 24px', color: '#334155', fontWeight: '600' }}>{cls.name}</td>
+                <td style={{ padding: '16px 24px', color: '#334155' }}>
+                  <span style={{ background: '#e0e7ff', color: '#4f46e5', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>{cls.section}</span>
+                </td>
+                <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                  <button onClick={() => handleEdit(cls)} style={{ background: 'transparent', border: '1px solid #e2e8f0', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', marginRight: '8px', color: '#3b82f6', fontWeight: '600' }}>Edit</button>
+                  <button onClick={() => handleDelete(cls.id)} style={{ background: 'transparent', border: '1px solid #fecaca', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', color: '#ef4444', fontWeight: '600' }}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {classes.length === 0 && (
+              <tr>
+                <td colSpan="4" style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>No classes found. Add one to get started!</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {isModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in" style={{ background: 'white', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '500px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+            <h3 style={{ margin: '0 0 24px', fontSize: '20px', fontWeight: '700', color: '#1e293b' }}>{editingId ? 'Edit Class' : 'Create New Class'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Class Name</label>
+                <input required type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="e.g., Class 10" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Section</label>
-                <input required type="text" value={formData.section} onChange={e => setFormData({...formData, section: e.target.value})} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Section</label>
+                <input required type="text" name="section" value={formData.section} onChange={handleInputChange} placeholder="e.g., A, B, Science" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Capacity (Strength)</label>
-                <input required type="number" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
-              </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#8b5cf6', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Save Class</button>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setIsModalOpen(false)} style={{ padding: '10px 20px', background: 'transparent', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#64748b', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" style={{ padding: '10px 20px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{editingId ? 'Save Changes' : 'Create Class'}</button>
               </div>
             </form>
           </div>
@@ -127,18 +151,5 @@ const ClassManagement = () => {
     </div>
   );
 };
-
-const ActionBtn = ({ text, icon, onClick }) => (
-  <button onClick={onClick} style={{
-    padding: '12px 20px', borderRadius: '12px', border: 'none',
-    background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', color: 'white',
-    fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)', transition: 'all 0.2s'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <span>{icon}</span> {text}
-  </button>
-);
 
 export default ClassManagement;

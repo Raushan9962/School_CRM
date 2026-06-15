@@ -41,14 +41,10 @@ const TeacherManagement = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          subjectSpecialization: formData.subject,
-          experienceYears: formData.experience,
-          // Mandatory fields for User creation behind the scenes
-          email: `${formData.firstName.toLowerCase()}@vidyasetu.com`,
-          password: 'password123',
-          contactNumber: '0000000000'
+          employeeId: 'EMP-' + Math.floor(Math.random() * 100000),
+          subject: formData.subject,
+          experience: formData.experience,
+          schoolId: 1 // Example school id
         })
       });
       if(res.ok) {
