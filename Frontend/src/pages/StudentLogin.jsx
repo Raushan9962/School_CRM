@@ -30,8 +30,12 @@ const StudentLogin = () => {
           navigate('/SchoolAdminDashboard');
         } else if (role === 'principal') {
           navigate('/PrincipalDashboard');
+        } else if (role === 'student') {
+          navigate('/StudentDashboard');
+        } else if (role === 'teacher') {
+          navigate('/TeacherDashboard');
         } else {
-          navigate('/'); // fallback or student dashboard
+          navigate('/'); // fallback
         }
       }
     } catch (err) {

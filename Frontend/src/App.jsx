@@ -5,6 +5,8 @@ import SuperAdmin from './pages/SuperAdmin/SuperAdmin';
 import SchoolRegister from './pages/SuperAdmin/SchoolRegister';
 import SchoolAdminDashboard from './pages/SchoolAdmin/SchoolAdminDashboard';
 import PrincipalDashboard from './pages/Principal/PrincipalDashboard';
+import StudentDashboard from './pages/Student/StudentDashboard';
+import TeacherDashboard from './pages/Teacher/TeacherDashboard';
 import './App.css';
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
       <Route path="/register-school" element={<SchoolRegister />} />
       <Route path="/SchoolAdminDashboard" element={<SchoolAdminDashboard />} />
       <Route path="/PrincipalDashboard" element={<PrincipalDashboard />} />
+      <Route path="/StudentDashboard" element={<StudentDashboard />} />
+      <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
     </Routes>
   );
 }
