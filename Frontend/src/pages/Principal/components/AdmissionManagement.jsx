@@ -8,7 +8,8 @@ const AdmissionManagement = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ studentId: '', classId: '' });
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [formData, setFormData] = useState({ studentId: '', classId: '', reason: '' });
 
   const fetchData = async () => {
     try {
@@ -46,10 +47,32 @@ const AdmissionManagement = () => {
       });
       if(res.ok) {
         setShowModal(false);
-        setFormData({ studentId: '', classId: '' });
+        setFormData({ studentId: '', classId: '', reason: '' });
         fetchData();
       } else {
         alert('Failed to approve admission.');
+      }
+    } catch(err) {
+      alert('Error connecting to backend.');
+      console.error(err);
+    }
+  };
+
+  const handleReject = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/admissions/reject/${formData.studentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ reason: formData.reason })
+      });
+      if(res.ok) {
+        setShowRejectModal(false);
+        setFormData({ studentId: '', classId: '', reason: '' });
+        fetchData();
+      } else {
+        alert('Failed to reject admission.');
       }
     } catch(err) {
       alert('Error connecting to backend.');
@@ -62,7 +85,7 @@ const AdmissionManagement = () => {
       <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Admission Management</h2>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <ActionBtn text="Approve Admissions" icon="✅" onClick={() => setShowModal(true)} />
-        <ActionBtn text="Reject Applications" icon="❌" />
+        <ActionBtn text="Reject Applications" icon="❌" onClick={() => setShowRejectModal(true)} />
       </div>
       
       <div className="glass-panel" style={panelStyle}>
@@ -124,6 +147,37 @@ const AdmissionManagement = () => {
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#10b981', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Approve</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showRejectModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, backdropFilter: 'blur(4px)'
+        }}>
+          <div className="animate-fade-in" style={{
+            background: 'white', padding: '32px', borderRadius: '24px', width: '100%', maxWidth: '400px',
+            boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Reject Admission</h3>
+            <form onSubmit={handleReject} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Application / Student ID</label>
+                <input required type="text" value={formData.studentId} onChange={e => setFormData({...formData, studentId: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Reason for Rejection</label>
+                <input required type="text" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="button" onClick={() => setShowRejectModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#ef4444', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Reject</button>
               </div>
             </form>
           </div>

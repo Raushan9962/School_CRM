@@ -34,6 +34,16 @@ const StudentLogin = () => {
           navigate('/StudentDashboard');
         } else if (role === 'teacher') {
           navigate('/TeacherDashboard');
+        } else if (role === 'accountant') {
+          navigate('/AccountantDashboard');
+        } else if (role === 'transport') {
+          navigate('/TransportDashboard');
+        } else if (role === 'librarian') {
+          navigate('/LibrarianDashboard');
+        } else if (role === 'receptionist') {
+          navigate('/ReceptionistDashboard');
+        } else if (role === 'labassistant') {
+          navigate('/LabAssistantDashboard');
         } else {
           navigate('/'); // fallback
         }

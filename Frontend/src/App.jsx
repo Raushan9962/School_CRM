@@ -7,6 +7,11 @@ import SchoolAdminDashboard from './pages/SchoolAdmin/SchoolAdminDashboard';
 import PrincipalDashboard from './pages/Principal/PrincipalDashboard';
 import StudentDashboard from './pages/Student/StudentDashboard';
 import TeacherDashboard from './pages/Teacher/TeacherDashboard';
+import AccountantDashboard from './pages/Accountant/AccountantDashboard';
+import TransportDashboard from './pages/Transport/TransportDashboard';
+import LibrarianDashboard from './pages/Librarian/LibrarianDashboard';
+import ReceptionistDashboard from './pages/Receptionist/ReceptionistDashboard';
+import LabAssistantDashboard from './pages/LabAssistant/LabAssistantDashboard';
 import './App.css';
 
 function App() {
@@ -20,6 +25,11 @@ function App() {
       <Route path="/PrincipalDashboard" element={<PrincipalDashboard />} />
       <Route path="/StudentDashboard" element={<StudentDashboard />} />
       <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
+      <Route path="/AccountantDashboard" element={<AccountantDashboard />} />
+      <Route path="/TransportDashboard" element={<TransportDashboard />} />
+      <Route path="/LibrarianDashboard" element={<LibrarianDashboard />} />
+      <Route path="/ReceptionistDashboard" element={<ReceptionistDashboard />} />
+      <Route path="/LabAssistantDashboard" element={<LabAssistantDashboard />} />
     </Routes>
   );
 }
