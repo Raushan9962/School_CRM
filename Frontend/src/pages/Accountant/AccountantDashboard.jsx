@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import FinanceOverview from './components/FinanceOverview';
+import StudentFeeManagement from './components/StudentFeeManagement';
+import FeeCategories from './components/FeeCategories';
+import FeeCollection from './components/FeeCollection';
+import ExpenseManagement from './components/ExpenseManagement';
+import SalaryManagement from './components/SalaryManagement';
+import VendorManagement from './components/VendorManagement';
+import ScholarshipsDiscounts from './components/ScholarshipsDiscounts';
+import FinancialReports from './components/FinancialReports';
+import PaymentReminders from './components/PaymentReminders';
+import RefundManagement from './components/RefundManagement';
+import AuditLogs from './components/AuditLogs';
 
 const PlaceholderView = ({ title }) => (
     <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
@@ -49,23 +60,33 @@ const AccountantDashboard = () => {
 
     const navItems = [
         { id: 'overview', label: 'Finance Overview', icon: '📊' },
+        { id: 'student_fee', label: 'Student Fee Management', icon: '👨‍🎓' },
+        { id: 'fee_categories', label: 'Fee Categories', icon: '⚙️' },
         { id: 'fee_collection', label: 'Fee Collection', icon: '💳' },
-        { id: 'fee_structure', label: 'Fee Structure', icon: '⚙️' },
-        { id: 'dues', label: 'Dues & Reminders', icon: '⚠️' },
-        { id: 'payroll', label: 'Payroll', icon: '📝' },
-        { id: 'expenses', label: 'Expenses & Vendors', icon: '🛒' },
-        { id: 'reports', label: 'Financial Reports', icon: '📈' }
+        { id: 'expenses', label: 'Expense Management', icon: '🧾' },
+        { id: 'salary', label: 'Salary Management', icon: '💵' },
+        { id: 'vendors', label: 'Vendor Management', icon: '🛒' },
+        { id: 'scholarships', label: 'Scholarships & Discounts', icon: '🎓' },
+        { id: 'reports', label: 'Financial Reports', icon: '📈' },
+        { id: 'reminders', label: 'Payment Reminders', icon: '🔔' },
+        { id: 'refunds', label: 'Refund Management', icon: '💸' },
+        { id: 'audit', label: 'Audit Logs', icon: '📋' }
     ];
 
     const renderContent = () => {
         switch (activeTab) {
             case 'overview': return <FinanceOverview />;
-            case 'fee_collection': return <PlaceholderView title="Fee Collection" />;
-            case 'fee_structure': return <PlaceholderView title="Fee Structure Setup" />;
-            case 'dues': return <PlaceholderView title="Dues & Reminders" />;
-            case 'payroll': return <PlaceholderView title="Staff Payroll Processing" />;
-            case 'expenses': return <PlaceholderView title="Expenses & Vendor Payments" />;
-            case 'reports': return <PlaceholderView title="Financial Reports" />;
+            case 'student_fee': return <StudentFeeManagement />;
+            case 'fee_categories': return <FeeCategories />;
+            case 'fee_collection': return <FeeCollection />;
+            case 'expenses': return <ExpenseManagement />;
+            case 'salary': return <SalaryManagement />;
+            case 'vendors': return <VendorManagement />;
+            case 'scholarships': return <ScholarshipsDiscounts />;
+            case 'reports': return <FinancialReports />;
+            case 'reminders': return <PaymentReminders />;
+            case 'refunds': return <RefundManagement />;
+            case 'audit': return <AuditLogs />;
             default: return <FinanceOverview />;
         }
     };

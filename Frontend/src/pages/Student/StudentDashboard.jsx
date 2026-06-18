@@ -7,6 +7,15 @@ import AttendanceView from './components/AttendanceView';
 import ExamsView from './components/ExamsView';
 import AssignmentsView from './components/AssignmentsView';
 import FeeView from './components/FeeView';
+import AcademicsView from './components/AcademicsView';
+import TimetableView from './components/TimetableView';
+import LibraryView from './components/LibraryView';
+import CommunicationView from './components/CommunicationView';
+import LeaveView from './components/LeaveView';
+import CertificatesView from './components/CertificatesView';
+import ActivitiesView from './components/ActivitiesView';
+import TransportView from './components/TransportView';
+import ComplaintView from './components/ComplaintView';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
@@ -49,9 +58,18 @@ const StudentDashboard = () => {
         { id: 'overview', label: 'Dashboard Overview', icon: '📊' },
         { id: 'profile', label: 'My Profile', icon: '👤' },
         { id: 'attendance', label: 'Attendance', icon: '📅' },
-        { id: 'exams', label: 'Exams & Grades', icon: '📝' },
+        { id: 'academics', label: 'Academics', icon: '📚' },
+        { id: 'exams', label: 'Exams & Results', icon: '📝' },
+        { id: 'timetable', label: 'Timetable', icon: '⏰' },
         { id: 'assignments', label: 'Assignments', icon: '📋' },
-        { id: 'fees', label: 'Fee Management', icon: '💰' }
+        { id: 'fees', label: 'Fees Management', icon: '💰' },
+        { id: 'library', label: 'Library', icon: '📖' },
+        { id: 'communication', label: 'Communication', icon: '💬' },
+        { id: 'leave', label: 'Leave Management', icon: '🏖️' },
+        { id: 'certificates', label: 'Certificates', icon: '📜' },
+        { id: 'activities', label: 'Activities & Events', icon: '🎭' },
+        { id: 'transport', label: 'Transport', icon: '🚌' },
+        { id: 'complaint', label: 'Complaint / Help Desk', icon: '🎫' }
     ];
 
     const renderContent = () => {
@@ -59,9 +77,18 @@ const StudentDashboard = () => {
             case 'overview': return <DashboardOverview />;
             case 'profile': return <StudentProfile />;
             case 'attendance': return <AttendanceView />;
+            case 'academics': return <AcademicsView />;
             case 'exams': return <ExamsView />;
+            case 'timetable': return <TimetableView />;
             case 'assignments': return <AssignmentsView />;
             case 'fees': return <FeeView />;
+            case 'library': return <LibraryView />;
+            case 'communication': return <CommunicationView />;
+            case 'leave': return <LeaveView />;
+            case 'certificates': return <CertificatesView />;
+            case 'activities': return <ActivitiesView />;
+            case 'transport': return <TransportView />;
+            case 'complaint': return <ComplaintView />;
             default: return <DashboardOverview />;
         }
     };

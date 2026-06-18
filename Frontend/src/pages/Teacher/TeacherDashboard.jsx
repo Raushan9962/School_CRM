@@ -2,10 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import DashboardOverview from './components/DashboardOverview';
-import ClassesView from './components/ClassesView';
+import TeacherProfile from './components/TeacherProfile';
+import ClassManagement from './components/ClassManagement';
 import AttendanceManagement from './components/AttendanceManagement';
-import GradesManagement from './components/GradesManagement';
-import AssignmentsManagement from './components/AssignmentsManagement';
+import AssignmentManagement from './components/AssignmentManagement';
+import StudyMaterials from './components/StudyMaterials';
+import ExamManagement from './components/ExamManagement';
+import StudentPerformance from './components/StudentPerformance';
+import LeaveManagement from './components/LeaveManagement';
+import TeacherCommunication from './components/TeacherCommunication';
+import ParentInteraction from './components/ParentInteraction';
+import TeacherTimetable from './components/TeacherTimetable';
+import Recommendations from './components/Recommendations';
+import TeacherReports from './components/TeacherReports';
 
 const TeacherDashboard = () => {
     const navigate = useNavigate();
@@ -46,19 +55,37 @@ const TeacherDashboard = () => {
 
     const navItems = [
         { id: 'overview', label: 'Dashboard Overview', icon: '📊' },
-        { id: 'classes', label: 'My Classes', icon: '👨‍🏫' },
-        { id: 'attendance', label: 'Mark Attendance', icon: '✅' },
-        { id: 'grades', label: 'Grades Management', icon: '📝' },
-        { id: 'assignments', label: 'Assignments', icon: '📋' }
+        { id: 'profile', label: 'My Profile', icon: '👤' },
+        { id: 'classes', label: 'Class Management', icon: '👨‍🏫' },
+        { id: 'attendance', label: 'Attendance Management', icon: '✅' },
+        { id: 'assignments', label: 'Assignment Management', icon: '📋' },
+        { id: 'materials', label: 'Study Materials', icon: '📚' },
+        { id: 'exams', label: 'Exam Management', icon: '📝' },
+        { id: 'performance', label: 'Student Performance', icon: '📈' },
+        { id: 'leave', label: 'Leave Management', icon: '🏖️' },
+        { id: 'communication', label: 'Communication', icon: '💬' },
+        { id: 'parents', label: 'Parent Interaction', icon: '👪' },
+        { id: 'timetable', label: 'Timetable', icon: '⏰' },
+        { id: 'certificates', label: 'Certificates & Recs.', icon: '📜' },
+        { id: 'reports', label: 'Reports', icon: '📄' }
     ];
 
     const renderContent = () => {
         switch (activeTab) {
             case 'overview': return <DashboardOverview />;
-            case 'classes': return <ClassesView />;
+            case 'profile': return <TeacherProfile />;
+            case 'classes': return <ClassManagement />;
             case 'attendance': return <AttendanceManagement />;
-            case 'grades': return <GradesManagement />;
-            case 'assignments': return <AssignmentsManagement />;
+            case 'assignments': return <AssignmentManagement />;
+            case 'materials': return <StudyMaterials />;
+            case 'exams': return <ExamManagement />;
+            case 'performance': return <StudentPerformance />;
+            case 'leave': return <LeaveManagement />;
+            case 'communication': return <TeacherCommunication />;
+            case 'parents': return <ParentInteraction />;
+            case 'timetable': return <TeacherTimetable />;
+            case 'certificates': return <Recommendations />;
+            case 'reports': return <TeacherReports />;
             default: return <DashboardOverview />;
         }
     };

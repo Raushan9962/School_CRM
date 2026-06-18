@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import TransportOverview from './components/TransportOverview';
+import VehicleManagement from './components/VehicleManagement';
+import DriverManagement from './components/DriverManagement';
+import RouteManagement from './components/RouteManagement';
+import StopManagement from './components/StopManagement';
+import StudentAllocation from './components/StudentAllocation';
+import TransportRequests from './components/TransportRequests';
+import GPSTracking from './components/GPSTracking';
+import MaintenanceManagement from './components/MaintenanceManagement';
+import TransportFees from './components/TransportFees';
+import TransportReports from './components/TransportReports';
+import Notifications from './components/Notifications';
 
 const PlaceholderView = ({ title }) => (
     <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
@@ -48,29 +59,41 @@ const TransportDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Transport Overview', icon: '🚌' },
+        { id: 'overview', label: 'Dashboard Overview', icon: '🚌' },
         { id: 'vehicles', label: 'Vehicle Management', icon: '🚙' },
-        { id: 'routes', label: 'Route & Stop Management', icon: '🗺️' },
-        { id: 'assignment', label: 'Student Assignment', icon: '👨‍🎓' },
-        { id: 'staff', label: 'Driver & Conductor Records', icon: '👷' },
-        { id: 'maintenance', label: 'Maintenance Schedule', icon: '🔧' }
+        { id: 'drivers', label: 'Driver Management', icon: '👨‍✈️' },
+        { id: 'routes', label: 'Route Management', icon: '🗺️' },
+        { id: 'stops', label: 'Stop Management', icon: '🚏' },
+        { id: 'allocation', label: 'Student Allocation', icon: '👨‍🎓' },
+        { id: 'requests', label: 'Transport Requests', icon: '📨' },
+        { id: 'gps', label: 'GPS Tracking', icon: '📍' },
+        { id: 'maintenance', label: 'Maintenance', icon: '🔧' },
+        { id: 'fees', label: 'Transport Fees', icon: '💰' },
+        { id: 'reports', label: 'Reports', icon: '📊' },
+        { id: 'notifications', label: 'Notifications', icon: '🔔' }
     ];
 
     const renderContent = () => {
         switch (activeTab) {
             case 'overview': return <TransportOverview />;
-            case 'vehicles': return <PlaceholderView title="Vehicle Management" />;
-            case 'routes': return <PlaceholderView title="Route & Stop Management" />;
-            case 'assignment': return <PlaceholderView title="Student Route Assignment" />;
-            case 'staff': return <PlaceholderView title="Driver & Conductor Records" />;
-            case 'maintenance': return <PlaceholderView title="Maintenance Schedule" />;
+            case 'vehicles': return <VehicleManagement />;
+            case 'drivers': return <DriverManagement />;
+            case 'routes': return <RouteManagement />;
+            case 'stops': return <StopManagement />;
+            case 'allocation': return <StudentAllocation />;
+            case 'requests': return <TransportRequests />;
+            case 'gps': return <GPSTracking />;
+            case 'maintenance': return <MaintenanceManagement />;
+            case 'fees': return <TransportFees />;
+            case 'reports': return <TransportReports />;
+            case 'notifications': return <Notifications />;
             default: return <TransportOverview />;
         }
     };
 
     const getActiveTitle = () => {
         const item = navItems.find(n => n.id === activeTab);
-        return item ? item.label : 'Transport Overview';
+        return item ? item.label : 'Dashboard Overview';
     };
 
     return (
