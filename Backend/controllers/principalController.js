@@ -122,7 +122,11 @@ exports.getStudents = async (req, res) => {
     try {
         const pool = require('../config/db');
         const studentsQuery = await pool.query(`
-            SELECT s.id, u.name, u.email, s.admission_no, s.roll_number, s.class_id, s.section, s.parent_phone 
+            SELECT s.id, u.name, u.email, s.admission_no, s.roll_number, s.class_id, s.section, s.parent_phone,
+            COALESCE(
+                (SELECT ROUND((SUM(CASE WHEN a.status = 'Present' THEN 1.0 ELSE 0.0 END) / COUNT(a.id)) * 100, 1) 
+                 FROM attendance a WHERE a.student_id = s.id)
+            , 0) as attendance_percentage
             FROM students s 
             JOIN users u ON s.user_id = u.id
         `);
@@ -134,8 +138,10 @@ exports.getStudents = async (req, res) => {
             admissionNo: s.admission_no,
             rollNumber: s.roll_number,
             className: s.class_id ? `Class ${s.class_id}` : 'Unassigned',
+            classId: s.class_id,
             section: s.section,
-            phone: s.parent_phone
+            phone: s.parent_phone,
+            attendance: s.attendance_percentage > 0 ? `${s.attendance_percentage}%` : 'N/A'
         }));
         
         res.status(200).json({ data: formattedStudents });
@@ -503,11 +509,39 @@ exports.getAdmissions = async (req, res) => {
 };
 exports.getAttendance = async (req, res) => {
     try {
-        const Attendance = require('../models/Attendance');
-        const logs = await Attendance.findAll();
-        // Since we don't have full logic, we return a mock aggregation based on real logs
-        res.status(200).json({ data: { studentAvg: '94.5%', teacherAvg: '98.2%', trends: [{ class: 'Class 10', rate: '96%', color: '#10b981' }, { class: 'Class 9', rate: '92%', color: '#f59e0b' }] } });
+        const pool = require('../config/db');
+        const query = `
+            SELECT a.id, a.date, a.status, a.remarks, u.name as student_name, c.name as class_name, c.section
+            FROM attendance a
+            LEFT JOIN students s ON a.student_id = s.id
+            LEFT JOIN users u ON s.user_id = u.id
+            LEFT JOIN classes c ON a.class_id = c.id
+            ORDER BY a.date DESC
+            LIMIT 50
+        `;
+        const logs = await pool.query(query);
+        
+        const attendanceData = await pool.query(`
+            SELECT 
+                COUNT(*) as total, 
+                SUM(CASE WHEN status = 'Present' THEN 1.0 ELSE 0.0 END) as present
+            FROM attendance 
+            WHERE date = CURRENT_DATE
+        `);
+        let presentCount = attendanceData.rows[0].present || 0;
+        let totalCount = attendanceData.rows[0].total || 1;
+        let studentAvg = Math.round((presentCount / totalCount) * 100) + '%';
+        if (totalCount === 0 || totalCount == 1 && presentCount == 0 && attendanceData.rows[0].total == 0) studentAvg = 'N/A';
+
+        res.status(200).json({ 
+            data: { 
+                recent: logs.rows, 
+                studentAvg: studentAvg, 
+                teacherAvg: 'N/A'
+            } 
+        });
     } catch(err) {
+        console.error("Error fetching attendance logs:", err);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

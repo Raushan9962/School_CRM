@@ -7,7 +7,7 @@ class Accountant {
             `INSERT INTO accountants (user_id, school_id, employee_id, qualification, experience, joining_date, salary)
              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
             [userId, schoolId, employeeId, qualification, experience, joiningDate, salary]
-        );
+        );                   
         return res.rows[0];
     }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Library, BookOpen, Repeat, IndianRupee } from 'lucide-react';
 
 import LibrarianOverview from './components/LibrarianOverview';
 
@@ -48,10 +49,10 @@ const LibrarianDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Library Overview', icon: '📚' },
-        { id: 'inventory', label: 'Book Inventory', icon: '📖' },
-        { id: 'issuereturn', label: 'Issue / Return', icon: '🔄' },
-        { id: 'fines', label: 'Fine Tracking', icon: '💰' }
+        { id: 'overview', label: 'Library Overview', icon: <Library size={20} strokeWidth={1.5} /> },
+        { id: 'inventory', label: 'Book Inventory', icon: <BookOpen size={20} strokeWidth={1.5} /> },
+        { id: 'issuereturn', label: 'Issue / Return', icon: <Repeat size={20} strokeWidth={1.5} /> },
+        { id: 'fines', label: 'Fine Tracking', icon: <IndianRupee size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {

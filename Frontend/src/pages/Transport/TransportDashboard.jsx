@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Bus, Users, Map, MapPin, CheckCircle, Bell, Navigation, Wrench, IndianRupee, Mail, BarChart3 } from 'lucide-react';
 
 import TransportOverview from './components/TransportOverview';
 import VehicleManagement from './components/VehicleManagement';
@@ -59,18 +60,18 @@ const TransportDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Dashboard Overview', icon: '🚌' },
-        { id: 'vehicles', label: 'Vehicle Management', icon: '🚙' },
-        { id: 'drivers', label: 'Driver Management', icon: '👨‍✈️' },
-        { id: 'routes', label: 'Route Management', icon: '🗺️' },
-        { id: 'stops', label: 'Stop Management', icon: '🚏' },
-        { id: 'allocation', label: 'Student Allocation', icon: '👨‍🎓' },
-        { id: 'requests', label: 'Transport Requests', icon: '📨' },
-        { id: 'gps', label: 'GPS Tracking', icon: '📍' },
-        { id: 'maintenance', label: 'Maintenance', icon: '🔧' },
-        { id: 'fees', label: 'Transport Fees', icon: '💰' },
-        { id: 'reports', label: 'Reports', icon: '📊' },
-        { id: 'notifications', label: 'Notifications', icon: '🔔' }
+        { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'vehicles', label: 'Vehicle Management', icon: <Bus size={20} strokeWidth={1.5} /> },
+        { id: 'drivers', label: 'Driver Management', icon: <Users size={20} strokeWidth={1.5} /> },
+        { id: 'routes', label: 'Route Management', icon: <Map size={20} strokeWidth={1.5} /> },
+        { id: 'stops', label: 'Stop Management', icon: <MapPin size={20} strokeWidth={1.5} /> },
+        { id: 'allocation', label: 'Student Allocation', icon: <CheckCircle size={20} strokeWidth={1.5} /> },
+        { id: 'requests', label: 'Transport Requests', icon: <Mail size={20} strokeWidth={1.5} /> },
+        { id: 'gps', label: 'GPS Tracking', icon: <Navigation size={20} strokeWidth={1.5} /> },
+        { id: 'maintenance', label: 'Maintenance', icon: <Wrench size={20} strokeWidth={1.5} /> },
+        { id: 'fees', label: 'Transport Fees', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
+        { id: 'reports', label: 'Reports', icon: <BarChart3 size={20} strokeWidth={1.5} /> },
+        { id: 'notifications', label: 'Notifications', icon: <Bell size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {

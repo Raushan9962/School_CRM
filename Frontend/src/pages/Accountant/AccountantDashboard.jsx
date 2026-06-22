@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, GraduationCap, Settings, CreditCard, TrendingDown, IndianRupee, Building, Award, LineChart, Bell, RefreshCw, ClipboardList } from 'lucide-react';
 
 import FinanceOverview from './components/FinanceOverview';
 import StudentFeeManagement from './components/StudentFeeManagement';
@@ -59,18 +60,18 @@ const AccountantDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Finance Overview', icon: '📊' },
-        { id: 'student_fee', label: 'Student Fee Management', icon: '👨‍🎓' },
-        { id: 'fee_categories', label: 'Fee Categories', icon: '⚙️' },
-        { id: 'fee_collection', label: 'Fee Collection', icon: '💳' },
-        { id: 'expenses', label: 'Expense Management', icon: '🧾' },
-        { id: 'salary', label: 'Salary Management', icon: '💵' },
-        { id: 'vendors', label: 'Vendor Management', icon: '🛒' },
-        { id: 'scholarships', label: 'Scholarships & Discounts', icon: '🎓' },
-        { id: 'reports', label: 'Financial Reports', icon: '📈' },
-        { id: 'reminders', label: 'Payment Reminders', icon: '🔔' },
-        { id: 'refunds', label: 'Refund Management', icon: '💸' },
-        { id: 'audit', label: 'Audit Logs', icon: '📋' }
+        { id: 'overview', label: 'Finance Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'student_fee', label: 'Student Fee Management', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
+        { id: 'fee_categories', label: 'Fee Categories', icon: <Settings size={20} strokeWidth={1.5} /> },
+        { id: 'fee_collection', label: 'Fee Collection', icon: <CreditCard size={20} strokeWidth={1.5} /> },
+        { id: 'expenses', label: 'Expense Management', icon: <TrendingDown size={20} strokeWidth={1.5} /> },
+        { id: 'salary', label: 'Salary Management', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
+        { id: 'vendors', label: 'Vendor Management', icon: <Building size={20} strokeWidth={1.5} /> },
+        { id: 'scholarships', label: 'Scholarships & Discounts', icon: <Award size={20} strokeWidth={1.5} /> },
+        { id: 'reports', label: 'Financial Reports', icon: <LineChart size={20} strokeWidth={1.5} /> },
+        { id: 'reminders', label: 'Payment Reminders', icon: <Bell size={20} strokeWidth={1.5} /> },
+        { id: 'refunds', label: 'Refund Management', icon: <RefreshCw size={20} strokeWidth={1.5} /> },
+        { id: 'audit', label: 'Audit Logs', icon: <ClipboardList size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {

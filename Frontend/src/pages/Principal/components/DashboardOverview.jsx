@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import StatCard from '../../../components/layout/StatCard';
 
 const panelStyle = {
   background: 'rgba(255, 255, 255, 0.7)',
@@ -58,22 +59,51 @@ const DashboardOverview = () => {
 
   return (
     <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Principal Overview</h2>
       
-      {/* Top Row: 8 Stat Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        <StatCard title="Total Students" value={data.stats.students.toLocaleString()} icon="👨‍🎓" color="#4f46e5" />
-        <StatCard title="Total Teachers" value={data.stats.teachers.toLocaleString()} icon="👨‍🏫" color="#0ea5e9" />
-        <StatCard title="Present Students" value={data.stats.present.toLocaleString()} icon="✅" color="#10b981" />
-        <StatCard title="Absent Students" value={data.stats.absent.toLocaleString()} icon="⚠️" color="#ef4444" />
-        <StatCard title="Today's Fee Collection" value={`₹${data.stats.feesCollected.toLocaleString()}`} icon="💰" color="#f59e0b" />
-        <StatCard title="Pending Fees" value={`₹${data.stats.pendingFees.toLocaleString()}`} icon="⏳" color="#f43f5e" />
-        <StatCard title="School Pass %" value={data.stats.passPercentage} icon="🎓" color="#8b5cf6" />
-        <StatCard title="Teacher Attendance" value={data.stats.teacherAttendance} icon="🧑‍🏫" color="#06b6d4" />
+      {/* Top Row: 3 Large Stat Cards (Matching User Sample) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px', marginBottom: '24px' }}>
+        <StatCard 
+            title="Student Overview" 
+            metrics={[
+                { label: 'Total Students', value: data.stats.students.toLocaleString() },
+                { label: 'Present Today', value: data.stats.present.toLocaleString() },
+                { label: 'Absent Today', value: data.stats.absent.toLocaleString() },
+                { label: 'Pass Percentage', value: data.stats.passPercentage }
+            ]}
+        />
+        <StatCard 
+            title="Financial Summary" 
+            metrics={[
+                { label: "Today's Collection", value: `₹${data.stats.feesCollected.toLocaleString()}` },
+                { label: 'Pending Fees', value: `₹${data.stats.pendingFees.toLocaleString()}` }
+            ]}
+            bottomComponent={
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <select style={{ padding: '6px 12px', border: 'none', background: 'transparent', color: '#475569', fontSize: '14px', cursor: 'pointer', outline: 'none' }}>
+                        <option>Today</option>
+                        <option>This Week</option>
+                        <option>This Month</option>
+                    </select>
+                </div>
+            }
+        />
+        <StatCard 
+            title="Staff Overview" 
+            extraHeaderIcon={<span className="material-icons">refresh</span>}
+            metrics={[
+                { label: 'Total Teachers', value: data.stats.teachers.toLocaleString() },
+                { label: 'Teacher Attendance', value: data.stats.teacherAttendance }
+            ]}
+            bottomComponent={
+                <div style={{ textAlign: 'right' }}>
+                    <a href="#" style={{ color: '#0ea5e9', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>View All Staff</a>
+                </div>
+            }
+        />
       </div>
 
       {/* Middle Grid: 5 Panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '24px', marginBottom: '24px' }}>
         
         {/* Top 10 Students */}
         <div className="glass-panel" style={panelStyle}>
@@ -171,7 +201,7 @@ const DashboardOverview = () => {
       </div>
 
       {/* Bottom Row: 2 Analytics Graphs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', gap: '24px' }}>
         
         {/* Monthly Attendance Graph */}
         <div className="glass-panel" style={panelStyle}>
@@ -214,24 +244,5 @@ const DashboardOverview = () => {
     </div>
   );
 };
-
-const StatCard = ({ title, value, icon, color }) => (
-  <div style={{ 
-    background: 'white', borderRadius: '16px', padding: '20px', 
-    boxShadow: '0 4px 20px rgba(0,0,0,0.05)', display: 'flex', 
-    alignItems: 'center', gap: '16px', borderLeft: `4px solid ${color}`,
-    transition: 'transform 0.2s', cursor: 'pointer'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
-      {icon}
-    </div>
-    <div>
-      <p style={{ margin: 0, fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>{title}</p>
-      <h3 style={{ margin: '4px 0 0', fontSize: '24px', color: '#0f172a', fontWeight: '800' }}>{value}</h3>
-    </div>
-  </div>
-);
 
 export default DashboardOverview;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MapPin, CreditCard, User, Phone, Mail, Droplet, Users, Calendar, GraduationCap, Briefcase, AlertCircle, FileText, CheckCircle, XCircle } from 'lucide-react';
 
 const StudentProfile = ({ studentId, onBack }) => {
     const [profile, setProfile] = useState(null);
@@ -54,31 +55,25 @@ const StudentProfile = ({ studentId, onBack }) => {
                 {/* Left Column (Sticky Identity) */}
                 <div className="lg:col-span-1 space-y-8">
                     {/* Basic Info */}
-                    <SectionCard title="1. Basic Information">
-                        <div className="flex flex-col items-center text-center mb-6">
+                    <SectionCard title="BASIC INFORMATION">
+                        <div className="flex flex-col items-center text-center mb-8 border-b border-slate-100 pb-6">
                             <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-4xl mb-4 border-4 border-white shadow-lg">{basic_info.photo}</div>
                             <h3 className="text-xl font-bold text-slate-800">{basic_info.name}</h3>
                             <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs font-bold mt-2">Class {basic_info.class} - {basic_info.section}</span>
                         </div>
-                        <div className="space-y-3">
-                            <InfoRow label="Admission No" value={basic_info.admission_number} />
-                            <InfoRow label="Roll Number" value={basic_info.roll_number} />
-                            <InfoRow label="Date of Birth" value={basic_info.dob} />
-                            <InfoRow label="Gender" value={basic_info.gender} />
-                            <InfoRow label="Blood Group" value={basic_info.blood_group} />
-                            <InfoRow label="Category" value={basic_info.category} />
-                        </div>
+                        <IconRow icon={CreditCard} text={`Admission No: ${basic_info.admission_number}`} />
+                        <IconRow icon={FileText} text={`Roll No: ${basic_info.roll_number}`} />
+                        <IconRow icon={Calendar} text={`DOB: ${basic_info.dob}`} />
+                        <IconRow icon={User} text={`Gender: ${basic_info.gender}`} />
+                        <IconRow icon={Droplet} text={`Blood Group: ${basic_info.blood_group}`} />
+                        <IconRow icon={Users} text={`Category: ${basic_info.category}`} />
                     </SectionCard>
 
                     {/* Contact Info */}
-                    <SectionCard title="2. Contact Information">
-                        <div className="space-y-3">
-                            <InfoRow label="Mobile" value={contact_info.mobile} />
-                            <InfoRow label="Email" value={contact_info.email} />
-                            <InfoRow label="Address" value={contact_info.address} />
-                            <InfoRow label="City/State" value={`${contact_info.city}, ${contact_info.state}`} />
-                            <InfoRow label="Pincode" value={contact_info.pincode} />
-                        </div>
+                    <SectionCard title="CONTACT INFO">
+                        <IconRow icon={MapPin} text={contact_info.address} subtext={`${contact_info.city}, ${contact_info.state} - ${contact_info.pincode}`} />
+                        <IconRow icon={Phone} text={contact_info.mobile} />
+                        <IconRow icon={Mail} text={contact_info.email} />
                     </SectionCard>
                 </div>
 
@@ -87,37 +82,34 @@ const StudentProfile = ({ studentId, onBack }) => {
                     
                     {/* Academic & Parent Info Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <SectionCard title="3. Parent / Guardian Details">
-                            <div className="space-y-4">
-                                <div>
-                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Father</h4>
-                                    <InfoRow label="Name" value={parent_details.father_name} />
-                                    <InfoRow label="Mobile" value={parent_details.father_mobile} />
-                                    <InfoRow label="Occupation" value={parent_details.father_occupation} />
-                                </div>
-                                <div className="pt-4 border-t border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mother</h4>
-                                    <InfoRow label="Name" value={parent_details.mother_name} />
-                                    <InfoRow label="Mobile" value={parent_details.mother_mobile} />
-                                    <InfoRow label="Occupation" value={parent_details.mother_occupation} />
-                                </div>
-                                <div className="pt-4 border-t border-slate-100">
-                                    <InfoRow label="Emergency Contact" value={parent_details.emergency_contact} />
-                                </div>
+                        <SectionCard title="PARENT DETAILS">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Father</h4>
+                            <IconRow icon={User} text={parent_details.father_name} />
+                            <IconRow icon={Phone} text={parent_details.father_mobile} />
+                            <IconRow icon={Briefcase} text={parent_details.father_occupation} />
+                            
+                            <div className="pt-6 border-t border-slate-100 mt-2">
+                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Mother</h4>
+                                <IconRow icon={User} text={parent_details.mother_name} />
+                                <IconRow icon={Phone} text={parent_details.mother_mobile} />
+                                <IconRow icon={Briefcase} text={parent_details.mother_occupation} />
+                            </div>
+
+                            <div className="pt-6 border-t border-slate-100 mt-2">
+                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Emergency</h4>
+                                <IconRow icon={AlertCircle} text={parent_details.emergency_contact} />
                             </div>
                         </SectionCard>
 
                         <div className="space-y-8">
-                            <SectionCard title="4. Academic Information">
-                                <div className="space-y-3">
-                                    <InfoRow label="Current Session" value={academic_info.current_session} />
-                                    <InfoRow label="Class Teacher" value={academic_info.class_teacher} />
-                                    <InfoRow label="Previous Class" value={`Class ${academic_info.previous_class}`} />
-                                    <InfoRow label="Admission Date" value={academic_info.admission_date} />
-                                </div>
+                            <SectionCard title="ACADEMICS">
+                                <IconRow icon={Calendar} text={`Session: ${academic_info.current_session}`} />
+                                <IconRow icon={User} text={`Class Teacher: ${academic_info.class_teacher}`} />
+                                <IconRow icon={GraduationCap} text={`Prev Class: ${academic_info.previous_class}`} />
+                                <IconRow icon={Calendar} text={`Admitted: ${academic_info.admission_date}`} />
                             </SectionCard>
 
-                            <SectionCard title="5. Attendance Summary">
+                            <SectionCard title="ATTENDANCE">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-slate-50 p-4 rounded-xl text-center">
                                         <div className="text-2xl font-bold text-slate-800">{attendance_summary.working_days}</div>
@@ -140,81 +132,37 @@ const StudentProfile = ({ studentId, onBack }) => {
                         </div>
                     </div>
 
-                    {/* Results & Performance */}
-                    <SectionCard title="6. Result & Performance">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <h4 className="font-bold text-slate-700 mb-4">Recent Exams</h4>
-                                <table className="w-full text-left text-sm">
-                                    <thead><tr className="text-slate-400 border-b border-slate-100"><th className="pb-2">Exam</th><th className="pb-2">Score</th><th className="pb-2">Grade</th></tr></thead>
-                                    <tbody>
-                                        {performance.recent_exams.map((e, i) => (
-                                            <tr key={i} className="border-b border-slate-50">
-                                                <td className="py-3 font-semibold text-slate-700">{e.exam}</td>
-                                                <td className="py-3 font-bold text-blue-600">{e.percentage}</td>
-                                                <td className="py-3"><span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-bold">{e.grade}</span></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-slate-700 mb-4">Subject Wise (Latest)</h4>
-                                <div className="space-y-4">
-                                    {performance.subject_marks.map((s, i) => (
-                                        <div key={i}>
-                                            <div className="flex justify-between text-sm mb-1"><span className="font-semibold text-slate-600">{s.subject}</span><span className="font-bold text-slate-800">{s.marks}/100</span></div>
-                                            <div className="w-full bg-slate-100 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${s.marks}%` }}></div></div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </SectionCard>
-
-                    {/* Bottom Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-8">
-                            <SectionCard title="7. Fee Information">
-                                <div className="space-y-3">
-                                    <InfoRow label="Total Fees" value={`₹${fee_info.total_fees.toLocaleString()}`} />
-                                    <InfoRow label="Paid Fees" value={`₹${fee_info.paid.toLocaleString()}`} valueColor="text-emerald-600 font-bold" />
-                                    <InfoRow label="Pending Fees" value={`₹${fee_info.pending.toLocaleString()}`} valueColor="text-red-500 font-bold" />
-                                    <InfoRow label="Last Payment" value={fee_info.last_payment_date} />
-                                </div>
+                            <SectionCard title="FEE INFO">
+                                <IconRow icon={CreditCard} text={`Total Fees: ₹${fee_info.total_fees.toLocaleString()}`} />
+                                <IconRow icon={CheckCircle} text={`Paid: ₹${fee_info.paid.toLocaleString()}`} />
+                                <IconRow icon={XCircle} text={`Pending: ₹${fee_info.pending.toLocaleString()}`} />
+                                <IconRow icon={Calendar} text={`Last Payment: ${fee_info.last_payment_date}`} />
                             </SectionCard>
 
-                            <SectionCard title="8. Documents">
-                                <ul className="space-y-3">
-                                    {documents.map((d, i) => (
-                                        <li key={i} className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
-                                            <span className="font-semibold text-slate-700 flex items-center gap-2">📄 {d.name}</span>
-                                            <span className={`text-xs font-bold px-2 py-1 rounded ${d.status === 'Uploaded' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>{d.status}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <SectionCard title="DOCUMENTS">
+                                {documents.map((d, i) => (
+                                    <IconRow 
+                                        key={i} 
+                                        icon={FileText} 
+                                        text={d.name} 
+                                        subtext={d.status} 
+                                    />
+                                ))}
                             </SectionCard>
                         </div>
 
                         <div className="space-y-8">
-                            <SectionCard title="9. Discipline Record">
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    <div className="bg-red-50 p-3 rounded-xl text-center border border-red-100">
-                                        <div className="text-xl font-bold text-red-600">{discipline.warnings}</div>
-                                        <div className="text-xs font-semibold text-red-500">Warnings</div>
-                                    </div>
-                                    <div className="bg-amber-50 p-3 rounded-xl text-center border border-amber-100">
-                                        <div className="text-xl font-bold text-amber-600">{discipline.complaints}</div>
-                                        <div className="text-xs font-semibold text-amber-600">Complaints</div>
-                                    </div>
-                                </div>
-                                <div className="space-y-2 text-sm">
-                                    <p><strong className="text-slate-500">Achievements:</strong> <span className="font-semibold text-slate-800">{discipline.achievements}</span></p>
-                                    <p><strong className="text-slate-500">Awards:</strong> <span className="font-semibold text-slate-800">{discipline.awards}</span></p>
+                            <SectionCard title="DISCIPLINE">
+                                <IconRow icon={AlertCircle} text={`${discipline.warnings} Warnings`} />
+                                <IconRow icon={AlertCircle} text={`${discipline.complaints} Complaints`} />
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                    <IconRow icon={GraduationCap} text={`Achievements: ${discipline.achievements}`} />
                                 </div>
                             </SectionCard>
 
-                            <SectionCard title="10. Activity Timeline">
+                            <SectionCard title="TIMELINE">
                                 <div className="relative border-l-2 border-slate-200 ml-3 space-y-6">
                                     {timeline.map((t, i) => (
                                         <div key={i} className="relative pl-6">
@@ -244,16 +192,23 @@ const InsightCard = ({ title, value, icon, color, bg }) => (
 );
 
 const SectionCard = ({ title, children }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
-        <h3 className="text-lg font-bold text-indigo-900 mb-6 border-b border-slate-100 pb-4">{title}</h3>
-        {children}
+    <div style={{ background: '#ffffff', padding: '24px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+        <h3 style={{ color: '#3b82f6', fontSize: '20px', fontWeight: '400', marginBottom: '24px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{title}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {children}
+        </div>
     </div>
 );
 
-const InfoRow = ({ label, value, valueColor = "text-slate-800 font-semibold" }) => (
-    <div className="flex justify-between items-center text-sm py-2 border-b border-slate-50 last:border-0">
-        <span className="text-slate-500 font-medium">{label}</span>
-        <span className={`${valueColor} text-right`}>{value}</span>
+const IconRow = ({ icon: Icon, text, subtext }) => (
+    <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+        <div style={{ color: '#be185d', marginTop: '2px' }}>
+            <Icon size={20} strokeWidth={1.5} />
+        </div>
+        <div style={{ flex: 1 }}>
+            <div style={{ color: '#1e293b', fontSize: '15px' }}>{text}</div>
+            {subtext && <div style={{ color: '#475569', fontSize: '14px', marginTop: '2px' }}>{subtext}</div>}
+        </div>
     </div>
 );
 

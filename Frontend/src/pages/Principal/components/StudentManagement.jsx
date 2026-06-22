@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Eye, Edit, ArrowUpCircle, ArrowRightLeft, IdCard } from 'lucide-react';
 import StudentProfile from './StudentProfile';
+import DataTable from '../../../components/layout/DataTable';
+import ActionMenu from '../../../components/layout/ActionMenu';
 
 const StudentManagement = ({ activeAction }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Views
   const [viewingProfileId, setViewingProfileId] = useState(null);
 
@@ -13,7 +16,7 @@ const StudentManagement = ({ activeAction }) => {
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showIdCardModal, setShowIdCardModal] = useState(false);
-  
+
   const [activeStudent, setActiveStudent] = useState(null);
   const [editingId, setEditingId] = useState(null);
 
@@ -23,7 +26,7 @@ const StudentManagement = ({ activeAction }) => {
   });
   const [promoteData, setPromoteData] = useState({ classId: '', section: '' });
   const [transferData, setTransferData] = useState({ reason: '', date: new Date().toISOString().split('T')[0] });
-  
+
   // ID Card Edit State
   const [idCardData, setIdCardData] = useState(null);
   const [isEditingIdCard, setIsEditingIdCard] = useState(false);
@@ -63,7 +66,7 @@ const StudentManagement = ({ activeAction }) => {
   const handleEdit = (s) => {
     setEditingId(s.id);
     setFormData({
-      name: s.name, email: s.email, admissionNo: s.admissionNo, rollNumber: s.rollNumber, 
+      name: s.name, email: s.email, admissionNo: s.admissionNo, rollNumber: s.rollNumber,
       classId: s.className.replace('Class ', ''), section: s.section, parentPhone: s.phone
     });
     setShowModal(true);
@@ -142,65 +145,49 @@ const StudentManagement = ({ activeAction }) => {
   if (viewingProfileId) {
     return <StudentProfile studentId={viewingProfileId} onBack={() => setViewingProfileId(null)} />;
   }
-
   return (
-    <div className="p-6 animate-fade-in relative">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">👨‍🎓 Student List</h2>
+    <div className="animate-fade-in relative" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+      <div className="flex justify-between items-center px-2">
+        <h2 className="text-lg font-bold text-slate-800 m-0">Student List</h2>
         <div className="flex gap-3 flex-wrap">
           <ActionBtn text="Add New Student" icon="➕" onClick={handleCreateNew} color="bg-blue-600" />
         </div>
       </div>
-      
-      <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/50">
-        {loading ? <p className="text-slate-500">Loading students...</p> : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse whitespace-nowrap">
-              <thead className="bg-slate-100/80">
-                <tr>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Photo</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Admission No</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Name</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Class</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Section</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Roll No</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Attendance</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200">Status</th>
-                  <th className="p-4 text-sm font-semibold text-slate-500 border-b border-slate-200 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map((s) => (
-                  <tr key={s.id} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${s.section === 'Transferred' ? 'opacity-50' : ''}`}>
-                    <td className="p-4 text-2xl text-center">👤</td>
-                    <td className="p-4 text-slate-500 font-semibold">{s.admissionNo}</td>
-                    <td className="p-4 font-bold text-slate-800">{s.name}</td>
-                    <td className="p-4 text-slate-600">{s.className || 'N/A'}</td>
-                    <td className="p-4"><span className="bg-indigo-100 text-indigo-700 py-1 px-3 rounded-full text-xs font-bold">{s.section || 'N/A'}</span></td>
-                    <td className="p-4 text-slate-500">{s.rollNumber}</td>
-                    <td className="p-4 font-bold text-emerald-500">92%</td>
-                    <td className="p-4"><span className={`px-2 py-1 rounded text-xs font-bold ${s.section === 'Transferred' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>{s.section === 'Transferred' ? 'Transferred' : 'Active'}</span></td>
-                    <td className="p-4 text-center">
-                      <div className="flex gap-2 justify-center">
-                        <button onClick={() => setViewingProfileId(s.id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors shadow">View Profile</button>
-                        <button onClick={() => handleEdit(s)} className="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-1.5 rounded transition-colors shadow">Edit</button>
-                        <button onClick={() => openPromote(s)} className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors shadow" disabled={s.section === 'Transferred'}>Promote</button>
-                        <button onClick={() => openTransfer(s)} className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors shadow" disabled={s.section === 'Transferred'}>Transfer</button>
-                        <button onClick={() => openIdCard(s)} className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors shadow">Print ID Card</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {students.length === 0 && (
-                  <tr>
-                    <td colSpan="9" className="p-8 text-center text-slate-400">No students found.</td>
-                  </tr>
+
+      {loading ? <p className="text-slate-500 px-2">Loading students...</p> : (
+        <DataTable 
+            columns={[
+                { key: 'photo', label: 'Photo', render: () => <div style={{ fontSize: '24px' }}>👤</div> },
+                { key: 'admissionNo', label: 'Admission No', render: (row) => <span style={{ color: '#64748b', fontWeight: 600 }}>{row.admissionNo}</span> },
+                { key: 'name', label: 'Name', render: (row) => <span style={{ fontWeight: 'bold', color: '#1e293b' }}>{row.name}</span> },
+                { key: 'class', label: 'Class', render: (row) => <span style={{ color: '#475569' }}>{row.className || 'N/A'}</span> },
+                { key: 'section', label: 'Section', render: (row) => <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>{row.section || 'N/A'}</span> },
+                { key: 'rollNumber', label: 'Roll No', render: (row) => <span style={{ color: '#64748b' }}>{row.rollNumber}</span> },
+                { key: 'attendance', label: 'Attendance', render: (row) => <span style={{ fontWeight: 'bold', color: row.attendance === 'N/A' ? '#64748b' : '#10b981' }}>{row.attendance}</span> },
+                { key: 'status', label: 'Status', render: (row) => (
+                    <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold', background: row.section === 'Transferred' ? '#fee2e2' : '#dcfce7', color: row.section === 'Transferred' ? '#dc2626' : '#166534' }}>
+                        {row.section === 'Transferred' ? 'Transferred' : 'Active'}
+                    </span>
+                )},
+                { key: 'viewProfile', label: 'View Profile', render: (row) => (
+                    <button onClick={() => setViewingProfileId(row.id)} title="View Profile" style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Eye size={18} /></button>
+                )},
+                { key: 'edit', label: 'Edit', render: (row) => (
+                    <button onClick={() => handleEdit(row)} title="Edit" style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Edit size={18} /></button>
+                )},
+                { key: 'promote', label: 'Promote', render: (row) => (
+                    <button onClick={() => openPromote(row)} title="Promote" disabled={row.section === 'Transferred'} style={{ background: 'none', border: 'none', color: row.section === 'Transferred' ? '#cbd5e1' : '#f59e0b', cursor: row.section === 'Transferred' ? 'not-allowed' : 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ArrowUpCircle size={18} /></button>
+                )},
+                { key: 'transfer', label: 'Transfer', render: (row) => (
+                    <button onClick={() => openTransfer(row)} title="Transfer" disabled={row.section === 'Transferred'} style={{ background: 'none', border: 'none', color: row.section === 'Transferred' ? '#cbd5e1' : '#ef4444', cursor: row.section === 'Transferred' ? 'not-allowed' : 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ArrowRightLeft size={18} /></button>
+                )},
+                { key: 'idCard', label: 'ID Card', render: (row) => (
+                    <button onClick={() => openIdCard(row)} title="ID Card" style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IdCard size={18} /></button>
                 )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+            ]}
+            data={students}
+        />
+      )}
 
       {/* Add/Edit Modal */}
       {showModal && (
@@ -208,13 +195,13 @@ const StudentManagement = ({ activeAction }) => {
           <div className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl animate-fade-in">
             <h3 className="text-xl font-bold text-slate-800 mb-6">{editingId ? 'Edit Student' : 'Add New Student'}</h3>
             <form onSubmit={handleSaveStudent} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Full Name</label><input required type="text" name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Admission Number</label><input required type="text" name="admissionNo" value={formData.admissionNo} onChange={(e) => setFormData({...formData, admissionNo: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Roll Number</label><input required type="text" name="rollNumber" value={formData.rollNumber} onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Class ID</label><input required type="number" name="classId" value={formData.classId} onChange={(e) => setFormData({...formData, classId: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Section</label><input required type="text" name="section" value={formData.section} onChange={(e) => setFormData({...formData, section: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
-              <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-500 mb-1">Parent Phone</label><input required type="text" name="parentPhone" value={formData.parentPhone} onChange={(e) => setFormData({...formData, parentPhone: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Full Name</label><input required type="text" name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Admission Number</label><input required type="text" name="admissionNo" value={formData.admissionNo} onChange={(e) => setFormData({ ...formData, admissionNo: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Roll Number</label><input required type="text" name="rollNumber" value={formData.rollNumber} onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Class ID</label><input required type="number" name="classId" value={formData.classId} onChange={(e) => setFormData({ ...formData, classId: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div><label className="block text-xs font-semibold text-slate-500 mb-1">Section</label><input required type="text" name="section" value={formData.section} onChange={(e) => setFormData({ ...formData, section: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-500 mb-1">Parent Phone</label><input required type="text" name="parentPhone" value={formData.parentPhone} onChange={(e) => setFormData({ ...formData, parentPhone: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
               <div className="md:col-span-2 flex gap-3 mt-4">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-lg bg-slate-100 text-slate-600 font-bold hover:bg-slate-200">Cancel</button>
                 <button type="submit" className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30">Save Student</button>
@@ -233,11 +220,11 @@ const StudentManagement = ({ activeAction }) => {
             <form onSubmit={handlePromoteSubmit} className="space-y-4 text-left">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">New Class ID</label>
-                <input required type="number" value={promoteData.classId} onChange={(e) => setPromoteData({...promoteData, classId: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-amber-500" />
+                <input required type="number" value={promoteData.classId} onChange={(e) => setPromoteData({ ...promoteData, classId: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-amber-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">New Section</label>
-                <input required type="text" value={promoteData.section} onChange={(e) => setPromoteData({...promoteData, section: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-amber-500" />
+                <input required type="text" value={promoteData.section} onChange={(e) => setPromoteData({ ...promoteData, section: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-amber-500" />
               </div>
               <div className="flex gap-3 pt-4">
                 <button type="button" onClick={() => setShowPromoteModal(false)} className="flex-1 py-2 rounded-lg bg-slate-100 text-slate-600 font-bold hover:bg-slate-200">Cancel</button>
@@ -258,11 +245,11 @@ const StudentManagement = ({ activeAction }) => {
             <form onSubmit={handleTransferSubmit} className="space-y-4 text-left">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Transfer Date</label>
-                <input required type="date" value={transferData.date} onChange={(e) => setTransferData({...transferData, date: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-red-500" />
+                <input required type="date" value={transferData.date} onChange={(e) => setTransferData({ ...transferData, date: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-red-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Reason for Transfer</label>
-                <textarea required rows="3" value={transferData.reason} onChange={(e) => setTransferData({...transferData, reason: e.target.value})} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                <textarea required rows="3" value={transferData.reason} onChange={(e) => setTransferData({ ...transferData, reason: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-red-500"></textarea>
               </div>
               <div className="flex gap-3 pt-4">
                 <button type="button" onClick={() => setShowTransferModal(false)} className="flex-1 py-2 rounded-lg bg-slate-100 text-slate-600 font-bold hover:bg-slate-200">Cancel</button>
@@ -276,7 +263,7 @@ const StudentManagement = ({ activeAction }) => {
       {/* ID Card Modal */}
       {showIdCardModal && idCardData && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4">
-          
+
           <div className="flex justify-between w-full max-w-md mb-4 text-white">
             <h3 className="text-xl font-bold">Student ID Card</h3>
             <button onClick={() => setShowIdCardModal(false)} className="text-slate-300 hover:text-white font-bold">✕ Close</button>
@@ -289,15 +276,15 @@ const StudentManagement = ({ activeAction }) => {
             </div>
             <div className="p-6 flex flex-col items-center">
               <div className="w-32 h-32 bg-slate-100 rounded-lg border-4 border-white shadow-md flex items-center justify-center text-6xl mb-4 -mt-12">👤</div>
-              
+
               {isEditingIdCard ? (
                 <div className="w-full space-y-3 mb-4">
-                  <input className="w-full text-center text-2xl font-bold text-slate-800 border-b border-indigo-200 outline-none" value={idCardData.name} onChange={(e) => setIdCardData({...idCardData, name: e.target.value})} />
+                  <input className="w-full text-center text-2xl font-bold text-slate-800 border-b border-indigo-200 outline-none" value={idCardData.name} onChange={(e) => setIdCardData({ ...idCardData, name: e.target.value })} />
                   <div className="flex gap-2">
-                    <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.className} onChange={(e) => setIdCardData({...idCardData, className: e.target.value})} />
-                    <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.section} onChange={(e) => setIdCardData({...idCardData, section: e.target.value})} />
+                    <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.className} onChange={(e) => setIdCardData({ ...idCardData, className: e.target.value })} />
+                    <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.section} onChange={(e) => setIdCardData({ ...idCardData, section: e.target.value })} />
                   </div>
-                  <input className="w-full text-center text-slate-500 border-b border-slate-200 outline-none text-sm" value={idCardData.admissionNo} onChange={(e) => setIdCardData({...idCardData, admissionNo: e.target.value})} />
+                  <input className="w-full text-center text-slate-500 border-b border-slate-200 outline-none text-sm" value={idCardData.admissionNo} onChange={(e) => setIdCardData({ ...idCardData, admissionNo: e.target.value })} />
                 </div>
               ) : (
                 <div className="text-center mb-6">

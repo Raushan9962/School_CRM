@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DataTable from '../../../components/layout/DataTable';
 
 const PaymentReminders = () => {
     const [activeTab, setActiveTab] = useState('send');
@@ -88,35 +89,21 @@ const PaymentReminders = () => {
             )}
 
             {activeTab === 'logs' && (
-                <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                                <tr>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Date & Time</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Channel</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Recipient</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Message Preview</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {logs.map((l, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b' }}>{l.date}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>{l.type}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155' }}>{l.recipient}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{l.message}</td>
-                                        <td style={{ padding: '16px 24px' }}>
-                                            <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: l.status === 'Sent' ? '#dcfce7' : '#fee2e2', color: l.status === 'Sent' ? '#166534' : '#dc2626' }}>
-                                                {l.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                <div style={{ marginTop: '16px' }}>
+                    <DataTable 
+                        columns={[
+                            { key: 'date', label: 'Date & Time' },
+                            { key: 'type', label: 'Channel', render: (row) => <span style={{ fontWeight: 500, color: '#1e293b' }}>{row.type}</span> },
+                            { key: 'recipient', label: 'Recipient' },
+                            { key: 'message', label: 'Message Preview' },
+                            { key: 'status', label: 'Status', render: (row) => (
+                                <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: row.status === 'Sent' ? '#dcfce7' : '#fee2e2', color: row.status === 'Sent' ? '#166534' : '#dc2626' }}>
+                                    {row.status}
+                                </span>
+                            )}
+                        ]}
+                        data={logs}
+                    />
                 </div>
             )}
 

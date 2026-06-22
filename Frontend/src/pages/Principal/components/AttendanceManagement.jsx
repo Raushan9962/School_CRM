@@ -17,7 +17,11 @@ const AttendanceManagement = () => {
         });
         if (!res.ok) throw new Error('API not ready');
         const json = await res.json();
-        setData(json.data);
+        setData({
+          studentAvg: json.data.studentAvg || '0%',
+          teacherAvg: json.data.teacherAvg || '0%',
+          trends: json.data.trends || []
+        });
       } catch (err) {
         // Fallback to Hardcoded Data
         setData({
@@ -60,7 +64,7 @@ const AttendanceManagement = () => {
         <h3 style={panelTitleStyle}>Class-wise Attendance Trends</h3>
         {loading ? <p style={{ color: '#64748b' }}>Loading trends...</p> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-            {data.trends.map((t, idx) => (
+            {(!data.trends || data.trends.length === 0) ? <p style={{ color: '#64748b' }}>No trend data available.</p> : data.trends.map((t, idx) => (
               <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: `1px solid ${t.color}40`, textAlign: 'center' }}>
                 <p style={{ margin: '0 0 8px', fontWeight: '600', color: '#475569' }}>{t.class}</p>
                 <h4 style={{ margin: 0, fontSize: '24px', color: t.color }}>{t.rate}</h4>

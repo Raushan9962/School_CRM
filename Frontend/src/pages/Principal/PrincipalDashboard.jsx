@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, BookOpen, FileText, UserCheck, IndianRupee, BarChart2, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
 import DashboardOverview from './components/DashboardOverview';
 import StudentManagement from './components/StudentManagement';
 import TeacherManagement from './components/TeacherManagement';
@@ -12,14 +13,33 @@ import StaffManagement from './components/StaffManagement';
 import CommunicationCenter from './components/CommunicationCenter';
 import EventsManagement from './components/EventsManagement';
 import PlaceholderView from './components/PlaceholderView';
+import DashboardLayout from '../../components/layout/DashboardLayout';
+import ModuleContainer from '../../components/layout/ModuleContainer';
 
 const PrincipalDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [schoolName, setSchoolName] = useState('VidyaSetu School');
+    const [stats, setStats] = useState({ students: 0, teachers: 0, present: 0 });
 
     useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('http://localhost:5000/api/principal/dashboard-stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    setStats(json.stats);
+                }
+            } catch (err) {
+                console.error("Failed to load global stats", err);
+            }
+        };
+        fetchStats();
+
         const checkAuth = () => {
             const isAuth = localStorage.getItem('isAuthenticated');
             const userStr = localStorage.getItem('user');
@@ -52,8 +72,8 @@ const PrincipalDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Dashboard Overview', icon: '📊' },
-        { id: 'student_management', label: '👨‍🎓 Student Management', subItems: [
+        { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'student_management', label: 'Student Management', icon: <Users size={20} strokeWidth={1.5} />, subItems: [
             { id: 'sm_list', label: 'Student List', subItems: [
                 { id: 'sm_list_all', label: 'All Students' },
                 { id: 'sm_list_admission', label: 'Admission Details' },
@@ -88,7 +108,7 @@ const PrincipalDashboard = () => {
                 { id: 'sm_disc_behavior', label: 'Behaviour Records' }
             ]}
         ]},
-        { id: 'academic_management', label: '📚 Academic Management', subItems: [
+        { id: 'academic_management', label: 'Academic Management', icon: <BookOpen size={20} strokeWidth={1.5} />, subItems: [
             { id: 'ac_classes', label: 'Classes', subItems: [
                 { id: 'ac_class_list', label: 'Class List' },
                 { id: 'ac_class_sections', label: 'Sections' },
@@ -115,7 +135,7 @@ const PrincipalDashboard = () => {
                 { id: 'ac_study_video', label: 'Video Resources' }
             ]}
         ]},
-        { id: 'exam_management', label: '📝 Examination & Results', subItems: [
+        { id: 'exam_management', label: 'Examination & Results', icon: <FileText size={20} strokeWidth={1.5} />, subItems: [
             { id: 'ex_setup', label: 'Exam Setup', subItems: [
                 { id: 'ex_setup_types', label: 'Exam Types' },
                 { id: 'ex_setup_unit', label: 'Unit Test' },
@@ -151,7 +171,7 @@ const PrincipalDashboard = () => {
                 { id: 'ex_rep_pub', label: 'Publish Results' }
             ]}
         ]},
-        { id: 'staff_management', label: '👩‍🏫 Staff Management', subItems: [
+        { id: 'staff_management', label: 'Staff Management', icon: <UserCheck size={20} strokeWidth={1.5} />, subItems: [
             { id: 'stf_teachers', label: 'Teachers', subItems: [
                 { id: 'stf_teach_list', label: 'Teacher List' },
                 { id: 'stf_teach_prof', label: 'Teacher Profiles' },
@@ -179,7 +199,7 @@ const PrincipalDashboard = () => {
                 { id: 'stf_pay_rep', label: 'Salary Reports' }
             ]}
         ]},
-        { id: 'finance_management', label: '💰 Finance Management', subItems: [
+        { id: 'finance_management', label: 'Finance Management', icon: <IndianRupee size={20} strokeWidth={1.5} />, subItems: [
             { id: 'fin_fees', label: 'Fees Collection', subItems: [
                 { id: 'fin_fee_coll', label: 'Fee Collection' },
                 { id: 'fin_fee_on', label: 'Online Payments' },
@@ -201,7 +221,7 @@ const PrincipalDashboard = () => {
                 { id: 'fin_inc_other', label: 'Other Income Sources' }
             ]}
         ]},
-        { id: 'reports_analytics', label: '📈 Reports & Analytics', subItems: [
+        { id: 'reports_analytics', label: 'Reports & Analytics', icon: <BarChart2 size={20} strokeWidth={1.5} />, subItems: [
             { id: 'rep_attendance', label: 'Attendance Reports', subItems: [
                 { id: 'rep_att_daily', label: 'Daily Report' },
                 { id: 'rep_att_monthly', label: 'Monthly Report' },
@@ -227,7 +247,7 @@ const PrincipalDashboard = () => {
                 { id: 'rep_cus_pdf', label: 'Export PDF' }
             ]}
         ]},
-        { id: 'communication', label: '📢 Communication', subItems: [
+        { id: 'communication', label: 'Communication', icon: <MessageSquare size={20} strokeWidth={1.5} />, subItems: [
             { id: 'com_notices', label: 'Notices', subItems: [
                 { id: 'com_not_school', label: 'School Notices' },
                 { id: 'com_not_emer', label: 'Emergency Notices' }
@@ -246,7 +266,7 @@ const PrincipalDashboard = () => {
                 { id: 'com_em_teach', label: 'Teachers Email' }
             ]}
         ]},
-        { id: 'settings', label: '⚙️ Settings', subItems: [
+        { id: 'settings', label: 'Settings', icon: <SettingsIcon size={20} strokeWidth={1.5} />, subItems: [
             { id: 'set_session', label: 'Academic Session', subItems: [
                 { id: 'set_ses_create', label: 'Session Creation' },
                 { id: 'set_ses_switch', label: 'Session Switch' }
@@ -298,139 +318,161 @@ const PrincipalDashboard = () => {
 
     const renderContent = () => {
         if (activeTab === 'overview') return <DashboardOverview />;
-        
-        // Handle mapped functional modules
-        if (activeTab === 'sm_list_all' || activeTab === 'sm_list') return <StudentManagement />;
-        if (activeTab === 'sm_list_admission') return <AdmissionManagement />;
-        if (activeTab === 'sm_att_daily' || activeTab === 'sm_attendance') return <AttendanceManagement />;
-        
-        if (activeTab === 'ac_class_list' || activeTab === 'ac_classes') return <ClassManagement />;
-        if (activeTab === 'ex_marks_teacher' || activeTab === 'exam_management') return <ExaminationManagement />;
-        if (activeTab === 'fin_fee_coll' || activeTab === 'fin_fees') return <FeeManagement />;
-        if (activeTab === 'stf_teach_list' || activeTab === 'staff_management') return <StaffManagement />;
-        if (activeTab === 'com_not_school' || activeTab === 'communication') return <CommunicationCenter />;
-        
-        // Any other unmatched tab falls back to PlaceholderView
+
+        if (activeTab === 'student_management') {
+            const tabs = [
+                { id: 'sm_list', label: 'Student List', count: stats.students > 0 ? stats.students.toString() : '' },
+                { id: 'sm_attendance', label: 'Attendance', count: stats.present > 0 ? stats.present.toString() : '', subtext: 'Present Today' },
+                { id: 'sm_performance', label: 'Performance' },
+                { id: 'sm_promotions', label: 'Promotions' },
+                { id: 'sm_alumni', label: 'Alumni' },
+                { id: 'sm_discipline', label: 'Discipline' }
+            ];
+            const contentMap = {
+                'sm_list': <StudentManagement />,
+                'sm_attendance': <AttendanceManagement />,
+                'sm_performance': <PlaceholderView title="Student Performance" />,
+                'sm_promotions': <PlaceholderView title="Promotions" />,
+                'sm_alumni': <PlaceholderView title="Alumni" />,
+                'sm_discipline': <PlaceholderView title="Discipline" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sm_list" />;
+        }
+
+        if (activeTab === 'academic_management') {
+            const tabs = [
+                { id: 'ac_classes', label: 'Classes' },
+                { id: 'ac_subjects', label: 'Subjects' },
+                { id: 'ac_timetable', label: 'Timetable' },
+                { id: 'ac_homework', label: 'Homework' },
+                { id: 'ac_study', label: 'Study Materials' }
+            ];
+            const contentMap = {
+                'ac_classes': <ClassManagement />,
+                'ac_subjects': <PlaceholderView title="Subjects" />,
+                'ac_timetable': <PlaceholderView title="Timetable" />,
+                'ac_homework': <PlaceholderView title="Homework & Assignments" />,
+                'ac_study': <PlaceholderView title="Study Materials" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="ac_classes" />;
+        }
+
+        if (activeTab === 'exam_management') {
+            const tabs = [
+                { id: 'ex_setup', label: 'Exam Setup' },
+                { id: 'ex_marks', label: 'Marks Entry' },
+                { id: 'ex_analysis', label: 'Result Analysis' },
+                { id: 'ex_top', label: 'Top Performers' },
+                { id: 'ex_weak', label: 'Weak Students' },
+                { id: 'ex_report', label: 'Report Cards' }
+            ];
+            const contentMap = {
+                'ex_setup': <PlaceholderView title="Exam Setup" />,
+                'ex_marks': <ExaminationManagement />,
+                'ex_analysis': <PlaceholderView title="Result Analysis" />,
+                'ex_top': <PlaceholderView title="Top Performers" />,
+                'ex_weak': <PlaceholderView title="Weak Students" />,
+                'ex_report': <PlaceholderView title="Report Cards" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="ex_marks" />;
+        }
+
+        if (activeTab === 'staff_management') {
+            const tabs = [
+                { id: 'stf_teachers', label: 'Teachers', count: stats.teachers > 0 ? stats.teachers.toString() : '' },
+                { id: 'stf_attendance', label: 'Attendance' },
+                { id: 'stf_performance', label: 'Performance' },
+                { id: 'stf_leave', label: 'Leave Management' },
+                { id: 'stf_payroll', label: 'Payroll' }
+            ];
+            const contentMap = {
+                'stf_teachers': <StaffManagement />,
+                'stf_attendance': <PlaceholderView title="Staff Attendance" />,
+                'stf_performance': <PlaceholderView title="Staff Performance" />,
+                'stf_leave': <PlaceholderView title="Leave Management" />,
+                'stf_payroll': <PlaceholderView title="Payroll" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="stf_teachers" />;
+        }
+
+        if (activeTab === 'finance_management') {
+            const tabs = [
+                { id: 'fin_fees', label: 'Fees Collection' },
+                { id: 'fin_pending', label: 'Pending Fees' },
+                { id: 'fin_expense', label: 'Expenses' },
+                { id: 'fin_income', label: 'Income Reports' }
+            ];
+            const contentMap = {
+                'fin_fees': <FeeManagement />,
+                'fin_pending': <PlaceholderView title="Pending Fees" />,
+                'fin_expense': <PlaceholderView title="Expense Management" />,
+                'fin_income': <PlaceholderView title="Income Reports" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="fin_fees" />;
+        }
+
+        if (activeTab === 'reports_analytics') {
+            const tabs = [
+                { id: 'rep_attendance', label: 'Attendance Reports' },
+                { id: 'rep_results', label: 'Result Reports' },
+                { id: 'rep_fees', label: 'Fee Reports' },
+                { id: 'rep_staff', label: 'Staff Reports' }
+            ];
+            const contentMap = {
+                'rep_attendance': <PlaceholderView title="Attendance Reports" />,
+                'rep_results': <PlaceholderView title="Result Reports" />,
+                'rep_fees': <PlaceholderView title="Fee Reports" />,
+                'rep_staff': <PlaceholderView title="Staff Reports" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="rep_attendance" />;
+        }
+
+        if (activeTab === 'communication') {
+            const tabs = [
+                { id: 'com_notices', label: 'Notices' },
+                { id: 'com_announce', label: 'Announcements' },
+                { id: 'com_sms', label: 'SMS / WhatsApp' },
+                { id: 'com_email', label: 'Email' }
+            ];
+            const contentMap = {
+                'com_notices': <CommunicationCenter />,
+                'com_announce': <PlaceholderView title="Announcements" />,
+                'com_sms': <PlaceholderView title="SMS / WhatsApp" />,
+                'com_email': <PlaceholderView title="Email" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="com_notices" />;
+        }
+
+        if (activeTab === 'settings') {
+            const tabs = [
+                { id: 'set_school', label: 'School Settings' },
+                { id: 'set_session', label: 'Academic Session' },
+                { id: 'set_roles', label: 'Roles & Permissions' },
+                { id: 'set_sys', label: 'System Settings' }
+            ];
+            const contentMap = {
+                'set_school': <PlaceholderView title="School Settings" />,
+                'set_session': <PlaceholderView title="Academic Session" />,
+                'set_roles': <PlaceholderView title="Roles & Permissions" />,
+                'set_sys': <PlaceholderView title="System Settings" />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="set_school" />;
+        }
+
         const title = getActiveTitle().split(' / ').pop();
         return <PlaceholderView title={title} />;
     };
 
-    // Recursive component to render sidebar items
-    const renderNavItems = (items, depth = 0) => {
-        return items.map(item => {
-            const hasSub = item.subItems && item.subItems.length > 0;
-            const isOpen = openMenus[item.id];
-            const isSelected = activeTab === item.id;
-            
-            return (
-                <div key={item.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                    <button
-                        onClick={(e) => {
-                            if (hasSub) {
-                                toggleMenu(item.id, e);
-                            } else {
-                                setActiveTab(item.id);
-                            }
-                        }}
-                        style={{
-                            width: '100%', textAlign: 'left', 
-                            padding: depth === 0 ? '12px 14px' : depth === 1 ? '8px 12px 8px 24px' : '6px 12px 6px 36px',
-                            borderRadius: '8px', border: 'none', cursor: 'pointer',
-                            fontSize: depth === 0 ? 14 : 13, 
-                            fontWeight: depth === 0 ? 600 : 500,
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            background: isSelected ? 'rgba(56, 189, 248, 0.1)' : 'transparent',
-                            color: isSelected ? '#38bdf8' : (depth === 0 ? '#cbd5e1' : '#94a3b8'),
-                            transition: 'all 0.2s ease',
-                            marginTop: depth === 0 ? '4px' : '2px'
-                        }}
-                        onMouseEnter={e => { if (!isSelected) e.currentTarget.style.color = '#e2e8f0' }}
-                        onMouseLeave={e => { if (!isSelected) e.currentTarget.style.color = depth === 0 ? '#cbd5e1' : '#94a3b8' }}
-                    >
-                        {item.icon && <span style={{ fontSize: '16px' }}>{item.icon}</span>}
-                        <span style={{ flex: 1 }}>{item.label}</span>
-                        {hasSub && (
-                            <span style={{ fontSize: '12px', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
-                        )}
-                    </button>
-                    {hasSub && isOpen && (
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {renderNavItems(item.subItems, depth + 1)}
-                        </div>
-                    )}
-                </div>
-            );
-        });
-    };
-
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', fontFamily: "'Inter', sans-serif" }}>
-            {/* Sidebar */}
-            <aside style={{
-                width: isSidebarOpen ? 300 : 0, overflow: 'hidden', background: '#0f172a',
-                transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)', display: 'flex', flexDirection: 'column',
-                boxShadow: '4px 0 24px rgba(0,0,0,0.1)', zIndex: 10
-            }}>
-                <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 4px 12px rgba(59,130,246,0.4)' }}>👑</div>
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <h2 style={{ color: 'white', margin: 0, fontSize: 16, fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{schoolName}</h2>
-                        <p style={{ color: '#94a3b8', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Principal Portal</p>
-                    </div>
-                </div>
-
-                <nav style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {renderNavItems(navItems)}
-                    </div>
-                </nav>
-
-                <div style={{ padding: '20px 16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, marginBottom: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>P</div>
-                        <div>
-                            <p style={{ color: 'white', margin: 0, fontSize: 14, fontWeight: 600 }}>Principal User</p>
-                            <p style={{ color: '#94a3b8', margin: 0, fontSize: 11 }}>Administrator</p>
-                        </div>
-                    </div>
-                    <button onClick={handleLogout} style={{ width: '100%', padding: '10px', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)' }}>
-                        Sign Out
-                    </button>
-                </div>
-            </aside>
-
-            {/* Main Content */}
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-                {/* Header */}
-                <header style={{ 
-                    background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(10px)', 
-                    padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-                    borderBottom: '1px solid rgba(255,255,255,0.5)', zIndex: 5 
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#64748b', padding: 4, transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform='scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>☰</button>
-                        <div>
-                            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#0f172a' }}>{getActiveTitle()}</h1>
-                            <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748b' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <button style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: 18, position: 'relative' }}>
-                            🔔<span style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#ef4444', borderRadius: '50%' }}></span>
-                        </button>
-                    </div>
-                </header>
-
-                {/* Content Area */}
-                <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
-                    <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-                        {renderContent()}
-                    </div>
-                </div>
-            </main>
-        </div>
+        <DashboardLayout
+            navItems={navItems}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            userInfo={{ name: 'Principal', schoolName: schoolName, role: 'Administrator' }}
+            handleLogout={handleLogout}
+        >
+            {renderContent()}
+        </DashboardLayout>
     );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Monitor, FileText, PhoneCall, Pin } from 'lucide-react';
 
 import ReceptionistOverview from './components/ReceptionistOverview';
 
@@ -48,10 +49,10 @@ const ReceptionistDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Front Desk Overview', icon: '🛎️' },
-        { id: 'visitors', label: 'Visitor Log', icon: '📝' },
-        { id: 'enquiries', label: 'Admission Enquiries', icon: '📞' },
-        { id: 'notices', label: 'Front Desk Notices', icon: '📌' }
+        { id: 'overview', label: 'Front Desk Overview', icon: <Monitor size={20} strokeWidth={1.5} /> },
+        { id: 'visitors', label: 'Visitor Log', icon: <FileText size={20} strokeWidth={1.5} /> },
+        { id: 'enquiries', label: 'Admission Enquiries', icon: <PhoneCall size={20} strokeWidth={1.5} /> },
+        { id: 'notices', label: 'Front Desk Notices', icon: <Pin size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {

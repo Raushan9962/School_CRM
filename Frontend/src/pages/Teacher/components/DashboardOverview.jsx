@@ -1,4 +1,5 @@
 import React from 'react';
+import StatCard from '../../../components/layout/StatCard';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -50,51 +51,64 @@ const DashboardOverview = () => {
         }
     };
 
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* Welcome Section */}
             <div style={{ 
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', 
+                background: '#ffffff', 
                 padding: '24px', 
-                borderRadius: '16px', 
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                borderRadius: '8px', 
+                boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '24px',
                 border: '1px solid #e2e8f0'
             }}>
-                <img src={teacher.photo} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }} />
+                <img src={teacher.photo} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e2e8f0' }} />
                 <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 8px 0', fontSize: '28px', color: '#0f172a' }}>Welcome back, {teacher.name}! 👋</h2>
+                    <h2 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#1e293b', fontWeight: 600 }}>Welcome back, {teacher.name}! 👋</h2>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '15px' }}>{teacher.designation}</p>
                 </div>
             </div>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
-                <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: '600', opacity: 0.9 }}>Today's Classes</h3>
-                    <p style={{ fontSize: '32px', fontWeight: 'bold', margin: 0 }}>4</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '80px', opacity: 0.1 }}>👨‍🏫</span>
-                </div>
-                
-                <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: '600', opacity: 0.9 }}>Total Students</h3>
-                    <p style={{ fontSize: '32px', fontWeight: 'bold', margin: 0 }}>142</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '80px', opacity: 0.1 }}>👥</span>
-                </div>
-                
-                <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(245, 158, 11, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: '600', opacity: 0.9 }}>Attendance Pending</h3>
-                    <p style={{ fontSize: '32px', fontWeight: 'bold', margin: 0 }}>2</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '80px', opacity: 0.1 }}>📅</span>
-                </div>
-
-                <div style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(239, 68, 68, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: '600', opacity: 0.9 }}>Assignments to Review</h3>
-                    <p style={{ fontSize: '32px', fontWeight: 'bold', margin: 0 }}>28</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '80px', opacity: 0.1 }}>📋</span>
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                <StatCard 
+                    title="Class Overview" 
+                    metrics={[
+                        { label: "Today's Classes", value: '4' },
+                        { label: 'Total Students', value: '142' }
+                    ]}
+                />
+                <StatCard 
+                    title="Action Needed" 
+                    metrics={[
+                        { label: 'Attendance Pending', value: '2' },
+                        { label: 'Assignments to Review', value: '28' }
+                    ]}
+                    bottomComponent={
+                        <div style={{ textAlign: 'right' }}>
+                            <a href="#" style={{ color: '#0ea5e9', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Go to Tasks</a>
+                        </div>
+                    }
+                />
+                <StatCard 
+                    title="Performance" 
+                    extraHeaderIcon={<span className="material-icons">assessment</span>}
+                    metrics={[
+                        { label: 'Avg Class Score', value: '81%' },
+                        { label: 'Top Class', value: '9-A' }
+                    ]}
+                    bottomComponent={
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                            <select style={{ padding: '6px 12px', border: 'none', background: 'transparent', color: '#475569', fontSize: '14px', cursor: 'pointer', outline: 'none' }}>
+                                <option>Mid-Term</option>
+                                <option>Finals</option>
+                            </select>
+                        </div>
+                    }
+                />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>

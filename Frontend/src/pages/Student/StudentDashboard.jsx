@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, UserCircle, Calendar, BookOpen, FileText, Clock, ClipboardList, IndianRupee, Library, MessageSquare, Palmtree, Award, Palette, Bus, Ticket } from 'lucide-react';
 
 import DashboardOverview from './components/DashboardOverview';
 import StudentProfile from './components/StudentProfile';
@@ -55,21 +56,21 @@ const StudentDashboard = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Dashboard Overview', icon: '📊' },
-        { id: 'profile', label: 'My Profile', icon: '👤' },
-        { id: 'attendance', label: 'Attendance', icon: '📅' },
-        { id: 'academics', label: 'Academics', icon: '📚' },
-        { id: 'exams', label: 'Exams & Results', icon: '📝' },
-        { id: 'timetable', label: 'Timetable', icon: '⏰' },
-        { id: 'assignments', label: 'Assignments', icon: '📋' },
-        { id: 'fees', label: 'Fees Management', icon: '💰' },
-        { id: 'library', label: 'Library', icon: '📖' },
-        { id: 'communication', label: 'Communication', icon: '💬' },
-        { id: 'leave', label: 'Leave Management', icon: '🏖️' },
-        { id: 'certificates', label: 'Certificates', icon: '📜' },
-        { id: 'activities', label: 'Activities & Events', icon: '🎭' },
-        { id: 'transport', label: 'Transport', icon: '🚌' },
-        { id: 'complaint', label: 'Complaint / Help Desk', icon: '🎫' }
+        { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'profile', label: 'My Profile', icon: <UserCircle size={20} strokeWidth={1.5} /> },
+        { id: 'attendance', label: 'Attendance', icon: <Calendar size={20} strokeWidth={1.5} /> },
+        { id: 'academics', label: 'Academics', icon: <BookOpen size={20} strokeWidth={1.5} /> },
+        { id: 'exams', label: 'Exams & Results', icon: <FileText size={20} strokeWidth={1.5} /> },
+        { id: 'timetable', label: 'Timetable', icon: <Clock size={20} strokeWidth={1.5} /> },
+        { id: 'assignments', label: 'Assignments', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+        { id: 'fees', label: 'Fees Management', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
+        { id: 'library', label: 'Library', icon: <Library size={20} strokeWidth={1.5} /> },
+        { id: 'communication', label: 'Communication', icon: <MessageSquare size={20} strokeWidth={1.5} /> },
+        { id: 'leave', label: 'Leave Management', icon: <Palmtree size={20} strokeWidth={1.5} /> },
+        { id: 'certificates', label: 'Certificates', icon: <Award size={20} strokeWidth={1.5} /> },
+        { id: 'activities', label: 'Activities & Events', icon: <Palette size={20} strokeWidth={1.5} /> },
+        { id: 'transport', label: 'Transport', icon: <Bus size={20} strokeWidth={1.5} /> },
+        { id: 'complaint', label: 'Complaint / Help Desk', icon: <Ticket size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
@@ -175,8 +176,9 @@ const StudentDashboard = () => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: 12 }}>
-                        <button style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: 18, position: 'relative' }}>
-                            🔔<span style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#ef4444', borderRadius: '50%' }}></span>
+                        <button style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background='white'}>
+                            <Bell size={20} strokeWidth={1.5} color="#475569" />
+                            <span style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#ef4444', borderRadius: '50%', border: '2px solid white' }}></span>
                         </button>
                     </div>
                 </header>
