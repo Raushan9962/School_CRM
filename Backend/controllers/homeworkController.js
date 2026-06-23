@@ -1,4 +1,5 @@
 const Homework = require('../models/Homework');
+const pool = require('../config/db');
 
 exports.createHomework = async (req, res) => {
     try {
@@ -28,6 +29,41 @@ exports.getHomeworkById = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching details' });
+    }
+};
+
+exports.getHomeworkByClass = async (req, res) => {
+    try {
+        const classId = req.params.classId;
+        const result = await pool.query(`
+            SELECT h.*, s.name as subject_name 
+            FROM homework h
+            JOIN subjects s ON h.subject_id = s.id
+            WHERE h.class_id = $1
+            ORDER BY h.due_date ASC
+        `, [classId]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching class homework' });
+    }
+};
+
+exports.getHomeworkByStudentUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const result = await pool.query(`
+            SELECT h.*, s.name as subject_name 
+            FROM homework h
+            JOIN subjects s ON h.subject_id = s.id
+            JOIN students st ON h.class_id = st.class_id
+            WHERE st.user_id = $1
+            ORDER BY h.due_date ASC
+        `, [userId]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching student homework' });
     }
 };
 

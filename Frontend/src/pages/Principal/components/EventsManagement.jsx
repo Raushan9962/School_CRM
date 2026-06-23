@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
@@ -12,7 +13,7 @@ const EventsManagement = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/principal/events', {
+        const res = await apiFetch('/principal/events', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('API not ready');
@@ -33,16 +34,16 @@ const EventsManagement = () => {
   }, []);
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Events Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+    <div className="dashboard-section animate-fade-in" className="p-6">
+      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Events Management</h2>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Create Events" icon="🎉" />
         <ActionBtn text="Publish Calendars" icon="📅" />
       </div>
       
       <div className="glass-panel" style={panelStyle}>
         <h3 style={panelTitleStyle}>School Events & Holidays</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading events...</p> : (
+        {loading ? <p className="text-slate-500">Loading events...</p> : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {events.map(e => (
               <div key={e.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', borderLeft: `4px solid ${e.type === 'Holiday' ? '#ef4444' : (e.type === 'Sports' ? '#3b82f6' : '#8b5cf6')}` }}>

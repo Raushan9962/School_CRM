@@ -4,10 +4,10 @@ const AttendanceManagement = () => {
     const [activeTab, setActiveTab] = useState('mark');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Attendance Management</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Attendance Management</h2>
+                <div className="flex gap-3">
                     <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         📥 Download Reports
                     </button>
@@ -17,7 +17,7 @@ const AttendanceManagement = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['mark', 'daily', 'monthly', 'subject', 'requests'].map(tab => (
                     <button
                         key={tab}
@@ -40,7 +40,7 @@ const AttendanceManagement = () => {
             </div>
 
             {activeTab === 'mark' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="flex flex-col gap-6">
                     <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                         <select style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', minWidth: '200px' }}>
                             <option>Class 10 - A (Science)</option>
@@ -50,14 +50,14 @@ const AttendanceManagement = () => {
                         <button style={{ padding: '10px 24px', background: '#0f172a', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Fetch Students</button>
                     </div>
 
-                    <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Roll No</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Name</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Remarks</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Roll No</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Student Name</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Status</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,11 +68,11 @@ const AttendanceManagement = () => {
                                     { roll: 4, name: 'Ishaan Singh', status: 'Late' },
                                     { roll: 5, name: 'Kavya Verma', status: 'Present' }
                                 ].map((student, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                    <tr key={idx} className="border-b border-slate-200">
                                         <td style={{ padding: '16px', fontSize: '14px', color: '#1e293b' }}>{student.roll}</td>
                                         <td style={{ padding: '16px', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>{student.name}</td>
                                         <td style={{ padding: '16px' }}>
-                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                            <div className="flex gap-2">
                                                 {['Present', 'Absent', 'Late', 'Half Day'].map(status => (
                                                     <button key={status} style={{
                                                         padding: '6px 12px',
@@ -101,13 +101,13 @@ const AttendanceManagement = () => {
             )}
 
             {activeTab === 'requests' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className="flex flex-col gap-4">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #f59e0b' }}>
                         <div>
                             <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#1e293b' }}>Diya Sharma (Roll: 2) - Class 10 A</h4>
                             <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>Requested correction for 12-Oct-2026: Mark as Present (Was marked Absent by mistake)</p>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                             <button style={{ padding: '8px 16px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Reject</button>
                             <button style={{ padding: '8px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Approve</button>
                         </div>

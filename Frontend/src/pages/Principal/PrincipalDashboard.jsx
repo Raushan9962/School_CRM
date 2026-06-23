@@ -15,6 +15,7 @@ import EventsManagement from './components/EventsManagement';
 import PlaceholderView from './components/PlaceholderView';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ModuleContainer from '../../components/layout/ModuleContainer';
+import apiFetch from '../../services/api';
 
 const PrincipalDashboard = () => {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ const PrincipalDashboard = () => {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch('http://localhost:5000/api/principal/dashboard-stats', {
+                const res = await apiFetch('/principal/dashboard-stats', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {

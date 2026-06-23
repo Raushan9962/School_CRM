@@ -3,12 +3,12 @@ import React from 'react';
 const Transactions = () => {
   return (
     <div className="animate-fade-in">
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', margin: '0' }}>Transactions</h2>
-        <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Manage and track all payment transactions across schools.</p>
+      <div className="mb-6">
+        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Transactions</h2>
+        <p className="text-slate-500 text-sm mt-1">Manage and track all payment transactions across schools.</p>
       </div>
       
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Add Transaction" icon="➕" color="#3b82f6" />
         <ActionBtn text="Export Report" icon="⬇️" color="#10b981" />
       </div>
@@ -18,8 +18,8 @@ const Transactions = () => {
         borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', 
         border: '1px solid rgba(255,255,255,0.5)' 
       }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>Transaction History</h3>
-        <p style={{ color: '#64748b' }}>A detailed ledger of all platform transactions will be displayed here.</p>
+        <h3 className="m-0 mb-4 text-base font-bold text-slate-800">Transaction History</h3>
+        <p className="text-slate-500">A detailed ledger of all platform transactions will be displayed here.</p>
       </div>
     </div>
   );

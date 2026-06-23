@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StatCard from '../../../components/layout/StatCard';
 import {
   Chart as ChartJS,
@@ -10,6 +10,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import QRScannerModal from '../../../components/common/QRScannerModal';
+import apiFetch from '../../../services/api';
 
 ChartJS.register(
   CategoryScale,
@@ -21,6 +23,8 @@ ChartJS.register(
 );
 
 const DashboardOverview = () => {
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+
     // Mock teacher data
     const teacher = {
         name: "Anita Sharma",
@@ -51,9 +55,38 @@ const DashboardOverview = () => {
         }
     };
 
+    const handleScanSuccess = async (scannedData) => {
+        setIsScannerOpen(false);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await apiFetch('/attendance/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ qrPayload: scannedData })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Attendance Marked Successfully!');
+            } else {
+                alert(data.error || 'Failed to mark attendance.');
+            }
+        } catch (e) {
+            alert('Error marking attendance.');
+            console.error(e);
+        }
+    };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="flex flex-col gap-6">
+            <QRScannerModal 
+                isOpen={isScannerOpen} 
+                onClose={() => setIsScannerOpen(false)} 
+                onScanSuccess={handleScanSuccess} 
+            />
+
             {/* Welcome Section */}
             <div style={{ 
                 background: '#ffffff', 
@@ -62,14 +95,23 @@ const DashboardOverview = () => {
                 boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 gap: '24px',
                 border: '1px solid #e2e8f0'
             }}>
-                <img src={teacher.photo} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e2e8f0' }} />
-                <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#1e293b', fontWeight: 600 }}>Welcome back, {teacher.name}! 👋</h2>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '15px' }}>{teacher.designation}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                    <img src={teacher.photo} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e2e8f0' }} />
+                    <div style={{ flex: 1 }}>
+                        <h2 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#1e293b', fontWeight: 600 }}>Welcome back, {teacher.name}! 👋</h2>
+                        <p style={{ margin: 0, color: '#64748b', fontSize: '15px' }}>{teacher.designation}</p>
+                    </div>
                 </div>
+                <button 
+                    onClick={() => setIsScannerOpen(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 border border-transparent text-white rounded-lg shadow-sm hover:bg-emerald-700 transition-colors cursor-pointer font-medium"
+                >
+                    Scan Attendance
+                </button>
             </div>
 
             {/* Stats Grid */}
@@ -112,9 +154,9 @@ const DashboardOverview = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="flex flex-col gap-6">
                     {/* Performance Graph */}
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>📊 Class Performance Summary</h3>
                         <div style={{ height: '300px' }}>
                             <Bar data={performanceData} options={performanceOptions} />
@@ -122,7 +164,7 @@ const DashboardOverview = () => {
                     </div>
 
                     {/* Upcoming Exams */}
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>📝 Upcoming Exams</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {[
@@ -143,11 +185,11 @@ const DashboardOverview = () => {
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="flex flex-col gap-6">
                     {/* Today's Schedule */}
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>⏰ Today's Schedule</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             {[
                                 { time: '08:30 AM', class: 'Class 10-A', subject: 'Physics', status: 'completed' },
                                 { time: '10:15 AM', class: 'Class 9-B', subject: 'Chemistry', status: 'active' },
@@ -164,9 +206,9 @@ const DashboardOverview = () => {
                     </div>
 
                     {/* Recent Notices */}
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>📣 Recent Notices</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div style={{ paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
                                 <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: '600', background: '#fee2e2', padding: '2px 8px', borderRadius: '4px' }}>Staff</span>
                                 <h4 style={{ margin: '8px 0', fontSize: '14px', color: '#1e293b' }}>Staff Meeting Today</h4>

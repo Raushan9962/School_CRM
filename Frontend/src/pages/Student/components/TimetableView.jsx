@@ -1,90 +1,151 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, ChevronDown, Search, RefreshCw, Clock, MapPin, User } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const TimetableView = () => {
-    const [view, setView] = useState('daily');
-    
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const [activeDay, setActiveDay] = useState('Monday');
+    const [activeTab, setActiveTab] = useState('Monday');
+    const [schedule, setSchedule] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const schedule = [
-        { time: '08:00 AM - 08:45 AM', subject: 'Mathematics', teacher: 'Mr. Rajesh Kumar', room: 'Room 101', type: 'Theory' },
-        { time: '08:45 AM - 09:30 AM', subject: 'Physics', teacher: 'Mrs. Sunita Sharma', room: 'Lab 2', type: 'Practical' },
-        { time: '09:30 AM - 09:45 AM', subject: 'Break', isBreak: true },
-        { time: '09:45 AM - 10:30 AM', subject: 'Chemistry', teacher: 'Mr. Amit Patel', room: 'Room 101', type: 'Theory' },
-        { time: '10:30 AM - 11:15 AM', subject: 'English', teacher: 'Ms. Priya Singh', room: 'Room 101', type: 'Theory' },
-        { time: '11:15 AM - 12:00 PM', subject: 'Lunch Break', isBreak: true },
-        { time: '12:00 PM - 12:45 PM', subject: 'Computer Science', teacher: 'Mr. Rohan Gupta', room: 'Computer Lab 1', type: 'Practical' },
-        { time: '12:45 PM - 01:30 PM', subject: 'Physical Education', teacher: 'Mr. Vikram Singh', room: 'Playground', type: 'Sports' }
-    ];
+    const fetchTimetable = async () => {
+        try {
+            setLoading(true);
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const res = await apiFetch(`/timetables/student/${user.id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setSchedule(data);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching timetable:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTimetable();
+    }, []);
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    
+    const tabs = days.map(day => ({
+        id: day,
+        label: day,
+        count: schedule.filter(s => s.day_of_week === day).length.toString(),
+        subtext: 'Periods'
+    }));
+
+    const filteredSchedule = schedule.filter(s => s.day_of_week === activeTab);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Class Timetable</h2>
-                <button style={{ padding: '8px 16px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
-                    ⬇️ Download Timetable
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+            
+            {/* Action Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Weekly View <ChevronDown size={16} />
+                    </button>
+                    
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={16} /> Current Week
+                    </button>
+                </div>
+
+                <div className="flex gap-3">
+                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                        Download Timetable
+                    </button>
+                </div>
+            </div>
+
+            {/* Horizontal Tabs */}
+            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+                {tabs.map(tab => (
+                    <button 
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        style={{
+                            minWidth: '160px',
+                            padding: '16px',
+                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
+                            border: '1px solid',
+                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
+                            borderBottom: 'none',
+                            borderRadius: '8px 8px 0 0',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            position: 'relative',
+                            marginBottom: '-2px',
+                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
+                        }}
+                    >
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
+                            <span className="text-2xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                        </div>
+                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Data Table */}
+            <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
+                {loading ? (
+                    <div className="p-10 text-center text-gray-500">Loading timetable...</div>
+                ) : filteredSchedule.length === 0 ? (
+                    <div className="p-10 text-center text-gray-500">No classes scheduled for {activeTab}.</div>
+                ) : (
+                    <table className="w-full border-collapse text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
+                                <th className="px-3 py-4 w-[60px]">S.No.</th>
+                                <th className="px-3 py-4">Period</th>
+                                <th className="px-3 py-4">Time Slot</th>
+                                <th className="px-3 py-4">Subject</th>
+                                <th className="px-3 py-4">Instructor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredSchedule.map((row, idx) => (
+                                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
+                                    <td style={{ padding: '16px 12px', color: '#111827' }}>
+                                        PRD-{idx + 1}
+                                    </td>
+                                    <td style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '500' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Clock size={14} /> {row.start_time} - {row.end_time}
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '16px 12px', color: '#111827', fontWeight: '600' }}>{row.subject_name}</td>
+                                    <td className="px-3 py-4 text-gray-600">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <User size={14} /> {row.teacher_name || 'TBA'}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+                
+                {/* Floating Action Button */}
+                <button onClick={fetchTimetable} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
+                    <RefreshCw size={20} />
                 </button>
             </div>
 
-            <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
-                    <div style={{ display: 'flex', gap: '8px', background: '#f1f5f9', padding: '4px', borderRadius: '8px' }}>
-                        <button onClick={() => setView('daily')} style={{ padding: '6px 16px', background: view === 'daily' ? 'white' : 'transparent', color: view === 'daily' ? '#0f172a' : '#64748b', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', boxShadow: view === 'daily' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                            Daily View
-                        </button>
-                        <button onClick={() => setView('weekly')} style={{ padding: '6px 16px', background: view === 'weekly' ? 'white' : 'transparent', color: view === 'weekly' ? '#0f172a' : '#64748b', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', boxShadow: view === 'weekly' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                            Weekly View
-                        </button>
-                    </div>
-
-                    {view === 'daily' && (
-                        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0' }}>
-                            {days.map(day => (
-                                <button key={day} onClick={() => setActiveDay(day)} style={{ padding: '6px 12px', background: activeDay === day ? '#3b82f6' : 'transparent', color: activeDay === day ? 'white' : '#64748b', border: activeDay === day ? 'none' : '1px solid #cbd5e1', borderRadius: '20px', fontWeight: '500', fontSize: '13px', cursor: 'pointer' }}>
-                                    {day}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {view === 'daily' ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {schedule.map((slot, idx) => (
-                            slot.isBreak ? (
-                                <div key={idx} style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', textAlign: 'center', color: '#64748b', fontWeight: '500', fontSize: '14px', border: '1px dashed #cbd5e1' }}>
-                                    ☕ {slot.time} • {slot.subject}
-                                </div>
-                            ) : (
-                                <div key={idx} style={{ display: 'flex', gap: '16px', background: 'white', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', alignItems: 'center' }}>
-                                    <div style={{ background: '#eff6ff', color: '#1d4ed8', padding: '12px 16px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', minWidth: '160px', textAlign: 'center' }}>
-                                        {slot.time}
-                                    </div>
-                                    <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                {slot.subject}
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', background: slot.type === 'Theory' ? '#e0e7ff' : (slot.type === 'Practical' ? '#dcfce7' : '#fef3c7'), color: slot.type === 'Theory' ? '#4f46e5' : (slot.type === 'Practical' ? '#166534' : '#b45309'), fontWeight: '600' }}>
-                                                    {slot.type}
-                                                </span>
-                                            </h4>
-                                            <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>👨‍🏫 {slot.teacher}</p>
-                                        </div>
-                                        <div style={{ background: '#f1f5f9', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: '#475569', fontWeight: '500', fontSize: '14px' }}>
-                                            🏫 {slot.room}
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        ))}
-                    </div>
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
-                        <span style={{ fontSize: '48px' }}>📅</span>
-                        <h3 style={{ margin: '16px 0 8px', color: '#1e293b' }}>Weekly View Layout</h3>
-                        <p style={{ margin: 0 }}>The full weekly grid timetable is available in the downloaded PDF.</p>
-                    </div>
-                )}
+            {/* Pagination Footer */}
+            <div className="flex justify-end items-center px-6 py-4 border-t border-slate-200 text-gray-600 text-sm gap-6">
+                <div>Total {filteredSchedule.length} Academic Periods on {activeTab}</div>
             </div>
         </div>
     );

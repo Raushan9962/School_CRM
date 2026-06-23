@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import apiFetch from '../services/api';
 
 const StudentLogin = () => {
   const [email, setEmail] = useState('');
@@ -12,16 +12,21 @@ const StudentLogin = () => {
     e.preventDefault();
     try {
       // Connects to the backend we built earlier
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
-        password
+      const response = await apiFetch('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
       });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
 
-      if (res.data.success) {
+      if (data.success) {
         // Store JWT token and user info in localStorage
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-        const rawRole = res.data.user?.role || res.data.user?.roleName || '';
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        const rawRole = data.user?.role || data.user?.roleName || '';
         const role = rawRole.toLowerCase().replace(/\s+/g, '');
         // Route based on role
         if (role === 'superadmin') {
@@ -49,7 +54,7 @@ const StudentLogin = () => {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.message || 'Login failed');
     }
   };
 

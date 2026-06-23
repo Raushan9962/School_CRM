@@ -1,4 +1,5 @@
 const Fee = require('../models/Fee');
+const pool = require('../config/db');
 
 exports.createFee = async (req, res) => {
     try {
@@ -28,6 +29,24 @@ exports.getFeeById = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching details' });
+    }
+};
+
+exports.getFeesByStudentId = async (req, res) => {
+    try {
+        // Here studentId in URL is actually the users.id from frontend localStorage user obj
+        const userId = req.params.studentId;
+        const result = await pool.query(`
+            SELECT f.*, s.id as student_id 
+            FROM fees f
+            JOIN students s ON f.student_id = s.id
+            WHERE s.user_id = $1
+            ORDER BY f.due_date DESC
+        `, [userId]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching student fees' });
     }
 };
 

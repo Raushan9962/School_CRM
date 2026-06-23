@@ -10,26 +10,26 @@ const AuditLogs = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Financial Audit Logs</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Financial Audit Logs</h2>
+                <div className="flex gap-3">
                     <button style={{ padding: '10px 20px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         📥 Export Logs
                     </button>
                 </div>
             </div>
 
-            <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <input type="date" style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
-                    <select style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                    <input type="date" className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
+                    <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                         <option value="">All Users</option>
                         <option value="accountant">Accountant_Admin</option>
                         <option value="system">System_Auto</option>
                         <option value="super">Super_Admin</option>
                     </select>
-                    <select style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                    <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                         <option value="">All Modules</option>
                         <option value="fee">Fee Collection</option>
                         <option value="expense">Expense Management</option>
@@ -39,27 +39,27 @@ const AuditLogs = () => {
                     <input type="text" placeholder="Search Actions..." style={{ flex: 1, padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', minWidth: '200px' }} />
                 </div>
                 
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left">
+                        <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Date & Time</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>User</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Module</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Action Performed</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>IP Address</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Date & Time</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">User</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Module</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Action Performed</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">IP Address</th>
                             </tr>
                         </thead>
                         <tbody>
                             {logs.map((log) => (
                                 <tr key={log.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                     <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b', whiteSpace: 'nowrap' }}>{log.date}</td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4">
                                         <span style={{ padding: '4px 8px', background: log.user === 'System_Auto' ? '#f1f5f9' : '#eff6ff', color: log.user === 'System_Auto' ? '#64748b' : '#3b82f6', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
                                             {log.user}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{log.module}</td>
+                                    <td className="px-6 py-4 text-sm text-slate-600">{log.module}</td>
                                     <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b' }}>{log.action}</td>
                                     <td style={{ padding: '16px 24px', fontSize: '13px', color: '#94a3b8', fontFamily: 'monospace' }}>{log.ip}</td>
                                 </tr>
@@ -70,7 +70,7 @@ const AuditLogs = () => {
                 
                 <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '14px', color: '#64748b' }}>Showing 1 to 5 of 124 entries</span>
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div className="flex gap-2">
                         <button style={{ padding: '6px 12px', border: '1px solid #cbd5e1', background: 'white', color: '#94a3b8', borderRadius: '6px', cursor: 'not-allowed' }}>Previous</button>
                         <button style={{ padding: '6px 12px', border: '1px solid #0ea5e9', background: '#0ea5e9', color: 'white', borderRadius: '6px', cursor: 'pointer' }}>1</button>
                         <button style={{ padding: '6px 12px', border: '1px solid #cbd5e1', background: 'white', color: '#475569', borderRadius: '6px', cursor: 'pointer' }}>2</button>

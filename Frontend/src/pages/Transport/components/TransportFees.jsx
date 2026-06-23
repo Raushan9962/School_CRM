@@ -19,10 +19,10 @@ const TransportFees = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Transport Fees Management</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Transport Fees Management</h2>
+                <div className="flex gap-3">
                     <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         📥 Export List
                     </button>
@@ -56,7 +56,7 @@ const TransportFees = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['student', 'route'].map(tab => (
                     <button
                         key={tab}
@@ -79,46 +79,46 @@ const TransportFees = () => {
             </div>
 
             {activeTab === 'student' && (
-                <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
                         <input type="text" placeholder="Search Student..." style={{ flex: 1, padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
-                        <select style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                             <option value="">All Statuses</option>
                             <option value="Paid">Paid</option>
                             <option value="Pending">Pending</option>
                             <option value="Overdue">Overdue</option>
                         </select>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Details</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Assigned Route</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Amount</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Payment Date</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Actions</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Student Details</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Assigned Route</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Amount</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Payment Date</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {studentFees.map((s, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                        <td style={{ padding: '16px 24px' }}>
+                                    <tr key={idx} className="border-b border-slate-200">
+                                        <td className="px-6 py-4">
                                             <p style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>{s.student}</p>
-                                            <span style={{ fontSize: '12px', color: '#64748b' }}>{s.id} • {s.class}</span>
+                                            <span className="text-xs text-slate-500">{s.id} • {s.class}</span>
                                         </td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{s.route}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-600">{s.route}</td>
                                         <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#334155' }}>{s.amount}</td>
-                                        <td style={{ padding: '16px 24px' }}>
+                                        <td className="px-6 py-4">
                                             <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: getStatusStyle(s.status).bg, color: getStatusStyle(s.status).text }}>
                                                 {s.status}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{s.date}</td>
-                                        <td style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
+                                        <td className="px-6 py-4 text-sm text-slate-600">{s.date}</td>
+                                        <td className="px-6 py-4 flex gap-2">
                                             {s.status !== 'Paid' && (
-                                                <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#3b82f6', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Mark Paid</button>
+                                                <button className="px-3 py-1.5 bg-blue-50 text-blue-500 border-none rounded-md text-[13px] font-medium cursor-pointer hover:bg-blue-100 transition-colors">Mark Paid</button>
                                             )}
                                         </td>
                                     </tr>
@@ -130,10 +130,10 @@ const TransportFees = () => {
             )}
 
             {activeTab === 'route' && (
-                <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                    <span style={{ fontSize: '48px' }}>🛣️</span>
-                    <h3 style={{ color: '#0f172a', margin: '16px 0 8px 0' }}>Route-wise Fee Structure Setup</h3>
-                    <p style={{ color: '#64748b' }}>Define and manage standard monthly/annual fees per route here.</p>
+                <div className="bg-white p-10 rounded-2xl text-center shadow-sm">
+                    <span className="text-[48px]">🛣️</span>
+                    <h3 className="text-slate-900 my-4 mb-2">Route-wise Fee Structure Setup</h3>
+                    <p className="text-slate-500">Define and manage standard monthly/annual fees per route here.</p>
                 </div>
             )}
         </div>

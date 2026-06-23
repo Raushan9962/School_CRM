@@ -4,6 +4,7 @@ const timetableController = require('../controllers/timetableController');
 
 router.post('/', timetableController.createTimetable);
 router.get('/', timetableController.getAllTimetables);
+router.get('/student/:studentId', timetableController.getTimetableByStudentId);
 router.get('/:id', timetableController.getTimetableById);
 router.put('/:id', timetableController.updateTimetable);
 router.delete('/:id', timetableController.deleteTimetable);

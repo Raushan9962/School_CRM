@@ -27,10 +27,10 @@ const TeacherProfile = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>My Profile</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">My Profile</h2>
+                <div className="flex gap-3">
                     <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         🔒 Change Password
                     </button>
@@ -40,13 +40,13 @@ const TeacherProfile = () => {
                 </div>
             </div>
 
-            <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div style={{ height: '120px', background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)' }}></div>
                 
                 <div style={{ padding: '0 32px 32px', position: 'relative' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-40px', marginBottom: '24px' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px' }}>
-                            <div style={{ position: 'relative' }}>
+                            <div className="relative">
                                 <img src="https://ui-avatars.com/api/?name=Anita+Sharma&background=10B981&color=fff&size=128" alt="Profile" style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid white', background: 'white', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
                                 <button style={{ position: 'absolute', bottom: 4, right: 4, width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: 'white', border: '2px solid white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     📷
@@ -92,15 +92,15 @@ const TeacherProfile = () => {
                                 <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Professional Information</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Designation</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Designation</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.designation}</p>
                                     </div>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Qualification</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Qualification</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.qualification}</p>
                                     </div>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Experience</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Experience</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.experience}</p>
                                     </div>
                                 </div>
@@ -112,15 +112,15 @@ const TeacherProfile = () => {
                                 <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Personal Information</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Date of Birth</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Date of Birth</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.dob}</p>
                                     </div>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Gender</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Gender</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.gender}</p>
                                     </div>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Blood Group</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Blood Group</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.bloodGroup}</p>
                                     </div>
                                 </div>
@@ -132,15 +132,15 @@ const TeacherProfile = () => {
                                 <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Contact Details</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Email</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Email</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.contact.email}</p>
                                     </div>
                                     <div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Phone Number</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Phone Number</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.contact.phone}</p>
                                     </div>
                                     <div style={{ gridColumn: '1 / -1' }}>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Residential Address</p>
+                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Residential Address</p>
                                         <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500', lineHeight: '1.5' }}>{teacher.contact.address}</p>
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@ const TeacherProfile = () => {
                     {activeTab === 'documents' && (
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>Uploaded Documents</h3>
+                                <h3 className="m-0 text-lg text-slate-800">Uploaded Documents</h3>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {teacher.documents.map((doc, idx) => (

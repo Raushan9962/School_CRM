@@ -1,132 +1,259 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, ChevronDown, Search, RefreshCw, ChevronLeft, ChevronRight, MessageCircle, Bell, Megaphone, CheckCircle } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const CommunicationView = () => {
     const [activeTab, setActiveTab] = useState('notices');
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchNotifications = async () => {
+        try {
+            setLoading(true);
+            const res = await apiFetch(`/notifications/role/Student`);
+            if (res.ok) {
+                const data = await res.json();
+                setNotifications(data);
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    // For demonstration, map target_role "Student" to Notices
+    const notices = notifications.map((n, idx) => ({
+        id: `NTC-${n.id.toString().padStart(3, '0')}`,
+        title: n.title,
+        date: new Date(n.created_at).toLocaleDateString(),
+        sender: 'Admin',
+        desc: n.message,
+        type: 'Notice',
+        isNew: idx === 0
+    }));
+
+    const events = [
+        { id: 'EVT-012', title: 'Annual Science Exhibition', date: '20 Nov 2026', time: '09:00 AM', venue: 'School Auditorium', type: 'Academic', isNew: true },
+        { id: 'EVT-011', title: 'Inter-School Football Match', date: '12 Nov 2026', time: '10:00 AM', venue: 'City Sports Ground', type: 'Sports', isNew: false }
+    ];
+
+    const messages = [
+        { id: 'MSG-001', sender: 'Mr. Sharma', subject: 'Physics', preview: "Don't forget the assignment", date: 'Today, 10:30 AM', status: 'Unread', isNew: true },
+        { id: 'MSG-002', sender: 'Mrs. Gupta', subject: 'Chemistry', preview: 'Yes, the syllabus is updated', date: 'Yesterday', status: 'Read', isNew: false }
+    ];
+
+    const tabs = [
+        { id: 'notices', label: 'Notices', count: notices.length.toString(), subtext: 'Official Circulars' },
+        { id: 'events', label: 'Events', count: events.length.toString(), subtext: 'Upcoming Activities' },
+        { id: 'messages', label: 'Messages', count: messages.length.toString(), subtext: 'Chats' }
+    ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Communication Hub</h2>
-                <button style={{ padding: '8px 16px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
-                    ✉️ Send Query to Admin
-                </button>
-            </div>
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+            
+            {/* Action Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Type <ChevronDown size={16} />
+                    </button>
+                    
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={16} /> Filter Date
+                    </button>
 
-            <div style={{ display: 'flex', gap: '24px', flex: 1, minHeight: '500px' }}>
-                <div style={{ width: '280px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <div style={{ padding: '16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#1e293b' }}>
-                        Categories
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <button onClick={() => setActiveTab('notices')} style={{ padding: '16px', textAlign: 'left', background: activeTab === 'notices' ? '#eff6ff' : 'transparent', border: 'none', borderLeft: activeTab === 'notices' ? '4px solid #3b82f6' : '4px solid transparent', color: activeTab === 'notices' ? '#2563eb' : '#475569', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '18px' }}>📣</span> School Notices & Circulars
-                        </button>
-                        <button onClick={() => setActiveTab('events')} style={{ padding: '16px', textAlign: 'left', background: activeTab === 'events' ? '#eff6ff' : 'transparent', border: 'none', borderLeft: activeTab === 'events' ? '4px solid #3b82f6' : '4px solid transparent', color: activeTab === 'events' ? '#2563eb' : '#475569', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '18px' }}>🎭</span> Event Updates
-                        </button>
-                        <button onClick={() => setActiveTab('teachers')} style={{ padding: '16px', textAlign: 'left', background: activeTab === 'teachers' ? '#eff6ff' : 'transparent', border: 'none', borderLeft: activeTab === 'teachers' ? '4px solid #3b82f6' : '4px solid transparent', color: activeTab === 'teachers' ? '#2563eb' : '#475569', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '18px' }}>👨‍🏫</span> Teacher Messages / Chat
-                        </button>
+                    <div className="relative">
+                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="text" placeholder="Search communications..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
                     </div>
                 </div>
 
-                <div style={{ flex: 1, background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    {activeTab === 'notices' && (
-                        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
-                            <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#1e293b' }}>Recent Notices & Circulars</h3>
-                            {[
-                                { title: 'Winter Vacation Announcement', date: '05 Dec 2026', sender: 'Principal Office', desc: 'The school will remain closed for winter vacation from 25th Dec to 5th Jan.', type: 'Notice' },
-                                { title: 'Fee Submission Deadline', date: '01 Nov 2026', sender: 'Accounts Dept', desc: 'Please ensure all pending fees for the current term are submitted before 10th Nov.', type: 'Circular' }
-                            ].map((item, idx) => (
-                                <div key={idx} style={{ padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '12px', padding: '2px 8px', background: item.type === 'Notice' ? '#fee2e2' : '#e0e7ff', color: item.type === 'Notice' ? '#dc2626' : '#4f46e5', borderRadius: '4px', fontWeight: '600' }}>{item.type}</span>
-                                        <span style={{ fontSize: '12px', color: '#64748b' }}>{item.date}</span>
-                                    </div>
-                                    <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{item.title}</h4>
-                                    <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#475569', lineHeight: '1.5' }}>{item.desc}</p>
-                                    <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>By: {item.sender}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                <div className="flex gap-3">
+                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <MessageCircle size={16} /> Send Message
+                    </button>
+                </div>
+            </div>
 
-                    {activeTab === 'events' && (
-                        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
-                            <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#1e293b' }}>Upcoming Event Updates</h3>
-                            {[
-                                { title: 'Annual Science Exhibition', date: '20 Nov 2026', time: '09:00 AM', venue: 'School Auditorium', desc: 'All participants must submit their project reports by 15th Nov.' },
-                                { title: 'Inter-School Football Match', date: '12 Nov 2026', time: '10:00 AM', venue: 'City Sports Ground', desc: 'The school team will be playing against St. Jude High School.' }
-                            ].map((item, idx) => (
-                                <div key={idx} style={{ padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', gap: '16px' }}>
-                                    <div style={{ background: '#f1f5f9', minWidth: '60px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px', color: '#3b82f6', border: '1px solid #cbd5e1' }}>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold' }}>{item.date.split(' ')[1].toUpperCase()}</span>
-                                        <span style={{ fontSize: '24px', fontWeight: 'bold', lineHeight: '1' }}>{item.date.split(' ')[0]}</span>
-                                    </div>
-                                    <div>
-                                        <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#0f172a' }}>{item.title}</h4>
-                                        <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b' }}>⏰ {item.time} &nbsp;&nbsp; 📍 {item.venue}</p>
-                                        <p style={{ margin: 0, fontSize: '14px', color: '#475569' }}>{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
+            {/* Horizontal Tabs */}
+            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+                {tabs.map(tab => (
+                    <button 
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        style={{
+                            minWidth: '160px',
+                            padding: '16px',
+                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
+                            border: '1px solid',
+                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
+                            borderBottom: 'none',
+                            borderRadius: '8px 8px 0 0',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            position: 'relative',
+                            marginBottom: '-2px',
+                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
+                        }}
+                    >
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
+                            <span className="text-2xl font-bold text-gray-900 leading-none">{tab.count}</span>
                         </div>
-                    )}
+                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                    </button>
+                ))}
+            </div>
 
-                    {activeTab === 'teachers' && (
-                        <div style={{ display: 'flex', height: '100%' }}>
-                            <div style={{ width: '250px', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-                                <div style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>
-                                    <input type="text" placeholder="Search teacher..." style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }} />
-                                </div>
-                                <div style={{ flex: 1, overflowY: 'auto' }}>
-                                    {[
-                                        { name: 'Mr. Sharma (Physics)', lastMsg: 'Don\'t forget the assignment', time: '10:30 AM', unread: 1 },
-                                        { name: 'Mrs. Gupta (Chemistry)', lastMsg: 'Yes, the syllabus is updated', time: 'Yesterday', unread: 0 },
-                                        { name: 'Mr. Verma (Math)', lastMsg: 'See you in class', time: 'Mon', unread: 0 }
-                                    ].map((t, idx) => (
-                                        <div key={idx} style={{ padding: '16px', display: 'flex', gap: '12px', alignItems: 'center', cursor: 'pointer', background: idx === 0 ? '#f8fafc' : 'white', borderBottom: '1px solid #f1f5f9' }}>
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>👨‍🏫</div>
-                                            <div style={{ flex: 1, overflow: 'hidden' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <h5 style={{ margin: 0, fontSize: '14px', color: '#1e293b', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{t.name}</h5>
-                                                    <span style={{ fontSize: '11px', color: t.unread ? '#3b82f6' : '#94a3b8', fontWeight: t.unread ? 'bold' : 'normal' }}>{t.time}</span>
-                                                </div>
-                                                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{t.lastMsg}</p>
+            {/* Data Table */}
+            <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
+                {activeTab === 'notices' ? (
+                    loading ? (
+                        <div className="p-10 text-center text-gray-500">Loading notices...</div>
+                    ) : notices.length === 0 ? (
+                        <div className="p-10 text-center text-gray-500">No notices found.</div>
+                    ) : (
+                    <table className="w-full border-collapse text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
+                                <th className="px-3 py-4 w-[60px]">S.No.</th>
+                                <th className="px-3 py-4">Ref ID</th>
+                                <th className="px-3 py-4">Subject</th>
+                                <th className="px-3 py-4">Sender</th>
+                                <th className="px-3 py-4">Date</th>
+                                <th className="px-3 py-4 text-right">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {notices.map((row, idx) => (
+                                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
+                                    <td style={{ padding: '16px 12px', position: 'relative' }}>
+                                        {row.isNew && (
+                                            <div style={{ position: 'absolute', top: 0, left: 0, background: '#ef4444', color: 'white', fontSize: '10px', padding: '2px 16px 2px 4px', clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)', fontWeight: 'bold' }}>
+                                                New
                                             </div>
+                                        )}
+                                        <span style={{ color: '#0ea5e9', display: 'block', marginTop: row.isNew ? '8px' : '0' }}>{row.id}</span>
+                                    </td>
+                                    <td className="px-3 py-4">
+                                        <div style={{ color: '#111827', fontWeight: '600' }}>{row.title}</div>
+                                        <div style={{ color: '#6b7280', fontSize: '13px', marginTop: '4px' }}>{row.desc}</div>
+                                    </td>
+                                    <td className="px-3 py-4 text-gray-600">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Megaphone size={14} /> {row.sender}
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
-                                <div style={{ padding: '16px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>👨‍🏫</div>
-                                    <div>
-                                        <h4 style={{ margin: 0, fontSize: '15px', color: '#1e293b' }}>Mr. Sharma</h4>
-                                        <p style={{ margin: 0, fontSize: '12px', color: '#10b981' }}>Online</p>
-                                    </div>
-                                </div>
-                                <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
-                                    <div style={{ alignSelf: 'flex-start', background: 'white', padding: '12px 16px', borderRadius: '16px 16px 16px 0', border: '1px solid #e2e8f0', maxWidth: '80%' }}>
-                                        <p style={{ margin: 0, fontSize: '14px', color: '#334155' }}>Hello Rahul, please make sure to submit the Physics practical file by tomorrow.</p>
-                                        <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginTop: '4px', textAlign: 'right' }}>10:28 AM</span>
-                                    </div>
-                                    <div style={{ alignSelf: 'flex-end', background: '#3b82f6', padding: '12px 16px', borderRadius: '16px 16px 0 16px', maxWidth: '80%', color: 'white' }}>
-                                        <p style={{ margin: 0, fontSize: '14px' }}>Yes sir, I have completed it. I will bring it tomorrow.</p>
-                                        <span style={{ fontSize: '10px', color: '#bfdbfe', display: 'block', marginTop: '4px', textAlign: 'right' }}>10:30 AM ✓✓</span>
-                                    </div>
-                                    <div style={{ alignSelf: 'flex-start', background: 'white', padding: '12px 16px', borderRadius: '16px 16px 16px 0', border: '1px solid #e2e8f0', maxWidth: '80%' }}>
-                                        <p style={{ margin: 0, fontSize: '14px', color: '#334155' }}>Great. Don't forget the assignment questions as well.</p>
-                                        <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginTop: '4px', textAlign: 'right' }}>10:30 AM</span>
-                                    </div>
-                                </div>
-                                <div style={{ padding: '16px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px' }}>
-                                    <input type="text" placeholder="Type a message..." style={{ flex: 1, padding: '12px 16px', borderRadius: '24px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '14px' }} />
-                                    <button style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#3b82f6', border: 'none', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '18px' }}>➤</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                                    </td>
+                                    <td className="px-3 py-4 text-gray-600">{row.date}</td>
+                                    <td className="px-3 py-4 text-right">
+                                        <span style={{ 
+                                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
+                                            background: row.type === 'Notice' ? '#e0e7ff' : '#fce7f3',
+                                            color: row.type === 'Notice' ? '#4f46e5' : '#db2777'
+                                        }}>
+                                            {row.type}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    )
+                ) : activeTab === 'events' ? (
+                    <table className="w-full border-collapse text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
+                                <th className="px-3 py-4 w-[60px]">S.No.</th>
+                                <th className="px-3 py-4">Event ID</th>
+                                <th className="px-3 py-4">Event Name</th>
+                                <th className="px-3 py-4">Date & Time</th>
+                                <th className="px-3 py-4">Venue</th>
+                                <th className="px-3 py-4 text-right">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {events.map((row, idx) => (
+                                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
+                                    <td style={{ padding: '16px 12px', color: '#0ea5e9' }}>{row.id}</td>
+                                    <td style={{ padding: '16px 12px', color: '#111827', fontWeight: '600' }}>{row.title}</td>
+                                    <td className="px-3 py-4 text-gray-600">{row.date} • {row.time}</td>
+                                    <td className="px-3 py-4 text-gray-600">{row.venue}</td>
+                                    <td className="px-3 py-4 text-right">
+                                        <span style={{ 
+                                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
+                                            background: '#dcfce7',
+                                            color: '#166534'
+                                        }}>
+                                            {row.type}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <table className="w-full border-collapse text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
+                                <th className="px-3 py-4 w-[60px]">S.No.</th>
+                                <th className="px-3 py-4">From</th>
+                                <th className="px-3 py-4">Subject & Preview</th>
+                                <th className="px-3 py-4">Date</th>
+                                <th className="px-3 py-4 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {messages.map((row, idx) => (
+                                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
+                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.sender}</td>
+                                    <td className="px-3 py-4">
+                                        <div style={{ color: '#111827', fontWeight: row.status === 'Unread' ? '700' : '500' }}>{row.subject}</div>
+                                        <div style={{ color: '#6b7280', fontSize: '13px' }}>{row.preview}</div>
+                                    </td>
+                                    <td className="px-3 py-4 text-gray-600">{row.date}</td>
+                                    <td className="px-3 py-4 text-right">
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.status === 'Unread' ? '#3b82f6' : '#9ca3af', fontSize: '12px', fontWeight: '500' }}>
+                                            {row.status === 'Unread' && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }}></span>}
+                                            {row.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+                
+                {/* Floating Action Button */}
+                <button onClick={fetchNotifications} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
+                    <RefreshCw size={20} />
+                </button>
+            </div>
+
+            {/* Pagination Footer */}
+            <div className="flex justify-end items-center px-6 py-4 border-t border-slate-200 text-gray-600 text-sm gap-6">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Rows per page: 
+                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                </div>
+                <div>1-{activeTab === 'notices' ? notices.length : (activeTab === 'events' ? events.length : messages.length)} of {activeTab === 'notices' ? notices.length : (activeTab === 'events' ? events.length : messages.length)}</div>
+                <div className="flex gap-2">
+                    <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center' }} disabled><ChevronLeft size={20} /></button>
+                    <button style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={20} /></button>
                 </div>
             </div>
         </div>

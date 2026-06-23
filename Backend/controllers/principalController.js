@@ -412,6 +412,8 @@ exports.getClasses = async (req, res) => {
     }
 };
 
+
+
 exports.createClass = async (req, res) => {
     try {
         const { name, section } = req.body;

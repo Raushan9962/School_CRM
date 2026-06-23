@@ -3,9 +3,9 @@ import React from 'react';
 const DataTable = ({ columns, data, showPagination = true }) => {
     return (
         <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-            <div style={{ overflowX: 'auto' }}>
+            <div className="overflow-x-auto">
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
-                    <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <thead className="bg-slate-50 border-b border-slate-200">
                         <tr>
                             {columns.map((col, idx) => (
                                 <th key={idx} style={{ padding: '16px 24px', fontSize: '13px', fontWeight: '600', color: '#475569', whiteSpace: 'nowrap' }}>

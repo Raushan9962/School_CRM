@@ -48,7 +48,7 @@ const DashboardOverview = () => {
         border: '1px solid #e2e8f0' 
       }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '500', color: '#1e293b' }}>Platform Activity</h3>
-        <p style={{ color: '#64748b' }}>Graphs and recent activity logs will appear here.</p>
+        <p className="text-slate-500">Graphs and recent activity logs will appear here.</p>
       </div>
     </div>
   );

@@ -26,6 +26,8 @@ const subscriptionRoutes = require('./subscriptionRoutes');
 const adminRoutes = require('./adminRoutes');
 const superAdminRoutes = require('./superAdminRoutes');
 const principalRoutes = require('./principalRoutes');
+const leaveRoutes = require('./leaveRoutes');
+const complaintRoutes = require('./complaintRoutes');
 
 // API routes mapping
 router.use('/auth', authRoutes);
@@ -53,5 +55,7 @@ router.use('/subscriptions', subscriptionRoutes);
 router.use('/admin', adminRoutes);
 router.use('/super-admin', superAdminRoutes);
 router.use('/principal', principalRoutes);
+router.use('/leaves', leaveRoutes);
+router.use('/complaints', complaintRoutes);
 
 module.exports = router;

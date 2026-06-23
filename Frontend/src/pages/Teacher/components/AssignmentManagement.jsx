@@ -10,10 +10,10 @@ const AssignmentManagement = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Assignment Management</h2>
-                <button onClick={() => setIsCreateModalOpen(true)} style={{ padding: '10px 20px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Assignment Management</h2>
+                <button onClick={() => setIsCreateModalOpen(true)} className="px-5 py-2.5 bg-blue-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center gap-2 shadow-md shadow-blue-500/20 hover:bg-blue-600 transition">
                     ➕ Create Assignment
                 </button>
             </div>
@@ -23,22 +23,22 @@ const AssignmentManagement = () => {
                 <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>📋</div>
                     <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Total Assignments</p>
+                        <p className="m-0 mb-1 text-[13px] text-slate-500">Total Assignments</p>
                         <h3 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>12</h3>
                     </div>
                 </div>
                 <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>⏳</div>
                     <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Pending Reviews</p>
+                        <p className="m-0 mb-1 text-[13px] text-slate-500">Pending Reviews</p>
                         <h3 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>28</h3>
                     </div>
                 </div>
             </div>
 
             {/* Assignments List */}
-            <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
                     {['list', 'review'].map(tab => (
                         <button
                             key={tab}
@@ -61,39 +61,39 @@ const AssignmentManagement = () => {
                 </div>
 
                 {activeTab === 'list' && (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <table className="w-full border-collapse text-left">
+                        <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Assignment Details</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Class</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Due Date</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Stats (Sub/Pen)</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Action</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Assignment Details</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Class</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Due Date</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Stats (Sub/Pen)</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {assignments.map((asn, idx) => (
-                                <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                    <td style={{ padding: '16px 24px' }}>
+                                <tr key={idx} className="border-b border-slate-200">
+                                    <td className="px-6 py-4">
                                         <p style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '500', color: '#1e293b' }}>{asn.title}</p>
-                                        <span style={{ fontSize: '12px', color: '#64748b' }}>{asn.id}</span>
+                                        <span className="text-xs text-slate-500">{asn.id}</span>
                                     </td>
-                                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{asn.class}</td>
-                                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{asn.dueDate}</td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4 text-sm text-slate-600">{asn.class}</td>
+                                    <td className="px-6 py-4 text-sm text-slate-600">{asn.dueDate}</td>
+                                    <td className="px-6 py-4">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
                                             <span style={{ color: '#10b981', fontWeight: '600' }}>{asn.submitted}</span> /
                                             <span style={{ color: '#ef4444', fontWeight: '600' }}>{asn.pending}</span>
                                         </div>
                                     </td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4">
                                         <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: asn.status === 'Active' ? '#dcfce7' : '#f1f5f9', color: asn.status === 'Active' ? '#166534' : '#64748b' }}>
                                             {asn.status}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 24px' }}>
-                                        <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#3b82f6', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>View Details</button>
+                                    <td className="px-6 py-4">
+                                        <button className="px-3 py-1.5 bg-blue-50 text-blue-500 border-none rounded-md text-[13px] font-medium cursor-pointer hover:bg-blue-100 transition-colors">View Details</button>
                                     </td>
                                 </tr>
                             ))}
@@ -102,7 +102,7 @@ const AssignmentManagement = () => {
                 )}
 
                 {activeTab === 'review' && (
-                    <div style={{ padding: '24px' }}>
+                    <div className="p-6">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', marginBottom: '16px' }}>
                             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>I</div>
@@ -123,41 +123,41 @@ const AssignmentManagement = () => {
 
             {/* Create Assignment Modal */}
             {isCreateModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Create New Assignment</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Create New Assignment</h3>
                             <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Class</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Select Class</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Class 10 - A (Science)</option>
                                     <option>Class 9 - B (Physics)</option>
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Assignment Title</label>
-                                <input type="text" placeholder="e.g. Chapter 1 Exercise" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Assignment Title</label>
+                                <input type="text" placeholder="e.g. Chapter 1 Exercise" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Description</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Description</label>
                                 <textarea rows="3" placeholder="Instructions for students..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Due Date</label>
-                                    <input type="date" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Due Date</label>
+                                    <input type="date" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Total Marks</label>
-                                    <input type="number" placeholder="e.g. 10" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Total Marks</label>
+                                    <input type="number" placeholder="e.g. 10" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Attachment (Optional)</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Attachment (Optional)</label>
                                 <input type="file" style={{ fontSize: '14px', color: '#64748b' }} />
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

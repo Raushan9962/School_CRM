@@ -26,7 +26,7 @@ const TransportOverview = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="flex flex-col gap-6">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
                 {stats.map((stat, idx) => (
                     <div key={idx} style={{ 
@@ -49,30 +49,30 @@ const TransportOverview = () => {
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+            <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Recent Transport Requests</h3>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    <ul className="list-none p-0 m-0">
                         <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <p style={{ margin: 0, fontWeight: '600', color: '#334155', fontSize: '14px' }}>New Route Assignment</p>
-                                <span style={{ fontSize: '12px', color: '#64748b' }}>Aarav Patel (Class 10-A)</span>
+                                <span className="text-xs text-slate-500">Aarav Patel (Class 10-A)</span>
                             </div>
                             <span style={{ padding: '4px 8px', background: '#fef3c7', color: '#d97706', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>Pending</span>
                         </li>
                         <li style={{ padding: '12px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <p style={{ margin: 0, fontWeight: '600', color: '#334155', fontSize: '14px' }}>Stop Change</p>
-                                <span style={{ fontSize: '12px', color: '#64748b' }}>Diya Sharma (Class 9-B)</span>
+                                <span className="text-xs text-slate-500">Diya Sharma (Class 9-B)</span>
                             </div>
                             <span style={{ padding: '4px 8px', background: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>Approved</span>
                         </li>
                     </ul>
                 </div>
 
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Maintenance Alerts</h3>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    <ul className="list-none p-0 m-0">
                         <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <span style={{ fontSize: '20px' }}>🔧</span>
                             <div>

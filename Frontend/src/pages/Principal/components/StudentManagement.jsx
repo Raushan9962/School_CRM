@@ -3,6 +3,7 @@ import { Eye, Edit, ArrowUpCircle, ArrowRightLeft, IdCard } from 'lucide-react';
 import StudentProfile from './StudentProfile';
 import DataTable from '../../../components/layout/DataTable';
 import ActionMenu from '../../../components/layout/ActionMenu';
+import apiFetch from '../../../services/api';
 
 const StudentManagement = ({ activeAction }) => {
   const [students, setStudents] = useState([]);
@@ -35,7 +36,7 @@ const StudentManagement = ({ activeAction }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/principal/students', {
+      const res = await apiFetch('/principal/students', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('API not ready');
@@ -76,11 +77,11 @@ const StudentManagement = ({ activeAction }) => {
     e.preventDefault();
     try {
       if (editingId) {
-        await fetch(`http://localhost:5000/api/principal/students/${editingId}`, {
+        await apiFetch(`/principal/students/${editingId}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)
         });
       } else {
-        await fetch('http://localhost:5000/api/principal/students', {
+        await apiFetch('/principal/students', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)
         });
       }
@@ -100,7 +101,7 @@ const StudentManagement = ({ activeAction }) => {
   const handlePromoteSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:5000/api/principal/students/${activeStudent.id}/promote`, {
+      await apiFetch(`/principal/students/${activeStudent.id}/promote`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(promoteData)
       });
       setShowPromoteModal(false);
@@ -119,7 +120,7 @@ const StudentManagement = ({ activeAction }) => {
   const handleTransferSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:5000/api/principal/students/${activeStudent.id}/transfer`, {
+      await apiFetch(`/principal/students/${activeStudent.id}/transfer`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transferData)
       });
       setShowTransferModal(false);
@@ -162,7 +163,7 @@ const StudentManagement = ({ activeAction }) => {
                 { key: 'name', label: 'Name', render: (row) => <span style={{ fontWeight: 'bold', color: '#1e293b' }}>{row.name}</span> },
                 { key: 'class', label: 'Class', render: (row) => <span style={{ color: '#475569' }}>{row.className || 'N/A'}</span> },
                 { key: 'section', label: 'Section', render: (row) => <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>{row.section || 'N/A'}</span> },
-                { key: 'rollNumber', label: 'Roll No', render: (row) => <span style={{ color: '#64748b' }}>{row.rollNumber}</span> },
+                { key: 'rollNumber', label: 'Roll No', render: (row) => <span className="text-slate-500">{row.rollNumber}</span> },
                 { key: 'attendance', label: 'Attendance', render: (row) => <span style={{ fontWeight: 'bold', color: row.attendance === 'N/A' ? '#64748b' : '#10b981' }}>{row.attendance}</span> },
                 { key: 'status', label: 'Status', render: (row) => (
                     <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold', background: row.section === 'Transferred' ? '#fee2e2' : '#dcfce7', color: row.section === 'Transferred' ? '#dc2626' : '#166534' }}>

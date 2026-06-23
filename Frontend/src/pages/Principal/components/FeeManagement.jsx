@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
@@ -13,7 +14,7 @@ const FeeManagement = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/principal/fees', {
+      const res = await apiFetch('/principal/fees', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('API not ready');
@@ -44,7 +45,7 @@ const FeeManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/fees', {
+      const res = await apiFetch('/fees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -71,9 +72,9 @@ const FeeManagement = () => {
   const formatCurrency = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Fee Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+    <div className="dashboard-section animate-fade-in" className="p-6">
+      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Fee Management</h2>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Record Fee Payment" icon="💰" onClick={() => setShowModal(true)} />
         <ActionBtn text="Approve Concessions" icon="✅" />
         <ActionBtn text="Check Dues" icon="⚠️" />
@@ -96,23 +97,23 @@ const FeeManagement = () => {
 
       <div className="glass-panel" style={panelStyle}>
         <h3 style={panelTitleStyle}>Recent Transactions</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading fees...</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        {loading ? <p className="text-slate-500">Loading fees...</p> : (
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                <th style={{ padding: '12px' }}>Student</th>
-                <th style={{ padding: '12px' }}>Amount</th>
-                <th style={{ padding: '12px' }}>Date</th>
-                <th style={{ padding: '12px' }}>Status</th>
+                <th className="p-3">Student</th>
+                <th className="p-3">Amount</th>
+                <th className="p-3">Date</th>
+                <th className="p-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {feeData.recent.map(f => (
                 <tr key={f.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#1e293b', fontWeight: '500' }}>
-                  <td style={{ padding: '12px' }}>{f.student}</td>
+                  <td className="p-3">{f.student}</td>
                   <td style={{ padding: '12px', fontWeight: '700' }}>{formatCurrency(f.amount)}</td>
-                  <td style={{ padding: '12px', color: '#64748b' }}>{f.date}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td className="p-3 text-slate-500">{f.date}</td>
+                  <td className="p-3">
                     <span style={{ 
                       padding: '4px 10px', borderRadius: '12px', fontSize: '12px',
                       background: f.status === 'Paid' ? '#d1fae5' : '#fee2e2',
@@ -137,26 +138,26 @@ const FeeManagement = () => {
             boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
           }}>
             <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Record Fee Payment</h3>
-            <form onSubmit={handleAddFee} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleAddFee} className="flex flex-col gap-4">
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Student ID</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Student ID</label>
                 <input required type="number" value={formData.studentId} onChange={e => setFormData({...formData, studentId: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Amount (INR)</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Amount (INR)</label>
                 <input required type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Due Date</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Due Date</label>
                 <input type="date" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Status</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Status</label>
                 <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }}>
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500">
                   <option value="Paid">Paid</option>
                   <option value="Pending">Pending</option>
                 </select>

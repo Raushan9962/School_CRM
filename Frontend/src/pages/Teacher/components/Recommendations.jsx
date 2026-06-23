@@ -2,18 +2,18 @@ import React from 'react';
 
 const Recommendations = () => {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Recommendations & Alerts</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Recommendations & Alerts</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="grid grid-cols-2 gap-6">
                 {/* Academic Recommendations */}
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         💡 Academic Recommendations
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                         {[
                             { title: 'Extra Help Needed', desc: '5 students in Class 10-A scored below 40% in Unit Test 2.', action: 'Schedule Remedial Class' },
                             { title: 'Syllabus Pace', desc: 'Class 9-B Physics syllabus is slightly behind schedule.', action: 'Adjust Lesson Plan' }
@@ -28,11 +28,11 @@ const Recommendations = () => {
                 </div>
 
                 {/* Discipline Alerts */}
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         ⚠️ Discipline & Attendance Alerts
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                         {[
                             { title: 'Low Attendance', desc: 'Ishaan Singh (10-A) has been absent for 3 consecutive days.', level: 'High', action: 'Contact Parent' },
                             { title: 'Late Submissions', desc: '3 students in 9-B constantly submitting assignments late.', level: 'Medium', action: 'Send Warning' }

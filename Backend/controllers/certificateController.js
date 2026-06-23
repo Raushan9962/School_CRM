@@ -1,4 +1,5 @@
 const Certificate = require('../models/Certificate');
+const pool = require('../config/db');
 
 exports.createCertificate = async (req, res) => {
     try {
@@ -28,6 +29,23 @@ exports.getCertificateById = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching details' });
+    }
+};
+
+exports.getCertificatesByStudentUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const result = await pool.query(`
+            SELECT c.* 
+            FROM certificates c
+            JOIN students s ON c.student_id = s.id
+            WHERE s.user_id = $1
+            ORDER BY c.issue_date DESC
+        `, [userId]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching certificates' });
     }
 };
 

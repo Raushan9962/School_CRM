@@ -5,10 +5,10 @@ const ExamManagement = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Exam Management</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Exam Management</h2>
+                <div className="flex gap-3">
                     <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         📊 Generate Report Cards
                     </button>
@@ -18,7 +18,7 @@ const ExamManagement = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['marks', 'schedule', 'analytics'].map(tab => (
                     <button
                         key={tab}
@@ -41,7 +41,7 @@ const ExamManagement = () => {
             </div>
 
             {activeTab === 'marks' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="flex flex-col gap-6">
                     <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                         <select style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', minWidth: '150px' }}>
                             <option>Class 10 - A</option>
@@ -58,18 +58,18 @@ const ExamManagement = () => {
                         <button style={{ padding: '10px 24px', background: '#0f172a', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Fetch List</button>
                     </div>
 
-                    <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h3 style={{ margin: 0, fontSize: '16px', color: '#1e293b' }}>Unit Test 2 - Science (Max Marks: 40)</h3>
                             <button style={{ padding: '8px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Publish Results</button>
                         </div>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Roll No</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Name</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Marks Obtained</th>
-                                    <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Remarks</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Roll No</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Student Name</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Marks Obtained</th>
+                                    <th className="p-4 text-sm font-semibold text-slate-600">Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,7 +78,7 @@ const ExamManagement = () => {
                                     { roll: 2, name: 'Diya Sharma', marks: 35 },
                                     { roll: 3, name: 'Rohan Gupta', marks: '' }
                                 ].map((student, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                    <tr key={idx} className="border-b border-slate-200">
                                         <td style={{ padding: '16px', fontSize: '14px', color: '#1e293b' }}>{student.roll}</td>
                                         <td style={{ padding: '16px', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>{student.name}</td>
                                         <td style={{ padding: '16px' }}>
@@ -126,36 +126,36 @@ const ExamManagement = () => {
 
             {/* Create Exam Modal */}
             {isCreateModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Create Exam</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Create Exam</h3>
                             <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Exam Type</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Exam Type</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Unit Test</option>
                                     <option>Half Yearly</option>
                                     <option>Final Exam</option>
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Class</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Select Class</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Class 10 - A</option>
                                 </select>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Exam Date</label>
-                                    <input type="date" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Exam Date</label>
+                                    <input type="date" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Max Marks</label>
-                                    <input type="number" placeholder="e.g. 100" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Max Marks</label>
+                                    <input type="number" placeholder="e.g. 100" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const ClassManagement = () => {
   const [classes, setClasses] = useState([]);
@@ -13,7 +14,7 @@ const ClassManagement = () => {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/principal/classes');
+      const res = await apiFetch('/principal/classes');
       const data = await res.json();
       setClasses(data.data || []);
       setLoading(false);
@@ -46,7 +47,7 @@ const ClassManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this class?")) return;
     try {
-      await fetch(`http://localhost:5000/api/principal/classes/${id}`, {
+      await apiFetch(`/principal/classes/${id}`, {
         method: 'DELETE'
       });
       fetchClasses();
@@ -60,14 +61,14 @@ const ClassManagement = () => {
     try {
       if (editingId) {
         // Update
-        await fetch(`http://localhost:5000/api/principal/classes/${editingId}`, {
+        await apiFetch(`/principal/classes/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
       } else {
         // Create
-        await fetch('http://localhost:5000/api/principal/classes', {
+        await apiFetch('/principal/classes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -83,8 +84,8 @@ const ClassManagement = () => {
   if (loading) return <div>Loading classes...</div>;
 
   return (
-    <div className="animate-fade-in" style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <div className="animate-fade-in" className="p-6">
+      <div className="flex justify-between items-center mb-6">
         <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', margin: 0 }}>Class Management</h2>
         <button 
           onClick={handleCreateNew}
@@ -95,7 +96,7 @@ const ClassManagement = () => {
       </div>
 
       <div style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.5)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table className="w-full border-collapse text-left">
           <thead style={{ background: 'rgba(241, 245, 249, 0.8)' }}>
             <tr>
               <th style={{ padding: '16px 24px', color: '#64748b', fontWeight: '600', fontSize: '14px', borderBottom: '1px solid #e2e8f0' }}>ID</th>
@@ -136,7 +137,7 @@ const ClassManagement = () => {
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Class Name</label>
                 <input required type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="e.g., Class 10" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' }} />
               </div>
-              <div style={{ marginBottom: '24px' }}>
+              <div className="mb-6">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Section</label>
                 <input required type="text" name="section" value={formData.section} onChange={handleInputChange} placeholder="e.g., A, B, Science" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' }} />
               </div>

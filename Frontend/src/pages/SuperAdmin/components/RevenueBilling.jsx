@@ -3,12 +3,12 @@ import React from 'react';
 const RevenueBilling = () => {
   return (
     <div className="animate-fade-in">
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', margin: '0' }}>Revenue & Billing</h2>
-        <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Track platform revenue and billing cycles.</p>
+      <div className="mb-6">
+        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Revenue & Billing</h2>
+        <p className="text-slate-500 text-sm mt-1">Track platform revenue and billing cycles.</p>
       </div>
       
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Monthly Reports" icon="📈" color="#10b981" />
         <ActionBtn text="Yearly Reports" icon="📅" color="#0ea5e9" />
       </div>
@@ -18,8 +18,8 @@ const RevenueBilling = () => {
         borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', 
         border: '1px solid rgba(255,255,255,0.5)' 
       }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>Revenue Insights</h3>
-        <p style={{ color: '#64748b' }}>Revenue charts and billing details will appear here.</p>
+        <h3 className="m-0 mb-4 text-base font-bold text-slate-800">Revenue Insights</h3>
+        <p className="text-slate-500">Revenue charts and billing details will appear here.</p>
       </div>
     </div>
   );

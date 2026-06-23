@@ -1,86 +1,192 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, ChevronDown, Download, Search, RefreshCw, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const FeeView = () => {
+    const [activeTab, setActiveTab] = useState('all');
+    const [records, setRecords] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchFees = async () => {
+        try {
+            setLoading(true);
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                // Fetch fees for the logged-in student (using user.id)
+                const res = await apiFetch(`/fees/student/${user.id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setRecords(data);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching fees:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchFees();
+    }, []);
+
+    const handlePayFee = async (feeId) => {
+        try {
+            const payload = {
+                status: 'Paid',
+                paid_date: new Date().toISOString().split('T')[0]
+            };
+            const res = await apiFetch(`/fees/${feeId}`, {
+                method: 'PUT',
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                fetchFees(); // Refresh data
+            }
+        } catch (error) {
+            console.error("Error paying fee:", error);
+        }
+    };
+
+    const pendingCount = records.filter(r => r.status === 'Pending').length;
+    const paidCount = records.filter(r => r.status === 'Paid').length;
+    const fineCount = records.filter(r => r.status === 'Fine').length;
+
+    const tabs = [
+        { id: 'all', label: 'All records', count: records.length, subtext: 'Filtered by date' },
+        { id: 'pending', label: 'Pending fees', count: pendingCount, subtext: 'All time' },
+        { id: 'paid', label: 'Paid fees', count: paidCount, subtext: 'All time' },
+        { id: 'fine', label: 'Fines', count: fineCount, subtext: 'All time' }
+    ];
+
+    const filteredRecords = records.filter(r => activeTab === 'all' || r.status.toLowerCase() === activeTab);
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Fees Management</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#3b82f6', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        ❓ Raise Query
-                    </button>
-                    <button style={{ padding: '8px 16px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
-                        💳 Pay Fees Online
-                    </button>
-                </div>
-            </div>
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
-                <div style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', padding: '32px 24px', borderRadius: '16px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(239, 68, 68, 0.3)' }}>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '16px', opacity: 0.9 }}>Pending Amount</p>
-                    <p style={{ margin: 0, fontSize: '42px', fontWeight: 'bold' }}>₹ 2,500</p>
-                    <p style={{ margin: '8px 0 0 0', fontSize: '14px', opacity: 0.8 }}>Due by 31 Oct 2026</p>
-                    <button style={{ marginTop: '24px', padding: '14px', background: 'white', color: '#dc2626', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-                        Pay Now
+            {/* Action Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Filter <ChevronDown size={16} />
                     </button>
-                    <span style={{ position: 'absolute', right: -20, bottom: -20, fontSize: '120px', opacity: 0.1 }}>⚠️</span>
+                    
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={16} /> Date Range
+                    </button>
+
+                    <div className="relative">
+                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="text" placeholder="Search..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
+                    </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-                    <div style={{ padding: '24px', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                        <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Total Fees (Annual)</p>
-                        <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#0f172a' }}>₹ 24,000</p>
-                    </div>
-                    <div style={{ padding: '24px', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                        <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Paid Fees</p>
-                        <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#10b981' }}>₹ 21,500</p>
-                    </div>
-                    <div style={{ padding: '24px', background: '#fff1f2', borderRadius: '16px', border: '1px solid #ffe4e6', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                        <p style={{ margin: '0 0 8px 0', color: '#be123c', fontSize: '14px' }}>Fine Amount</p>
-                        <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#e11d48' }}>₹ 50</p>
-                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#f43f5e' }}>Late fee added</p>
-                    </div>
-                </div>
+                <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <Download size={16} style={{ marginRight: '6px' }} /> Export
+                </button>
             </div>
 
-            <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#1e293b' }}>Payment History</h3>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            {/* Horizontal Tabs */}
+            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+                {tabs.map(tab => (
+                    <button 
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        style={{
+                            minWidth: '160px',
+                            padding: '16px',
+                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
+                            border: '1px solid',
+                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
+                            borderBottom: 'none',
+                            borderRadius: '8px 8px 0 0',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            position: 'relative',
+                            marginBottom: '-2px',
+                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
+                        }}
+                    >
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
+                            <span className="text-2xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                        </div>
+                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Data Table */}
+            <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
+                {loading ? (
+                    <div className="p-10 text-center text-gray-500">Loading fees data...</div>
+                ) : filteredRecords.length === 0 ? (
+                    <div className="p-10 text-center text-gray-500">No fee records found.</div>
+                ) : (
+                    <table className="w-full border-collapse text-left text-sm">
                         <thead>
-                            <tr style={{ background: '#f8fafc', color: '#64748b', fontSize: '14px' }}>
-                                <th style={{ padding: '12px 16px', borderRadius: '8px 0 0 8px' }}>Receipt No.</th>
-                                <th style={{ padding: '12px 16px' }}>Date</th>
-                                <th style={{ padding: '12px 16px' }}>Description</th>
-                                <th style={{ padding: '12px 16px' }}>Amount</th>
-                                <th style={{ padding: '12px 16px' }}>Status</th>
-                                <th style={{ padding: '12px 16px', borderRadius: '0 8px 8px 0' }}>Action</th>
+                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
+                                <th className="px-3 py-4 w-[60px]">S.No.</th>
+                                <th className="px-3 py-4">Due Date</th>
+                                <th className="px-3 py-4">Description</th>
+                                <th className="px-3 py-4">Status</th>
+                                <th className="px-3 py-4 text-right">Amount</th>
+                                <th style={{ padding: '16px 12px', textAlign: 'center' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {[
-                                { id: 'REC-2026-092', date: '01 Sep 2026', desc: 'Term 2 Fee', amount: 8000, status: 'Paid' },
-                                { id: 'REC-2026-054', date: '15 Aug 2026', desc: 'Library Fine', amount: 150, status: 'Paid' },
-                                { id: 'REC-2026-011', date: '01 May 2026', desc: 'Term 1 Fee', amount: 13500, status: 'Paid' },
-                            ].map((row, idx) => (
-                                <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '16px', fontWeight: '500', color: '#334155' }}>{row.id}</td>
-                                    <td style={{ padding: '16px', color: '#64748b' }}>{row.date}</td>
-                                    <td style={{ padding: '16px', color: '#334155' }}>{row.desc}</td>
-                                    <td style={{ padding: '16px', fontWeight: '600', color: '#0f172a' }}>₹ {row.amount}</td>
-                                    <td style={{ padding: '16px' }}>
-                                        <span style={{ padding: '4px 8px', background: '#dcfce7', color: '#166534', borderRadius: '999px', fontSize: '12px', fontWeight: '600' }}>{row.status}</span>
+                            {filteredRecords.map((row, idx) => (
+                                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-3 py-4 text-gray-500">
+                                        {idx + 1}
                                     </td>
-                                    <td style={{ padding: '16px' }}>
-                                        <button style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            ⬇️ Download
-                                        </button>
+                                    <td className="px-3 py-4 text-gray-600">
+                                        {new Date(row.due_date).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-3 py-4 text-gray-900 font-medium">
+                                        {row.description || 'Academic Fee'}
+                                    </td>
+                                    <td className="px-3 py-4">
+                                        <span style={{ 
+                                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
+                                            background: row.status === 'Paid' ? '#dcfce7' : '#fee2e2',
+                                            color: row.status === 'Paid' ? '#166534' : '#dc2626'
+                                        }}>
+                                            {row.status}
+                                        </span>
+                                        {row.status === 'Paid' && row.paid_date && (
+                                            <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>
+                                                Paid on: {new Date(row.paid_date).toLocaleDateString()}
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: '600', color: '#111827' }}>₹ {row.amount}</td>
+                                    <td style={{ padding: '16px 12px', textAlign: 'center' }}>
+                                        {row.status === 'Pending' ? (
+                                            <button 
+                                                onClick={() => handlePayFee(row.id)}
+                                                style={{ padding: '6px 12px', background: '#0ea5e9', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' }}>
+                                                Pay Now
+                                            </button>
+                                        ) : (
+                                            <button style={{ padding: '6px 12px', background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#64748b', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
+                                                <Download size={14} /> Receipt
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
+                )}
+                
+                <button onClick={fetchFees} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
+                    <RefreshCw size={20} />
+                </button>
             </div>
         </div>
     );

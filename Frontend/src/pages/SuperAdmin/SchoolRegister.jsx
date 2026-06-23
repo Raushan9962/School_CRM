@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiFetch from '../../services/api';
 
 const SchoolRegister = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const SchoolRegister = () => {
       setPlansLoading(true);
       try {
         const token = localStorage.getItem('token') || '';
-        const res   = await fetch('http://localhost:5000/api/subscriptions/plans', {
+        const res   = await apiFetch('/subscriptions/plans', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -121,7 +122,7 @@ const SchoolRegister = () => {
       }
 
       const token = localStorage.getItem('token') || '';
-      const response = await fetch('http://localhost:5000/api/users/create', {
+      const response = await apiFetch('/users/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

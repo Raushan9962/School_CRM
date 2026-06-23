@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
@@ -14,7 +15,7 @@ const AdmissionManagement = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/principal/admissions', {
+      const res = await apiFetch('/principal/admissions', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('API not ready');
@@ -40,7 +41,7 @@ const AdmissionManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/students/${formData.studentId}`, {
+      const res = await apiFetch(`/students/${formData.studentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ classId: formData.classId })
@@ -62,7 +63,7 @@ const AdmissionManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/admissions/reject/${formData.studentId}`, {
+      const res = await apiFetch(`/admissions/reject/${formData.studentId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ reason: formData.reason })
@@ -81,34 +82,34 @@ const AdmissionManagement = () => {
   };
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Admission Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+    <div className="dashboard-section animate-fade-in" className="p-6">
+      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Admission Management</h2>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Approve Admissions" icon="✅" onClick={() => setShowModal(true)} />
         <ActionBtn text="Reject Applications" icon="❌" onClick={() => setShowRejectModal(true)} />
       </div>
       
       <div className="glass-panel" style={panelStyle}>
         <h3 style={panelTitleStyle}>New Applications</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading applications...</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        {loading ? <p className="text-slate-500">Loading applications...</p> : (
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                <th style={{ padding: '12px' }}>App ID</th>
-                <th style={{ padding: '12px' }}>Student Name</th>
-                <th style={{ padding: '12px' }}>Applied For</th>
-                <th style={{ padding: '12px' }}>Date</th>
-                <th style={{ padding: '12px' }}>Status</th>
+                <th className="p-3">App ID</th>
+                <th className="p-3">Student Name</th>
+                <th className="p-3">Applied For</th>
+                <th className="p-3">Date</th>
+                <th className="p-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {applications.map(a => (
                 <tr key={a.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#1e293b', fontWeight: '500' }}>
-                  <td style={{ padding: '12px', color: '#64748b' }}>{a.id}</td>
-                  <td style={{ padding: '12px' }}>{a.name}</td>
-                  <td style={{ padding: '12px' }}>{a.appliedClass}</td>
-                  <td style={{ padding: '12px', color: '#64748b' }}>{a.date}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td className="p-3 text-slate-500">{a.id}</td>
+                  <td className="p-3">{a.name}</td>
+                  <td className="p-3">{a.appliedClass}</td>
+                  <td className="p-3 text-slate-500">{a.date}</td>
+                  <td className="p-3">
                     <span style={{ 
                       padding: '4px 10px', borderRadius: '12px', fontSize: '12px',
                       background: a.status === 'Approved' ? '#d1fae5' : (a.status === 'Pending Review' ? '#fef3c7' : '#fee2e2'),
@@ -133,16 +134,16 @@ const AdmissionManagement = () => {
             boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
           }}>
             <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Approve Admission</h3>
-            <form onSubmit={handleApprove} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleApprove} className="flex flex-col gap-4">
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Application / Student ID</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Application / Student ID</label>
                 <input required type="number" value={formData.studentId} onChange={e => setFormData({...formData, studentId: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Assign to Class ID</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Assign to Class ID</label>
                 <input required type="number" value={formData.classId} onChange={e => setFormData({...formData, classId: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
@@ -164,16 +165,16 @@ const AdmissionManagement = () => {
             boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
           }}>
             <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Reject Admission</h3>
-            <form onSubmit={handleReject} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleReject} className="flex flex-col gap-4">
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Application / Student ID</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Application / Student ID</label>
                 <input required type="text" value={formData.studentId} onChange={e => setFormData({...formData, studentId: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>Reason for Rejection</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Reason for Rejection</label>
                 <input required type="text" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button type="button" onClick={() => setShowRejectModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>

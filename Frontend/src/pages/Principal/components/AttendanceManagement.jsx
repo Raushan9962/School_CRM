@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
@@ -12,7 +13,7 @@ const AttendanceManagement = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/principal/attendance', {
+        const res = await apiFetch('/principal/attendance', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('API not ready');
@@ -42,9 +43,9 @@ const AttendanceManagement = () => {
   }, []);
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Attendance Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+    <div className="dashboard-section animate-fade-in" className="p-6">
+      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Attendance Management</h2>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="View Reports" icon="📊" />
         <ActionBtn text="Export Attendance" icon="⬇️" />
       </div>
@@ -62,9 +63,9 @@ const AttendanceManagement = () => {
 
       <div className="glass-panel" style={panelStyle}>
         <h3 style={panelTitleStyle}>Class-wise Attendance Trends</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading trends...</p> : (
+        {loading ? <p className="text-slate-500">Loading trends...</p> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-            {(!data.trends || data.trends.length === 0) ? <p style={{ color: '#64748b' }}>No trend data available.</p> : data.trends.map((t, idx) => (
+            {(!data.trends || data.trends.length === 0) ? <p className="text-slate-500">No trend data available.</p> : data.trends.map((t, idx) => (
               <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: `1px solid ${t.color}40`, textAlign: 'center' }}>
                 <p style={{ margin: '0 0 8px', fontWeight: '600', color: '#475569' }}>{t.class}</p>
                 <h4 style={{ margin: 0, fontSize: '24px', color: t.color }}>{t.rate}</h4>

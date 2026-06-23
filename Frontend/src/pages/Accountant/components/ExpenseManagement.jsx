@@ -15,9 +15,9 @@ const ExpenseManagement = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Expense Management</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Expense Management</h2>
                 {activeTab === 'list' && (
                     <button onClick={() => setActiveTab('add')} style={{ padding: '10px 20px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(14,165,233,0.2)' }}>
                         ➕ Log Expense
@@ -25,7 +25,7 @@ const ExpenseManagement = () => {
                 )}
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['list', 'add'].map(tab => (
                     <button
                         key={tab}
@@ -48,47 +48,47 @@ const ExpenseManagement = () => {
             </div>
 
             {activeTab === 'list' && (
-                <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
-                        <select style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
+                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                             <option value="">All Categories</option>
                             {categories.map((c, i) => <option key={i} value={c}>{c}</option>)}
                         </select>
-                        <select style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                             <option value="">All Statuses</option>
                             <option value="Paid">Paid</option>
                             <option value="Pending">Pending</option>
                         </select>
-                        <input type="month" style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                        <input type="month" className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Expense ID & Date</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Category</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Description</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Amount</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Actions</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Expense ID & Date</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Category</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Description</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Amount</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {expenses.map((e, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                        <td style={{ padding: '16px 24px' }}>
-                                            <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{e.id}</p>
-                                            <span style={{ fontSize: '12px', color: '#64748b' }}>{e.date}</span>
+                                    <tr key={idx} className="border-b border-slate-200">
+                                        <td className="px-6 py-4">
+                                            <p className="m-0 mb-1 text-sm font-semibold text-slate-800">{e.id}</p>
+                                            <span className="text-xs text-slate-500">{e.date}</span>
                                         </td>
                                         <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155', fontWeight: '500' }}>{e.category}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{e.description}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-600">{e.description}</td>
                                         <td style={{ padding: '16px 24px', fontSize: '14px', color: '#ef4444', fontWeight: '600' }}>{e.amount}</td>
-                                        <td style={{ padding: '16px 24px' }}>
+                                        <td className="px-6 py-4">
                                             <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: e.status === 'Paid' ? '#dcfce7' : '#fef3c7', color: e.status === 'Paid' ? '#166534' : '#d97706' }}>
                                                 {e.status}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
+                                        <td className="px-6 py-4 flex gap-2">
                                             <button style={{ padding: '6px 12px', background: 'white', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Edit</button>
                                         </td>
                                     </tr>
@@ -101,41 +101,41 @@ const ExpenseManagement = () => {
 
             {activeTab === 'add' && (
                 <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', maxWidth: '800px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                    <div className="grid grid-cols-2 gap-6">
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Expense Category</label>
-                            <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Expense Category</label>
+                            <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                                 <option value="">Select Category...</option>
                                 {categories.map((c, i) => <option key={i} value={c}>{c}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Amount (₹)</label>
-                            <input type="number" placeholder="Enter amount" style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Amount (₹)</label>
+                            <input type="number" placeholder="Enter amount" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Expense Date</label>
-                            <input type="date" style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Expense Date</label>
+                            <input type="date" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Payment Status</label>
-                            <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Payment Status</label>
+                            <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                                 <option>Paid</option>
                                 <option>Pending</option>
                             </select>
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Description</label>
-                            <textarea rows="3" placeholder="Provide details about this expense..." style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Description</label>
+                            <textarea rows="3" placeholder="Provide details about this expense..." className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none resize-y"></textarea>
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Attach Receipt/Invoice</label>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Attach Receipt/Invoice</label>
                             <input type="file" style={{ width: '100%', padding: '10px', border: '1px dashed #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', cursor: 'pointer' }} />
                         </div>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
-                        <button onClick={() => setActiveTab('list')} style={{ padding: '12px 24px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-slate-200">
+                        <button onClick={() => setActiveTab('list')} className="px-6 py-3 bg-white border border-slate-300 rounded-lg text-slate-600 font-semibold cursor-pointer">Cancel</button>
                         <button style={{ padding: '12px 24px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Save Expense</button>
                     </div>
                 </div>

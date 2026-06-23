@@ -5,9 +5,9 @@ const StudentPerformance = () => {
     const [isRemarkModalOpen, setIsRemarkModalOpen] = useState(false);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Student Performance</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Student Performance</h2>
             </div>
 
             <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -28,7 +28,7 @@ const StudentPerformance = () => {
                     { name: 'Rohan Gupta', status: 'Top Performer', avgMarks: '95%', attendance: '98%', trend: '📈 Consistent' },
                     { name: 'Ishaan Singh', status: 'Needs Improvement', avgMarks: '65%', attendance: '78%', trend: '📉 Dropping in Physics' }
                 ].map((student, idx) => (
-                    <div key={idx} style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                             <div>
                                 <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#1e293b' }}>{student.name}</h3>
@@ -43,20 +43,20 @@ const StudentPerformance = () => {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                <span style={{ color: '#64748b' }}>Avg. Marks:</span>
+                                <span className="text-slate-500">Avg. Marks:</span>
                                 <span style={{ fontWeight: '600', color: '#0f172a' }}>{student.avgMarks}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                <span style={{ color: '#64748b' }}>Attendance:</span>
+                                <span className="text-slate-500">Attendance:</span>
                                 <span style={{ fontWeight: '600', color: '#0f172a' }}>{student.attendance}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                <span style={{ color: '#64748b' }}>Trend:</span>
+                                <span className="text-slate-500">Trend:</span>
                                 <span style={{ fontWeight: '600', color: '#0f172a' }}>{student.trend}</span>
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div className="flex gap-3">
                             <button style={{ flex: 1, padding: '8px', background: '#eff6ff', color: '#3b82f6', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>View Detailed Report</button>
                             <button onClick={() => { setSelectedStudent(student.name); setIsRemarkModalOpen(true); }} style={{ flex: 1, padding: '8px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>Add Remark</button>
                         </div>
@@ -66,23 +66,23 @@ const StudentPerformance = () => {
 
             {/* Remark Modal */}
             {isRemarkModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Add Remark & Recommendation</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Add Remark & Recommendation</h3>
                             <button onClick={() => setIsRemarkModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', color: '#334155', fontWeight: '500', fontSize: '15px' }}>
                                 Student: {selectedStudent}
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Remark/Observation</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Remark/Observation</label>
                                 <textarea rows="3" placeholder="e.g. Needs to focus more on numericals..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Improvement Plan Recommendation</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Improvement Plan Recommendation</label>
                                 <textarea rows="3" placeholder="e.g. Practice Chapter 4 exercises daily..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

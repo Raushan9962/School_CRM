@@ -9,12 +9,12 @@ const Notifications = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Transport Notifications</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Transport Notifications</h2>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['new', 'history'].map(tab => (
                     <button
                         key={tab}
@@ -40,7 +40,7 @@ const Notifications = () => {
                 <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', maxWidth: '800px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Recipients</label>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Select Recipients</label>
                             <div style={{ display: 'flex', gap: '16px' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475569' }}>
                                     <input type="checkbox" /> All Transport Students
@@ -50,7 +50,7 @@ const Notifications = () => {
                                 </label>
                             </div>
                             <div style={{ marginTop: '12px' }}>
-                                <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                                     <option value="">Or filter by specific Route...</option>
                                     <option value="RT-01">North City Circular (RT-01)</option>
                                     <option value="RT-02">South Avenue Express (RT-02)</option>
@@ -58,12 +58,12 @@ const Notifications = () => {
                             </div>
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message Title</label>
-                            <input type="text" placeholder="e.g. Bus 04 Delayed by 15 mins" style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Message Title</label>
+                            <input type="text" placeholder="e.g. Bus 04 Delayed by 15 mins" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message Content</label>
-                            <textarea rows="5" placeholder="Type your notification message here..." style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Message Content</label>
+                            <textarea rows="5" placeholder="Type your notification message here..." className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none resize-y"></textarea>
                         </div>
                     </div>
                     
@@ -76,12 +76,12 @@ const Notifications = () => {
             )}
 
             {activeTab === 'history' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className="flex flex-col gap-4">
                     {pastNotifications.map(n => (
                         <div key={n.id} style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                                 <h4 style={{ margin: 0, fontSize: '16px', color: '#1e293b' }}>{n.title}</h4>
-                                <span style={{ fontSize: '12px', color: '#64748b' }}>{n.date}</span>
+                                <span className="text-xs text-slate-500">{n.date}</span>
                             </div>
                             <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#475569' }}>{n.message}</p>
                             <div style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>

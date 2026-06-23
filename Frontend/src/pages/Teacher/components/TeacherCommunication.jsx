@@ -5,16 +5,16 @@ const TeacherCommunication = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Communication</h2>
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Communication</h2>
                 {activeTab === 'announcements' && (
-                    <button style={{ padding: '10px 20px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
+                    <button className="px-5 py-2.5 bg-blue-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center gap-2 shadow-md shadow-blue-500/20 hover:bg-blue-600 transition">
                         ➕ New Announcement
                     </button>
                 )}
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['announcements', 'students', 'parents', 'principal'].map(tab => (
                     <button
                         key={tab}

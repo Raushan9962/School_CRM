@@ -16,9 +16,9 @@ const ParentInteraction = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Parent Interaction</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Parent Interaction</h2>
                 <button onClick={() => setIsPtmModalOpen(true)} style={{ padding: '10px 20px', background: '#10b981', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(16,185,129,0.2)' }}>
                     📅 Schedule PTM
                 </button>
@@ -27,9 +27,9 @@ const ParentInteraction = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                 <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', gridColumn: '1 / -1' }}>
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Parent Contact Directory</h3>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student</th>
                                     <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Parent Name</th>
@@ -40,14 +40,14 @@ const ParentInteraction = () => {
                             </thead>
                             <tbody>
                                 {parents.map((p, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                    <tr key={idx} className="border-b border-slate-200">
                                         <td style={{ padding: '12px 16px' }}>
                                             <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>{p.studentName}</p>
-                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Roll: {p.rollNo} | {p.class}</span>
+                                            <span className="text-xs text-slate-500">Roll: {p.rollNo} | {p.class}</span>
                                         </td>
                                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{p.parentName}</td>
                                         <td style={{ padding: '12px 16px' }}>
-                                            <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>📞 {p.phone}</p>
+                                            <p className="m-0 mb-1 text-[13px] text-slate-500">📞 {p.phone}</p>
                                             <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>✉️ {p.email}</p>
                                         </td>
                                         <td style={{ padding: '12px 16px', fontSize: '14px', color: '#475569' }}>{p.lastMeeting}</td>
@@ -75,9 +75,9 @@ const ParentInteraction = () => {
                                     </span>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#475569' }}>
-                                    <div style={{ display: 'flex', gap: '8px' }}><strong>Date:</strong> {meeting.date}</div>
-                                    <div style={{ display: 'flex', gap: '8px' }}><strong>Parent:</strong> {meeting.parent} ({meeting.student})</div>
-                                    <div style={{ display: 'flex', gap: '8px' }}><strong>Notes:</strong> {meeting.notes}</div>
+                                    <div className="flex gap-2"><strong>Date:</strong> {meeting.date}</div>
+                                    <div className="flex gap-2"><strong>Parent:</strong> {meeting.parent} ({meeting.student})</div>
+                                    <div className="flex gap-2"><strong>Notes:</strong> {meeting.notes}</div>
                                 </div>
                             </div>
                         ))}
@@ -87,34 +87,34 @@ const ParentInteraction = () => {
 
             {/* Schedule PTM Modal */}
             {isPtmModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Schedule PTM</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Schedule PTM</h3>
                             <button onClick={() => setIsPtmModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Parent/Student</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Select Parent/Student</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Mr. Rakesh Patel (Aarav Patel)</option>
                                     <option>Mrs. Sunita Sharma (Diya Sharma)</option>
                                 </select>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Date</label>
-                                    <input type="date" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Date</label>
+                                    <input type="date" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Time</label>
-                                    <input type="time" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Time</label>
+                                    <input type="time" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Topic/Agenda</label>
-                                <input type="text" placeholder="e.g. Discuss Term 1 Results" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Topic/Agenda</label>
+                                <input type="text" placeholder="e.g. Discuss Term 1 Results" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                                 <button onClick={() => setIsPtmModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#f1f5f9', border: 'none', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
@@ -127,27 +127,27 @@ const ParentInteraction = () => {
 
             {/* Share Feedback Modal */}
             {isFeedbackModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Share Feedback</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Share Feedback</h3>
                             <button onClick={() => setIsFeedbackModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', color: '#334155', fontWeight: '500', fontSize: '15px' }}>
                                 To: {selectedParent}
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Feedback Type</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Feedback Type</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Academic Performance</option>
                                     <option>Behavioral Observation</option>
                                     <option>Appreciation</option>
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Message</label>
                                 <textarea rows="4" placeholder="Write your feedback here..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

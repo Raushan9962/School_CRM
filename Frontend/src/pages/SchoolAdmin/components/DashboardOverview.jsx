@@ -49,7 +49,7 @@ const DashboardOverview = () => {
         border: '1px solid #e2e8f0' 
       }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '500', color: '#1e293b' }}>Recent Staff Activity</h3>
-        <p style={{ color: '#64748b' }}>Staff activity logs and directory list will appear here.</p>
+        <p className="text-slate-500">Staff activity logs and directory list will appear here.</p>
       </div>
     </div>
   );

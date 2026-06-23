@@ -4,6 +4,7 @@ const feeController = require('../controllers/feeController');
 
 router.post('/', feeController.createFee);
 router.get('/', feeController.getAllFees);
+router.get('/student/:studentId', feeController.getFeesByStudentId);
 router.get('/:id', feeController.getFeeById);
 router.put('/:id', feeController.updateFee);
 router.delete('/:id', feeController.deleteFee);

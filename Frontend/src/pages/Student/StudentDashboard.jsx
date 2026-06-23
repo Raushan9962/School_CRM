@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Calendar, BookOpen, FileText, Clock, ClipboardList, IndianRupee, Library, MessageSquare, Palmtree, Award, Palette, Bus, Ticket } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Calendar, BookOpen, FileText, Clock, ClipboardList, IndianRupee, Library, MessageSquare, Palmtree, Award, Palette, Bus, Ticket, Bell, Menu } from 'lucide-react';
 
 import DashboardOverview from './components/DashboardOverview';
 import StudentProfile from './components/StudentProfile';
@@ -75,7 +75,7 @@ const StudentDashboard = () => {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'overview': return <DashboardOverview />;
+            case 'overview': return <DashboardOverview onNavigate={setActiveTab} />;
             case 'profile': return <StudentProfile />;
             case 'attendance': return <AttendanceView />;
             case 'academics': return <AcademicsView />;
@@ -90,7 +90,7 @@ const StudentDashboard = () => {
             case 'activities': return <ActivitiesView />;
             case 'transport': return <TransportView />;
             case 'complaint': return <ComplaintView />;
-            default: return <DashboardOverview />;
+            default: return <DashboardOverview onNavigate={setActiveTab} />;
         }
     };
 
@@ -100,92 +100,70 @@ const StudentDashboard = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', fontFamily: "'Inter', sans-serif" }}>
+        <div className="flex min-h-screen bg-slate-50 font-sans">
             {/* Sidebar */}
-            <aside style={{
-                width: isSidebarOpen ? 280 : 0, overflow: 'hidden', background: '#0f172a',
-                transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)', display: 'flex', flexDirection: 'column',
-                boxShadow: '4px 0 24px rgba(0,0,0,0.1)', zIndex: 10
-            }}>
-                <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #3b82f6, #2563eb)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 4px 12px rgba(59,130,246,0.4)' }}>🎓</div>
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <h2 style={{ color: 'white', margin: 0, fontSize: 16, fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                            VidyaSetu
-                        </h2>
-                        <p style={{ color: '#60a5fa', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Student Portal</p>
+            <aside className={`overflow-hidden bg-white transition-[width] duration-300 flex flex-col border-r border-slate-200 z-10 ${isSidebarOpen ? 'w-[260px]' : 'w-0'}`}>
+                {/* Profile Header */}
+                <div className="p-6 pb-2 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+                        {currentUser?.name ? currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : 'ST'}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <p className="text-slate-800 m-0 text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{currentUser?.name || 'Student'}</p>
                     </div>
                 </div>
+                
+                {/* Brand Selector */}
+                <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors mb-2">
+                    <span className="text-slate-600 font-semibold tracking-wide text-sm uppercase">VIDYASETU</span>
+                    <span className="text-slate-400 text-[10px]">▶</span>
+                </div>
 
-                <nav style={{ flex: 1, padding: '20px 12px', overflowY: 'auto' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <nav className="flex-1 px-3 overflow-y-auto">
+                    <div className="flex flex-col gap-1.5">
                         {navItems.map(item => (
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
-                                style={{
-                                    width: '100%', textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                                    border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600,
-                                    display: 'flex', alignItems: 'center', gap: '12px',
-                                    background: activeTab === item.id ? 'linear-gradient(90deg, rgba(59,130,246,0.15), transparent)' : 'transparent',
-                                    color: activeTab === item.id ? '#60a5fa' : '#94a3b8',
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: activeTab === item.id ? 'inset 3px 0 0 #3b82f6' : 'none'
-                                }}
-                                onMouseEnter={e => { if (activeTab !== item.id) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
-                                onMouseLeave={e => { if (activeTab !== item.id) e.currentTarget.style.background = 'transparent' }}
+                                className={`w-full text-left px-4 py-2.5 rounded-lg border-none cursor-pointer text-[15px] font-medium flex items-center gap-4 transition-colors ${activeTab === item.id ? 'bg-sky-50 text-sky-600' : 'bg-transparent text-slate-600 hover:bg-slate-50'}`}
                             >
-                                <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                                <span className={activeTab === item.id ? 'text-sky-600' : 'text-slate-400'}>{item.icon}</span>
                                 {item.label}
                             </button>
                         ))}
                     </div>
                 </nav>
 
-                <div style={{ padding: '20px 16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, marginBottom: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-                            {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'S'}
-                        </div>
-                        <div style={{ overflow: 'hidden' }}>
-                            <p style={{ color: 'white', margin: 0, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{currentUser?.name || 'Student Name'}</p>
-                            <p style={{ color: '#94a3b8', margin: 0, fontSize: 11 }}>Student</p>
-                        </div>
-                    </div>
-                    <button onClick={handleLogout} style={{ width: '100%', padding: '10px', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)' }}>
+                <div className="p-4 border-t border-slate-200">
+                    <button onClick={handleLogout} className="w-full p-2.5 bg-transparent text-slate-500 border-none rounded-lg cursor-pointer font-medium transition-colors flex justify-center items-center hover:bg-slate-100 hover:text-red-500">
                         Sign Out
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+            <main className="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
                 {/* Header */}
-                <header style={{ 
-                    background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(12px)', 
-                    padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-                    borderBottom: '1px solid rgba(0,0,0,0.05)', zIndex: 5 
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#64748b', padding: 4, transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform='scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>☰</button>
+                <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-slate-200 z-[5]">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="bg-transparent border-none text-xl cursor-pointer text-slate-500 p-1 flex items-center hover:text-slate-800 transition-colors">
+                            <Menu size={24} />
+                        </button>
                         <div>
-                            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#0f172a' }}>{getActiveTitle()}</h1>
-                            <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748b' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <h1 className="m-0 text-xl font-semibold text-gray-900">{getActiveTitle()}</h1>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <button style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background='white'}>
-                            <Bell size={20} strokeWidth={1.5} color="#475569" />
-                            <span style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#ef4444', borderRadius: '50%', border: '2px solid white' }}></span>
+                    <div className="flex gap-3">
+                        <button className="bg-transparent border-none cursor-pointer flex items-center justify-center relative p-2 hover:bg-slate-50 rounded-full transition-colors">
+                            <Bell size={20} strokeWidth={2} className="text-sky-500" />
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                         </button>
                     </div>
                 </header>
 
                 {/* Content Area */}
-                <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
-                    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+                <div className="flex-1 px-8 py-6 overflow-y-auto">
+                    <div className="max-w-[1400px] mx-auto">
                         {renderContent()}
                     </div>
                 </div>

@@ -1,46 +1,58 @@
 import React from 'react';
 
-const StatCard = ({ title, metrics, bottomComponent, extraHeaderIcon }) => {
-    return (
-        <div style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 500, color: '#1e293b' }}>
-                    {title}
-                </h3>
-                {extraHeaderIcon && (
-                    <div style={{ color: '#0ea5e9', cursor: 'pointer', fontSize: '20px' }}>
-                        {extraHeaderIcon}
+const StatCard = ({ title, metrics, bottomComponent, extraHeaderIcon, value, icon, trend, trendUp, color }) => {
+    if (metrics) {
+        return (
+            <div className="bg-white border border-slate-200 rounded-lg p-6 flex flex-col gap-6 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.06)]">
+                <div className="flex justify-between items-center">
+                    <h3 className="m-0 text-xl font-medium text-slate-800">
+                        {title}
+                    </h3>
+                    {extraHeaderIcon && (
+                        <div className="text-sky-500 cursor-pointer text-xl">
+                            {extraHeaderIcon}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex flex-wrap gap-6">
+                    {metrics.map((metric, idx) => (
+                        <div key={idx} className="flex-[1_1_calc(50%-12px)]">
+                            <div className="text-[13px] text-slate-600 mb-2 font-medium">
+                                {metric.label}
+                            </div>
+                            <div className="text-[28px] text-sky-500 font-medium">
+                                {metric.value}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {(bottomComponent || extraHeaderIcon) && (
+                    <div className="border-t border-slate-200 pt-4 mt-auto">
+                        {bottomComponent}
                     </div>
                 )}
             </div>
+        );
+    }
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-                {metrics.map((metric, idx) => (
-                    <div key={idx} style={{ flex: '1 1 calc(50% - 12px)' }}>
-                        <div style={{ fontSize: '13px', color: '#475569', marginBottom: '8px', fontWeight: 500 }}>
-                            {metric.label}
-                        </div>
-                        <div style={{ fontSize: '28px', color: '#0ea5e9', fontWeight: 500 }}>
-                            {metric.value}
-                        </div>
-                    </div>
-                ))}
+    return (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex items-center gap-5">
+            <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15`, color: color }}>
+                {icon}
             </div>
-
-            {(bottomComponent || extraHeaderIcon) && (
-                <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: 'auto' }}>
-                    {bottomComponent}
+            <div className="flex-1">
+                <h3 className="m-0 mb-2 text-[15px] text-slate-500 font-medium">{title}</h3>
+                <div className="flex items-end gap-3">
+                    <span className="text-[28px] font-bold text-slate-800 leading-none">{value}</span>
+                    {trend && (
+                        <span className={`text-[13px] font-semibold flex items-center gap-1 mb-1 ${trendUp ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {trend}
+                        </span>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };

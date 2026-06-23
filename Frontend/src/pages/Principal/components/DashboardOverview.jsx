@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import QRCode from 'react-qr-code';
 import StatCard from '../../../components/layout/StatCard';
+import apiFetch from '../../../services/api';
+import { QrCode, X } from 'lucide-react';
 
 const panelStyle = {
   background: 'rgba(255, 255, 255, 0.7)',
@@ -15,6 +18,8 @@ const panelStyle = {
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
 
 const DashboardOverview = () => {
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrPayload, setQrPayload] = useState(null);
   const [data, setData] = useState({
     stats: { students: 0, teachers: 0, present: 0, absent: 0, feesCollected: 0, pendingFees: 0, passPercentage: '0%', teacherAttendance: '0%' },
     exams: [],
@@ -31,7 +36,7 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/principal/dashboard-stats', {
+        const res = await apiFetch('/principal/dashboard-stats', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('API not ready');
@@ -55,10 +60,60 @@ const DashboardOverview = () => {
     fetchData();
   }, []);
 
+  const handleGenerateQR = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await apiFetch('/principal/attendance-qr', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setQrPayload(data.qrPayload);
+            setShowQRModal(true);
+        } else {
+            alert('Failed to generate QR code');
+        }
+    } catch (err) {
+        console.error("Error generating QR:", err);
+        alert('Error generating QR code');
+    }
+  };
+
   if (data.loading) return <div style={{ padding: '24px', color: '#64748b' }}>Loading comprehensive dashboard data...</div>;
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
+    <div className="dashboard-section animate-fade-in p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-slate-800 m-0">Principal Dashboard</h2>
+        <button 
+            onClick={handleGenerateQR}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm cursor-pointer border-none"
+        >
+            <QrCode size={18} />
+            Generate Daily Attendance QR
+        </button>
+      </div>
+
+      {showQRModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col items-center p-8 relative">
+                <button 
+                    onClick={() => setShowQRModal(false)} 
+                    className="absolute top-4 right-4 p-1 hover:bg-slate-200 rounded-full transition-colors cursor-pointer border-none bg-transparent"
+                >
+                    <X size={20} className="text-slate-500" />
+                </button>
+                <h3 className="font-bold text-xl text-slate-800 mb-2 mt-4 text-center">Daily Attendance QR</h3>
+                <p className="text-slate-500 text-sm mb-8 text-center">Display this QR code for students and staff to scan using their mobile apps.</p>
+                
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    {qrPayload && <QRCode value={qrPayload} size={250} level="H" />}
+                </div>
+                
+                <p className="text-xs text-slate-400 mt-8">Valid for today only ({new Date().toLocaleDateString()})</p>
+            </div>
+        </div>
+      )}
       
       {/* Top Row: 3 Large Stat Cards (Matching User Sample) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px', marginBottom: '24px' }}>
@@ -109,8 +164,8 @@ const DashboardOverview = () => {
         <div className="glass-panel" style={panelStyle}>
           <h3 style={panelTitleStyle}>Top 10 Students 🏆</h3>
           <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.topStudents.length === 0 ? <p style={{ color: '#64748b' }}>No result data available.</p> : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+            {data.topStudents.length === 0 ? <p className="text-slate-500">No result data available.</p> : (
+              <table className="w-full border-collapse text-left text-sm">
                 <thead>
                   <tr style={{ color: '#94a3b8', borderBottom: '1px solid #e2e8f0' }}>
                     <th style={{ padding: '8px 0' }}>Name</th>
@@ -119,7 +174,7 @@ const DashboardOverview = () => {
                 </thead>
                 <tbody>
                   {data.topStudents.map((s, i) => (
-                    <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50">
                       <td style={{ padding: '8px 0', fontWeight: '600', color: '#334155' }}>{i + 1}. {s.name}</td>
                       <td style={{ padding: '8px 0', textAlign: 'right', color: '#10b981', fontWeight: 'bold' }}>{s.total_marks}</td>
                     </tr>
@@ -134,8 +189,8 @@ const DashboardOverview = () => {
         <div className="glass-panel" style={panelStyle}>
           <h3 style={panelTitleStyle}>Weak Students Alerts ⚠️</h3>
           <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.weakStudents.length === 0 ? <p style={{ color: '#64748b' }}>No failing students found!</p> : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {data.weakStudents.length === 0 ? <p className="text-slate-500">No failing students found!</p> : (
+              <ul className="list-none p-0 m-0">
                 {data.weakStudents.map((s) => (
                   <li key={s.id} style={{ padding: '10px', background: '#fef2f2', borderLeft: '4px solid #ef4444', borderRadius: '4px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '600', color: '#7f1d1d' }}>{s.name}</span>
@@ -151,8 +206,8 @@ const DashboardOverview = () => {
         <div className="glass-panel" style={panelStyle}>
           <h3 style={panelTitleStyle}>Upcoming Exams 📝</h3>
           <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.exams.length === 0 ? <p style={{ color: '#64748b' }}>No upcoming exams scheduled.</p> : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {data.exams.length === 0 ? <p className="text-slate-500">No upcoming exams scheduled.</p> : (
+              <ul className="list-none p-0 m-0">
                 {data.exams.map((e) => (
                   <li key={e.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: '600', color: '#334155' }}>{e.title}</span>
@@ -168,8 +223,8 @@ const DashboardOverview = () => {
         <div className="glass-panel" style={panelStyle}>
           <h3 style={panelTitleStyle}>Recent Notices 📢</h3>
           <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.notices.length === 0 ? <p style={{ color: '#64748b' }}>No recent notices.</p> : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {data.notices.length === 0 ? <p className="text-slate-500">No recent notices.</p> : (
+              <ul className="list-none p-0 m-0">
                 {data.notices.map((n) => (
                   <li key={n.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <span style={{ fontWeight: '600', color: '#334155' }}>{n.title}</span>
@@ -185,8 +240,8 @@ const DashboardOverview = () => {
         <div className="glass-panel" style={panelStyle}>
           <h3 style={panelTitleStyle}>Pending Approvals ⏳</h3>
           <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.pendingApprovals.length === 0 ? <p style={{ color: '#64748b' }}>All caught up!</p> : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {data.pendingApprovals.length === 0 ? <p className="text-slate-500">All caught up!</p> : (
+              <ul className="list-none p-0 m-0">
                 {data.pendingApprovals.map((p) => (
                   <li key={p.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '600', color: '#334155', fontSize: '14px' }}>{p.title}</span>

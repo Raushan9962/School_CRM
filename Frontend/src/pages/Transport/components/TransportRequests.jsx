@@ -18,9 +18,9 @@ const TransportRequests = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Transport Requests</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Transport Requests</h2>
             </div>
 
             <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -40,39 +40,39 @@ const TransportRequests = () => {
                 <button style={{ padding: '10px 24px', background: '#0f172a', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Filter</button>
             </div>
 
-            <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left">
+                        <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Request ID & Date</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Details</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Request Type & Details</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Status</th>
-                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Actions</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Request ID & Date</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Student Details</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Request Type & Details</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {requests.map((r, idx) => (
-                                <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                    <td style={{ padding: '16px 24px' }}>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{r.id}</p>
-                                        <span style={{ fontSize: '12px', color: '#64748b' }}>{r.date}</span>
+                                <tr key={idx} className="border-b border-slate-200">
+                                    <td className="px-6 py-4">
+                                        <p className="m-0 mb-1 text-sm font-semibold text-slate-800">{r.id}</p>
+                                        <span className="text-xs text-slate-500">{r.date}</span>
                                     </td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4">
                                         <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#1e293b' }}>{r.student}</p>
-                                        <span style={{ fontSize: '12px', color: '#64748b' }}>Class: {r.class}</span>
+                                        <span className="text-xs text-slate-500">Class: {r.class}</span>
                                     </td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4">
                                         <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#3b82f6' }}>{r.type}</p>
                                         <span style={{ fontSize: '13px', color: '#475569' }}>{r.detail}</span>
                                     </td>
-                                    <td style={{ padding: '16px 24px' }}>
+                                    <td className="px-6 py-4">
                                         <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: getStatusStyle(r.status).bg, color: getStatusStyle(r.status).text }}>
                                             {r.status}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
+                                    <td className="px-6 py-4 flex gap-2">
                                         {r.status === 'Pending' ? (
                                             <>
                                                 <button style={{ padding: '6px 12px', background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Approve</button>

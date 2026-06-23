@@ -7,7 +7,7 @@ import ReceptionistOverview from './components/ReceptionistOverview';
 const PlaceholderView = ({ title }) => (
     <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
         <h2 style={{ color: '#0f172a', marginBottom: '16px' }}>{title}</h2>
-        <p style={{ color: '#64748b' }}>This module is currently under development. It will be available soon.</p>
+        <p className="text-slate-500">This module is currently under development. It will be available soon.</p>
     </div>
 );
 

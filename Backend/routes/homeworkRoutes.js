@@ -4,6 +4,8 @@ const homeworkController = require('../controllers/homeworkController');
 
 router.post('/', homeworkController.createHomework);
 router.get('/', homeworkController.getAllHomeworks);
+router.get('/class/:classId', homeworkController.getHomeworkByClass);
+router.get('/student/:userId', homeworkController.getHomeworkByStudentUserId);
 router.get('/:id', homeworkController.getHomeworkById);
 router.put('/:id', homeworkController.updateHomework);
 router.delete('/:id', homeworkController.deleteHomework);

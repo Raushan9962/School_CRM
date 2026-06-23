@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const pool = require('../config/db');
 
 exports.createNotification = async (req, res) => {
     try {
@@ -28,6 +29,21 @@ exports.getNotificationById = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching details' });
+    }
+};
+
+exports.getNotificationsByRole = async (req, res) => {
+    try {
+        const role = req.params.role;
+        const result = await pool.query(`
+            SELECT * FROM notifications 
+            WHERE target_role = $1 OR target_role = 'All' OR target_role IS NULL
+            ORDER BY created_at DESC
+        `, [role]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching notifications' });
     }
 };
 

@@ -10,12 +10,12 @@ const FeeCollection = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Fee Collection Desk</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Fee Collection Desk</h2>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['collect', 'history'].map(tab => (
                     <button
                         key={tab}
@@ -38,13 +38,13 @@ const FeeCollection = () => {
             </div>
 
             {activeTab === 'collect' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', color: '#1e293b' }}>Student Details</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Search Student</label>
-                                <input type="text" placeholder="Enter Admission No. or Name..." style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-2 text-sm font-medium text-slate-700">Search Student</label>
+                                <input type="text" placeholder="Enter Admission No. or Name..." className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                             </div>
                             <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                 <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#64748b' }}>Student Name: <strong style={{ color: '#1e293b' }}>Aarav Patel</strong></p>
@@ -52,8 +52,8 @@ const FeeCollection = () => {
                                 <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#64748b' }}>Pending Dues: <strong style={{ color: '#dc2626' }}>₹ 25,000</strong></p>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Fee to Pay</label>
-                                <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-2 text-sm font-medium text-slate-700">Select Fee to Pay</label>
+                                <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                                     <option>Term 1 Fee (₹ 25,000)</option>
                                     <option>Transport Fee (₹ 1,500)</option>
                                 </select>
@@ -61,15 +61,15 @@ const FeeCollection = () => {
                         </div>
                     </div>
 
-                    <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                         <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', color: '#1e293b' }}>Payment Details</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Amount Receiving (₹)</label>
-                                <input type="number" defaultValue="25000" style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-2 text-sm font-medium text-slate-700">Amount Receiving (₹)</label>
+                                <input type="number" defaultValue="25000" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Payment Method</label>
+                                <label className="block mb-2 text-sm font-medium text-slate-700">Payment Method</label>
                                 <div style={{ display: 'flex', gap: '16px' }}>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475569' }}>
                                         <input type="radio" name="method" defaultChecked /> Cash
@@ -83,8 +83,8 @@ const FeeCollection = () => {
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Remarks / Cheque No.</label>
-                                <input type="text" placeholder="Optional details..." style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-2 text-sm font-medium text-slate-700">Remarks / Cheque No.</label>
+                                <input type="text" placeholder="Optional details..." className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                             </div>
                             <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
                                 <button style={{ flex: 1, padding: '12px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(14,165,233,0.2)' }}>
@@ -97,35 +97,35 @@ const FeeCollection = () => {
             )}
 
             {activeTab === 'history' && (
-                <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
                         <input type="text" placeholder="Search Receipt No. or TXN ID..." style={{ flex: 1, padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
-                        <input type="date" style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                        <input type="date" className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Receipt No.</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Transaction ID & Date</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Name</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Amount</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Payment Method</th>
-                                    <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Actions</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Receipt No.</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Transaction ID & Date</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Student Name</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Amount</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Payment Method</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {recentCollections.map((c, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                    <tr key={idx} className="border-b border-slate-200">
                                         <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{c.receipt}</td>
-                                        <td style={{ padding: '16px 24px' }}>
+                                        <td className="px-6 py-4">
                                             <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#475569' }}>{c.id}</p>
-                                            <span style={{ fontSize: '12px', color: '#64748b' }}>{c.date}</span>
+                                            <span className="text-xs text-slate-500">{c.date}</span>
                                         </td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155' }}>{c.student}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-700">{c.student}</td>
                                         <td style={{ padding: '16px 24px', fontSize: '14px', color: '#10b981', fontWeight: '600' }}>{c.amount}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#475569' }}>{c.method}</td>
-                                        <td style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
+                                        <td className="px-6 py-4 text-sm text-slate-600">{c.method}</td>
+                                        <td className="px-6 py-4 flex gap-2">
                                             <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#0ea5e9', border: '1px solid #bae6fd', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                 🖨️ Print
                                             </button>

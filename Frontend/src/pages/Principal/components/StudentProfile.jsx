@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, CreditCard, User, Phone, Mail, Droplet, Users, Calendar, GraduationCap, Briefcase, AlertCircle, FileText, CheckCircle, XCircle } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const StudentProfile = ({ studentId, onBack }) => {
     const [profile, setProfile] = useState(null);
@@ -9,7 +10,7 @@ const StudentProfile = ({ studentId, onBack }) => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch(`http://localhost:5000/api/principal/students/${studentId}/profile`, {
+                const res = await apiFetch(`/principal/students/${studentId}/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const json = await res.json();

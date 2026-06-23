@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const PlaceholderView = ({ title }) => {
     const lowerTitle = title.toLowerCase();
@@ -27,7 +28,7 @@ const PlaceholderView = ({ title }) => {
             
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5000${endpoint}`, {
+                const response = await apiFetch(`${endpoint}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 

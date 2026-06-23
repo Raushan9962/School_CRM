@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
 const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
@@ -12,7 +13,7 @@ const ExaminationManagement = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/principal/exams', {
+        const res = await apiFetch('/principal/exams', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('API not ready');
@@ -33,9 +34,9 @@ const ExaminationManagement = () => {
   }, []);
 
   return (
-    <div className="dashboard-section animate-fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '24px' }}>Examination Management</h2>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+    <div className="dashboard-section animate-fade-in" className="p-6">
+      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Examination Management</h2>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Create Exams" icon="📝" />
         <ActionBtn text="Publish Results" icon="📢" />
         <ActionBtn text="Analyze Performance" icon="📈" />
@@ -43,23 +44,23 @@ const ExaminationManagement = () => {
       
       <div className="glass-panel" style={panelStyle}>
         <h3 style={panelTitleStyle}>Exam Schedules & Results</h3>
-        {loading ? <p style={{ color: '#64748b' }}>Loading exams...</p> : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        {loading ? <p className="text-slate-500">Loading exams...</p> : (
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                <th style={{ padding: '12px' }}>Exam Name</th>
-                <th style={{ padding: '12px' }}>Classes</th>
-                <th style={{ padding: '12px' }}>Start Date</th>
-                <th style={{ padding: '12px' }}>Status</th>
+                <th className="p-3">Exam Name</th>
+                <th className="p-3">Classes</th>
+                <th className="p-3">Start Date</th>
+                <th className="p-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {exams.map(e => (
                 <tr key={e.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#1e293b', fontWeight: '500' }}>
-                  <td style={{ padding: '12px' }}>{e.name}</td>
-                  <td style={{ padding: '12px', color: '#64748b' }}>{e.classes}</td>
-                  <td style={{ padding: '12px' }}>{e.date}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td className="p-3">{e.name}</td>
+                  <td className="p-3 text-slate-500">{e.classes}</td>
+                  <td className="p-3">{e.date}</td>
+                  <td className="p-3">
                     <span style={{ 
                       padding: '4px 10px', borderRadius: '12px', fontSize: '12px',
                       background: e.status === 'Completed' ? '#d1fae5' : (e.status === 'Upcoming' ? '#fef3c7' : '#e0e7ff'),

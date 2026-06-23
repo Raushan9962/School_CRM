@@ -11,12 +11,12 @@ const PaymentReminders = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Payment Reminders</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Payment Reminders</h2>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['send', 'logs', 'settings'].map(tab => (
                     <button
                         key={tab}
@@ -42,8 +42,8 @@ const PaymentReminders = () => {
                 <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', maxWidth: '800px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Select Target Audience</label>
-                            <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Select Target Audience</label>
+                            <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                                 <option>All Students with Pending Dues</option>
                                 <option>Class 10 - Pending Dues</option>
                                 <option>Class 9 - Pending Dues</option>
@@ -51,7 +51,7 @@ const PaymentReminders = () => {
                             </select>
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Communication Channels</label>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Communication Channels</label>
                             <div style={{ display: 'flex', gap: '24px' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '14px' }}>
                                     <input type="checkbox" defaultChecked /> SMS
@@ -65,7 +65,7 @@ const PaymentReminders = () => {
                             </div>
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message Template</label>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">Message Template</label>
                             <select style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', marginBottom: '12px' }}>
                                 <option>Standard Due Reminder</option>
                                 <option>Overdue Warning</option>
@@ -74,13 +74,13 @@ const PaymentReminders = () => {
                             <textarea 
                                 rows="4" 
                                 defaultValue="Dear Parent, This is a gentle reminder that the Term 1 Fee of ₹[Amount] for [Student_Name] is due by [Due_Date]. Please ignore if already paid."
-                                style={{ width: '100%', padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none resize-y"
                             ></textarea>
                         </div>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
-                        <button style={{ padding: '12px 24px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-slate-200">
+                        <button className="px-6 py-3 bg-white border border-slate-300 rounded-lg text-slate-600 font-semibold cursor-pointer">Cancel</button>
                         <button style={{ padding: '12px 24px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span>🚀</span> Send Now
                         </button>
@@ -108,10 +108,10 @@ const PaymentReminders = () => {
             )}
 
             {activeTab === 'settings' && (
-                <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                    <span style={{ fontSize: '48px' }}>⚙️</span>
-                    <h3 style={{ color: '#0f172a', margin: '16px 0 8px 0' }}>Automation Settings</h3>
-                    <p style={{ color: '#64748b' }}>Configure automatic reminders to be sent X days before or after the due date.</p>
+                <div className="bg-white p-10 rounded-2xl text-center shadow-sm">
+                    <span className="text-[48px]">⚙️</span>
+                    <h3 className="text-slate-900 my-4 mb-2">Automation Settings</h3>
+                    <p className="text-slate-500">Configure automatic reminders to be sent X days before or after the due date.</p>
                 </div>
             )}
         </div>

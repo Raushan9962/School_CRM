@@ -6,6 +6,9 @@ const principalController = require('../controllers/principalController');
 // GET dashboard statistics
 router.get('/dashboard-stats', principalController.getDashboardStats);
 
+// GET Daily Attendance QR token
+router.get('/attendance-qr', principalController.getDailyAttendanceQR);
+
 // Classes CRUD
 router.get('/classes', principalController.getClasses);
 router.post('/classes', principalController.createClass);

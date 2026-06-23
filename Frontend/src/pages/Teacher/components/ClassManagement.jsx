@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
 
 const ClassManagement = () => {
     const [classes, setClasses] = useState([]);
@@ -11,7 +12,7 @@ const ClassManagement = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch('http://localhost:5000/api/principal/classes', {
+                const res = await apiFetch('/principal/classes', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const json = await res.json();
@@ -31,7 +32,7 @@ const ClassManagement = () => {
         setSelectedClass(cls);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:5000/api/principal/students`, {
+            const res = await apiFetch(`/principal/students`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const json = await res.json();
@@ -46,19 +47,19 @@ const ClassManagement = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Class Management</h2>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Class Management</h2>
             </div>
 
             {loading ? (
-                <div style={{ color: '#64748b' }}>Loading classes...</div>
+                <div className="text-slate-500">Loading classes...</div>
             ) : !selectedClass ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '24px' }}>
                     {classes.map(cls => (
                         <div key={cls.id} style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h3 style={{ margin: 0, fontSize: '20px', color: '#1e293b' }}>{cls.name} - Section {cls.section}</h3>
+                            <div className="flex justify-between items-center">
+                                <h3 className="m-0 text-xl text-slate-800">{cls.name} - Section {cls.section}</h3>
                             </div>
                             
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -85,32 +86,32 @@ const ClassManagement = () => {
                     )}
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="flex flex-col gap-6">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                         <button onClick={() => setSelectedClass(null)} style={{ padding: '8px 16px', background: '#f1f5f9', border: 'none', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>
                             ← Back to Classes
                         </button>
-                        <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>{selectedClass.name} (Section {selectedClass.section}) - Student List</h3>
+                        <h3 className="m-0 text-xl text-slate-900">{selectedClass.name} (Section {selectedClass.section}) - Student List</h3>
                     </div>
 
-                    <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse text-left">
+                                <thead className="bg-slate-50 border-b border-slate-200">
                                     <tr>
-                                        <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Roll No</th>
-                                        <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Student Name</th>
-                                        <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Admission No</th>
-                                        <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Attendance</th>
-                                        <th style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#475569' }}>Action</th>
+                                        <th className="p-4 text-sm font-semibold text-slate-600">Roll No</th>
+                                        <th className="p-4 text-sm font-semibold text-slate-600">Student Name</th>
+                                        <th className="p-4 text-sm font-semibold text-slate-600">Admission No</th>
+                                        <th className="p-4 text-sm font-semibold text-slate-600">Attendance</th>
+                                        <th className="p-4 text-sm font-semibold text-slate-600">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {students.map((student, idx) => (
-                                        <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                        <tr key={idx} className="border-b border-slate-200">
                                             <td style={{ padding: '16px', fontSize: '14px', color: '#1e293b' }}>{student.rollNumber || 'N/A'}</td>
                                             <td style={{ padding: '16px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <div className="flex items-center gap-3">
                                                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>
                                                         {student.name ? student.name.charAt(0) : '?'}
                                                     </div>
@@ -120,7 +121,7 @@ const ClassManagement = () => {
                                             <td style={{ padding: '16px', fontSize: '14px', color: '#64748b' }}>{student.admissionNo}</td>
                                             <td style={{ padding: '16px', fontSize: '14px', color: student.attendance === 'N/A' ? '#64748b' : '#10b981', fontWeight: '500' }}>{student.attendance}</td>
                                             <td style={{ padding: '16px' }}>
-                                                <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#3b82f6', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>View Profile</button>
+                                                <button className="px-3 py-1.5 bg-blue-50 text-blue-500 border-none rounded-md text-[13px] font-medium cursor-pointer hover:bg-blue-100 transition-colors">View Profile</button>
                                             </td>
                                         </tr>
                                     ))}

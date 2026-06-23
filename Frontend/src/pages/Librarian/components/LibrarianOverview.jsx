@@ -23,19 +23,19 @@ const LibrarianOverview = () => {
 
             <div style={{ gridColumn: '1 / -1', background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
                 <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#1e293b' }}>Recent Library Activity</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <ul className="list-none p-0 m-0">
                     <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '12px', alignItems: 'center' }}>
                         <span style={{ fontSize: '24px' }}>📖</span>
                         <div>
                             <p style={{ margin: 0, fontWeight: '600', color: '#334155' }}>Harry Potter and the Sorcerer's Stone - Issued</p>
-                            <span style={{ fontSize: '12px', color: '#64748b' }}>To: Alice Smith (Grade 10)</span>
+                            <span className="text-xs text-slate-500">To: Alice Smith (Grade 10)</span>
                         </div>
                     </li>
                     <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '12px', alignItems: 'center' }}>
                         <span style={{ fontSize: '24px' }}>🔙</span>
                         <div>
                             <p style={{ margin: 0, fontWeight: '600', color: '#334155' }}>Introduction to Algorithms - Returned</p>
-                            <span style={{ fontSize: '12px', color: '#64748b' }}>By: Bob Johnson (Grade 12)</span>
+                            <span className="text-xs text-slate-500">By: Bob Johnson (Grade 12)</span>
                         </div>
                     </li>
                 </ul>

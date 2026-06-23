@@ -3,12 +3,12 @@ import React from 'react';
 const TeacherManagement = () => {
   return (
     <div className="animate-fade-in">
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e1b4b', margin: '0' }}>Teacher Management</h2>
-        <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Manage teachers, attendance, salary, and performance.</p>
+      <div className="mb-6">
+        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Teacher Management</h2>
+        <p className="text-slate-500 text-sm mt-1">Manage teachers, attendance, salary, and performance.</p>
       </div>
       
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div className="flex gap-3 mb-6 flex-wrap">
         <ActionBtn text="Add Teacher" icon="➕" color="#0ea5e9" />
         <ActionBtn text="Salary & Payroll" icon="💼" color="#10b981" />
         <ActionBtn text="Class Assignments" icon="🏫" color="#6366f1" />
@@ -20,8 +20,8 @@ const TeacherManagement = () => {
         borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', 
         border: '1px solid rgba(255,255,255,0.5)' 
       }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>Teacher Directory</h3>
-        <p style={{ color: '#64748b' }}>Teacher profiles and management actions will appear here.</p>
+        <h3 className="m-0 mb-4 text-base font-bold text-slate-800">Teacher Directory</h3>
+        <p className="text-slate-500">Teacher profiles and management actions will appear here.</p>
       </div>
     </div>
   );

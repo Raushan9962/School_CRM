@@ -11,6 +11,24 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import QRCode from 'react-qr-code';
+import { Hand, Book, Hash, Smartphone, CalendarDays, FileEdit, ClipboardList, IndianRupee, TrendingUp, Clock, User, BellRing, RefreshCw, FileText } from 'lucide-react';
+import StatCard from '../../../components/layout/StatCard';
+import apiFetch from '../../../services/api';
+
+import QRScannerModal from '../../../components/common/QRScannerModal';
+
+const panelStyle = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '16px',
+  padding: '24px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+  border: '1px solid rgba(255,255,255,0.5)',
+  display: 'flex',
+  flexDirection: 'column'
+};
+
+const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' };
 
 ChartJS.register(
   CategoryScale,
@@ -22,27 +40,72 @@ ChartJS.register(
   Legend
 );
 
-const DashboardOverview = () => {
+const DashboardOverview = ({ onNavigate }) => {
     const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [qrValue, setQrValue] = useState('');
     const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+    const [loading, setLoading] = useState(true);
 
-    // Mock user data
-    const user = {
-        name: "Rahul Kumar",
-        photo: "https://ui-avatars.com/api/?name=Rahul+Kumar&background=0D8ABC&color=fff&size=128",
-        classSec: "Class 10 - A",
-        rollNo: "10A045",
-        attendance: 92,
+    const [user, setUser] = useState({
+        name: "Student",
+        photo: "",
+        classSec: "N/A",
+        rollNo: "N/A",
+        attendance: 0,
+        pendingFees: 0,
+        latestResult: null
+    });
+
+    const fetchDashboardData = async () => {
+        try {
+            setLoading(true);
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const userObj = JSON.parse(userStr);
+                
+                // Fetch profile
+                const profileRes = await apiFetch(`/students/user/${userObj.id}`);
+                let profileData = null;
+                if (profileRes.ok) {
+                    profileData = await profileRes.json();
+                }
+
+                // Fetch stats
+                const statsRes = await apiFetch(`/students/dashboard/${userObj.id}`);
+                let statsData = null;
+                if (statsRes.ok) {
+                    statsData = await statsRes.json();
+                }
+
+                setUser({
+                    name: profileData?.name || userObj.name,
+                    photo: `https://ui-avatars.com/api/?name=${profileData?.name || userObj.name}&background=random`,
+                    classSec: profileData?.class_name || "N/A",
+                    rollNo: `STU-${profileData?.id || 'N/A'}`,
+                    attendance: statsData?.attendancePercentage || 0,
+                    pendingFees: statsData?.pendingFees || 0,
+                    latestResult: statsData?.latestResult || null
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching dashboard data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Chart Data
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
+    // Chart Data (Mocked since we don't have historical progression yet)
     const chartData = {
         labels: ['Unit Test 1', 'Half Yearly', 'Unit Test 2', 'Pre-Board', 'Final'],
         datasets: [
             {
                 label: 'Academic Performance (%)',
-                data: [75, 82, 88, 85, 91],
+                data: [75, 82, 88, 85, user.latestResult?.marks_obtained ? Math.round((user.latestResult.marks_obtained/user.latestResult.total_marks)*100) : 91],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 tension: 0.4,
@@ -86,178 +149,291 @@ const DashboardOverview = () => {
         setIsQrModalOpen(true);
     };
 
+    const handleScanSuccess = async (scannedData) => {
+        setIsScannerOpen(false);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await apiFetch('/attendance/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ qrPayload: scannedData })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Attendance Marked Successfully!');
+                fetchDashboardData(); // refresh stats
+            } else {
+                alert(data.error || 'Failed to mark attendance.');
+            }
+        } catch (e) {
+            alert('Error marking attendance.');
+            console.error(e);
+        }
+    };
+
     const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Welcome Section */}
-            <div style={{ 
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', 
-                padding: '24px', 
-                borderRadius: '16px', 
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                border: '1px solid #e2e8f0',
-                flexWrap: 'wrap'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                    <img src={user.photo} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }} />
-                    <div>
-                        <h2 style={{ margin: '0 0 8px 0', fontSize: '28px', color: '#0f172a' }}>Welcome back, {user.name}! 👋</h2>
-                        <div style={{ display: 'flex', gap: '24px', color: '#64748b', fontSize: '15px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>📚 <strong>Class:</strong> {user.classSec}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>🔢 <strong>Roll No:</strong> {user.rollNo}</span>
-                        </div>
-                    </div>
-                </div>
-                <div>
+        <div className="flex flex-col gap-6">
+            <QRScannerModal 
+                isOpen={isScannerOpen} 
+                onClose={() => setIsScannerOpen(false)} 
+                onScanSuccess={handleScanSuccess} 
+            />
+
+            {/* Header Title */}
+            <div className="flex justify-between items-center mb-2 flex-wrap gap-4">
+                <h1 className="m-0 text-2xl font-semibold text-slate-800 tracking-wide uppercase">
+                    {user.name || 'STUDENT DASHBOARD'}
+                </h1>
+                <div className="flex gap-2">
                     <button 
-                        onClick={handleOpenQR}
-                        style={{ padding: '12px 24px', background: '#10b981', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', transition: 'transform 0.2s' }}
-                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+                        onClick={() => setIsScannerOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 border border-transparent text-white rounded shadow-sm hover:bg-indigo-700 transition-colors cursor-pointer"
                     >
-                        <span style={{ fontSize: '20px' }}>📱</span> Show Attendance QR
+                        Scan Attendance
                     </button>
                 </div>
             </div>
 
-            {/* QR Code Modal */}
+            {/* Prominent Next Class Notification */}
+            <div className="bg-sky-50 border border-sky-200 p-4 rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 shadow-sm shrink-0">
+                        <Clock size={24} />
+                    </div>
+                    <div>
+                        <h3 className="m-0 text-sky-900 font-bold text-base">Next Class: Mathematics</h3>
+                        <p className="m-0 text-sky-700 text-sm mt-1">Starts in 15 mins (10:30 AM) • Room 101</p>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => onNavigate && onNavigate('timetable')}
+                    className="bg-sky-600 text-white px-5 py-2.5 rounded-lg font-medium border-none cursor-pointer hover:bg-sky-700 transition-colors text-sm shadow-sm hidden sm:block">
+                    View Timetable
+                </button>
+            </div>
+
+            {/* Core Stats Grid - Matches Screenshot */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <StatCard 
+                    title="Attendance"
+                    metrics={[
+                        { label: 'Total Present', value: `${user.attendance}%` },
+                        { label: 'Days Attended', value: Math.floor(user.attendance * 2.2) }
+                    ]}
+                    bottomComponent={
+                        <div className="flex items-center gap-6 mt-2">
+                            <div className="flex items-center border-b border-slate-300 pb-1">
+                                <select className="border-none bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer p-0 pr-4 appearance-none">
+                                    <option>Date</option>
+                                </select>
+                                <span className="text-[10px] text-slate-400 ml-[-12px]">▼</span>
+                            </div>
+                            <div className="flex items-center border-b border-slate-300 pb-1 flex-1">
+                                <input type="text" placeholder="DD/MM/YYYY" className="border-none bg-transparent text-[13px] text-slate-600 outline-none w-full" />
+                                <CalendarDays size={14} className="text-slate-400" />
+                            </div>
+                        </div>
+                    }
+                />
+                
+                <StatCard 
+                    title="Fee Status"
+                    metrics={[
+                        { label: 'Pending Fees', value: user.pendingFees > 0 ? `₹${user.pendingFees}` : '₹0.00' },
+                        { label: 'Total Invoices', value: user.pendingFees > 0 ? '1' : '0' }
+                    ]}
+                    bottomComponent={
+                        <div className="flex items-center border-b border-slate-300 pb-1 mt-2 w-max pr-8">
+                            <select className="border-none bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer p-0 pr-4 appearance-none">
+                                <option>Today</option>
+                                <option>This Month</option>
+                            </select>
+                            <span className="text-[10px] text-slate-400 ml-[-12px]">▼</span>
+                        </div>
+                    }
+                />
+
+                <StatCard 
+                    title="Academics & Online"
+                    extraHeaderIcon={<RefreshCw size={18} className="text-sky-500" />}
+                    metrics={[
+                        { label: 'Latest Result', value: user.latestResult ? `${user.latestResult.grade}` : 'N/A' },
+                        { label: 'Total Marks', value: user.latestResult ? `${user.latestResult.marks_obtained}/${user.latestResult.total_marks}` : '0' },
+                        { label: 'Pending Assignments', value: '2' },
+                        { label: 'Action Needed', value: '0' }
+                    ]}
+                />
+
+                <StatCard 
+                    title="Library & Transport"
+                    metrics={[
+                        { label: 'Books Due', value: '1' },
+                        { label: 'Transport Status', value: 'Active' },
+                    ]}
+                />
+            </div>
+
+            {/* Main Content Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+                {/* Academic Performance Chart */}
+                <div style={panelStyle}>
+                    <h3 style={panelTitleStyle}><TrendingUp size={20} color="#3b82f6" /> Academic Progression</h3>
+                    <div style={{ height: '300px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Line data={chartData} options={chartOptions} />
+                    </div>
+                </div>
+
+                {/* Today's Schedule & Quick Alerts */}
+                <div className="flex flex-col gap-6">
+                    <div style={panelStyle}>
+                        <h3 style={{ ...panelTitleStyle, color: '#f59e0b' }}><BellRing size={20} /> Quick Alerts</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <AlertItem icon={<IndianRupee size={16} />} text={user.pendingFees > 0 ? `Term Fee of ₹ ${user.pendingFees} is pending` : `No pending fees`} isUrgent={user.pendingFees > 0} />
+                            <AlertItem icon={<FileText size={16} />} text="Science Project due tomorrow" isUrgent={true} />
+                            <AlertItem icon={<Book size={16} />} text="Library Book 'The Alchemist' due in 3 days" isUrgent={false} />
+                        </div>
+                    </div>
+
+                    <div style={panelStyle}>
+                        <h3 style={panelTitleStyle}><Clock size={20} color="#8b5cf6" /> Next Classes</h3>
+                        <div className="flex flex-col gap-4">
+                            <ScheduleItem time="10:30 AM" subject="Mathematics" room="Room 101" />
+                            <ScheduleItem time="11:15 AM" subject="Physics" room="Lab 2" />
+                            <ScheduleItem time="12:00 PM" subject="English" room="Room 101" isNext />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Digital ID QR Modal */}
             {isQrModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-                    <div style={{ background: 'white', width: '400px', borderRadius: '24px', padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Daily Attendance QR</h3>
-                            <button onClick={() => setIsQrModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', fontSize: '16px', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '24px',
+                        padding: '40px',
+                        width: '100%',
+                        maxWidth: '400px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '24px',
+                        position: 'relative',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                    }}>
+                        <button 
+                            onClick={() => setIsQrModalOpen(false)}
+                            style={{ position: 'absolute', top: '20px', right: '20px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}
+                        >
+                            ✕
+                        </button>
+
+                        <div style={{ textAlign: 'center' }}>
+                            <h2 style={{ margin: '0 0 8px', fontSize: '24px', color: '#0f172a' }}>Digital Student ID</h2>
+                            <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Scan for attendance & library</p>
                         </div>
-                        
-                        <div style={{ background: 'white', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '24px' }}>
-                            <QRCode value={qrValue} size={200} level="H" />
+
+                        <div style={{ 
+                            background: '#f8fafc', 
+                            padding: '24px', 
+                            borderRadius: '16px',
+                            border: '1px solid #e2e8f0',
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}>
+                            <QRCode 
+                                value={qrValue} 
+                                size={200}
+                                level="H"
+                            />
                         </div>
-                        
-                        <p style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#334155', fontWeight: '500' }}>Scan at the School Entry Gate</p>
-                        
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fffbeb', color: '#d97706', padding: '8px 16px', borderRadius: '20px', fontWeight: '600', fontSize: '14px' }}>
-                            <span>⏳ Valid for:</span>
-                            <span style={{ fontSize: '16px', fontFamily: 'monospace' }}>{formatTime(timeLeft)}</span>
+
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            background: timeLeft < 300 ? '#fef2f2' : '#f0fdf4',
+                            color: timeLeft < 300 ? '#ef4444' : '#10b981',
+                            padding: '8px 16px',
+                            borderRadius: '20px',
+                            fontWeight: '600',
+                            fontSize: '14px'
+                        }}>
+                            <RefreshCw size={14} className={timeLeft < 300 ? "animate-spin" : ""} />
+                            QR Valid for {formatTime(timeLeft)}
                         </div>
-                        
-                        <p style={{ margin: '16px 0 0 0', fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>This QR code is generated in real-time and will expire automatically.</p>
+
+                        <div style={{ textAlign: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '20px', width: '100%' }}>
+                            <h3 style={{ margin: '0 0 4px', fontSize: '18px', color: '#0f172a' }}>{user.name}</h3>
+                            <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>{user.classSec} • {user.rollNo}</p>
+                        </div>
                     </div>
                 </div>
             )}
-
-            {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
-                <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: '600', opacity: 0.9 }}>Attendance</h3>
-                    <p style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>{user.attendance}%</p>
-                    <p style={{ fontSize: '14px', margin: '8px 0 0 0', opacity: 0.8 }}>Overall Percentage</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '100px', opacity: 0.1 }}>📅</span>
-                </div>
-                
-                <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: '600', opacity: 0.9 }}>Next Exam</h3>
-                    <p style={{ fontSize: '30px', fontWeight: 'bold', margin: 0 }}>Mathematics</p>
-                    <p style={{ fontSize: '14px', margin: '8px 0 0 0', opacity: 0.8 }}>Tomorrow, 9:00 AM</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '100px', opacity: 0.1 }}>📝</span>
-                </div>
-                
-                <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(245, 158, 11, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: '600', opacity: 0.9 }}>Pending Assignments</h3>
-                    <p style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>3</p>
-                    <p style={{ fontSize: '14px', margin: '8px 0 0 0', opacity: 0.8 }}>Due this week</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '100px', opacity: 0.1 }}>📋</span>
-                </div>
-
-                <div style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', padding: '24px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 15px -3px rgba(239, 68, 68, 0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: '600', opacity: 0.9 }}>Fee Due Status</h3>
-                    <p style={{ fontSize: '30px', fontWeight: 'bold', margin: 0 }}>₹ 2,500</p>
-                    <p style={{ fontSize: '14px', margin: '8px 0 0 0', opacity: 0.8 }}>Due by 25th Oct</p>
-                    <span style={{ position: 'absolute', right: -10, bottom: -20, fontSize: '100px', opacity: 0.1 }}>💰</span>
-                </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-                {/* Performance Graph & Today's Classes */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                        <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>📈 Academic Performance</h3>
-                        <div style={{ height: '300px' }}>
-                            <Line data={chartData} options={chartOptions} />
-                        </div>
-                    </div>
-
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                        <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>⏰ Today's Classes</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {[
-                                { time: '08:30 AM - 09:15 AM', subject: 'Physics', teacher: 'Mr. Sharma', status: 'completed' },
-                                { time: '09:15 AM - 10:00 AM', subject: 'Chemistry', teacher: 'Mrs. Gupta', status: 'active' },
-                                { time: '10:15 AM - 11:00 AM', subject: 'Mathematics', teacher: 'Mr. Verma', status: 'upcoming' },
-                            ].map((cls, idx) => (
-                                <div key={idx} style={{ 
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', 
-                                    borderRadius: '12px', background: cls.status === 'active' ? '#eff6ff' : '#f8fafc',
-                                    borderLeft: `4px solid ${cls.status === 'active' ? '#3b82f6' : (cls.status === 'completed' ? '#10b981' : '#cbd5e1')}`
-                                }}>
-                                    <div>
-                                        <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#1e293b' }}>{cls.subject}</h4>
-                                        <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>👨‍🏫 {cls.teacher}</p>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '500', color: '#334155' }}>{cls.time}</p>
-                                        <span style={{ 
-                                            fontSize: '11px', padding: '4px 8px', borderRadius: '12px', fontWeight: '600', textTransform: 'uppercase',
-                                            background: cls.status === 'active' ? '#dbeafe' : (cls.status === 'completed' ? '#d1fae5' : '#f1f5f9'),
-                                            color: cls.status === 'active' ? '#2563eb' : (cls.status === 'completed' ? '#059669' : '#64748b')
-                                        }}>
-                                            {cls.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Latest Notices */}
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', alignSelf: 'start' }}>
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>📣 Latest Notices</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <div style={{ paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
-                            <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: '600', background: '#fee2e2', padding: '2px 8px', borderRadius: '4px' }}>Important</span>
-                            <h4 style={{ margin: '8px 0', fontSize: '15px', color: '#1e293b' }}>Pre-Board Exam Datesheet</h4>
-                            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>The datesheet for the upcoming pre-board examinations has been published. Please check the Exams section.</p>
-                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>2 hours ago</span>
-                        </div>
-                        <div style={{ paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
-                            <span style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '600', background: '#dbeafe', padding: '2px 8px', borderRadius: '4px' }}>Event</span>
-                            <h4 style={{ margin: '8px 0', fontSize: '15px', color: '#1e293b' }}>Annual Sports Meet 2026</h4>
-                            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>Registrations for the Annual Sports Meet are now open. Interested students can apply through the Activities portal.</p>
-                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>1 day ago</span>
-                        </div>
-                        <div>
-                            <span style={{ fontSize: '12px', color: '#10b981', fontWeight: '600', background: '#d1fae5', padding: '2px 8px', borderRadius: '4px' }}>General</span>
-                            <h4 style={{ margin: '8px 0', fontSize: '15px', color: '#1e293b' }}>Winter Uniform Guidelines</h4>
-                            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>All students are required to switch to the winter uniform starting from next Monday.</p>
-                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>3 days ago</span>
-                        </div>
-                    </div>
-                    <button style={{ width: '100%', padding: '12px', marginTop: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#3b82f6', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.target.style.background = '#f1f5f9'} onMouseLeave={e => e.target.style.background = '#f8fafc'}>
-                        View All Notices
-                    </button>
-                </div>
-            </div>
         </div>
     );
 };
+
+// Helper Components
+const AlertItem = ({ icon, text, isUrgent }) => (
+    <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', 
+        padding: '12px', 
+        background: isUrgent ? '#fef2f2' : '#f8fafc', 
+        borderLeft: `4px solid ${isUrgent ? '#ef4444' : '#3b82f6'}`,
+        borderRadius: '0 8px 8px 0'
+    }}>
+        <div style={{ color: isUrgent ? '#ef4444' : '#3b82f6' }}>{icon}</div>
+        <span style={{ fontSize: '14px', color: '#334155', fontWeight: '500' }}>{text}</span>
+    </div>
+);
+
+const ScheduleItem = ({ time, subject, room, isNext }) => (
+    <div style={{ 
+        display: 'flex', 
+        alignItems: 'flex-start', 
+        gap: '16px',
+        position: 'relative'
+    }}>
+        <div style={{ 
+            width: '12px', 
+            height: '12px', 
+            borderRadius: '50%', 
+            background: isNext ? '#8b5cf6' : '#cbd5e1',
+            marginTop: '4px',
+            boxShadow: isNext ? '0 0 0 4px rgba(139,92,246,0.2)' : 'none'
+        }}></div>
+        <div style={{ flex: 1, paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontWeight: '600', color: '#0f172a', fontSize: '15px' }}>{subject}</span>
+                <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>{time}</span>
+            </div>
+            <span style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <User size={12} /> {room}
+            </span>
+        </div>
+    </div>
+);
 
 export default DashboardOverview;

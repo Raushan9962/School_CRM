@@ -10,15 +10,15 @@ const StudyMaterials = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Study Materials</h2>
-                <button onClick={() => setIsUploadModalOpen(true)} style={{ padding: '10px 20px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Study Materials</h2>
+                <button onClick={() => setIsUploadModalOpen(true)} className="px-5 py-2.5 bg-blue-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center gap-2 shadow-md shadow-blue-500/20 hover:bg-blue-600 transition">
                     📤 Upload Material
                 </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+            <div className="flex gap-4 border-b border-slate-200 pb-4">
                 {['All Files', 'PDFs & Notes', 'Videos', 'External Links'].map((tab, idx) => (
                     <button
                         key={idx}
@@ -47,7 +47,7 @@ const StudyMaterials = () => {
                         <div style={{ flex: 1 }}>
                             <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b' }}>{mat.title}</h3>
                             <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#64748b' }}>{mat.class}</p>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="flex justify-between items-center">
                                 <span style={{ fontSize: '12px', color: '#94a3b8' }}>{mat.date} • {mat.size}</span>
                                 <button style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '16px' }}>🗑️</button>
                             </div>
@@ -58,24 +58,24 @@ const StudyMaterials = () => {
 
             {/* Upload Modal */}
             {isUploadModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Upload Study Material</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="m-0 text-xl text-slate-900">Upload Study Material</h3>
                             <button onClick={() => setIsUploadModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Target Class</label>
-                                <select style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Target Class</label>
+                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
                                     <option>Class 10 - A (Science)</option>
                                     <option>Class 9 - B (Physics)</option>
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Material Type</label>
-                                <div style={{ display: 'flex', gap: '12px' }}>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Material Type</label>
+                                <div className="flex gap-3">
                                     {['PDF/Document', 'Video', 'External Link'].map(type => (
                                         <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#475569' }}>
                                             <input type="radio" name="materialType" defaultChecked={type === 'PDF/Document'} /> {type}
@@ -84,11 +84,11 @@ const StudyMaterials = () => {
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Title</label>
-                                <input type="text" placeholder="e.g. Chapter 1 Notes" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Title</label>
+                                <input type="text" placeholder="e.g. Chapter 1 Notes" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>File / Link</label>
+                                <label className="block mb-1.5 text-sm font-medium text-slate-700">File / Link</label>
                                 <input type="file" style={{ width: '100%', fontSize: '14px', color: '#64748b' }} />
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

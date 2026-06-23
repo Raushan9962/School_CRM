@@ -4,6 +4,7 @@ const resultController = require('../controllers/resultController');
 
 router.post('/', resultController.createResult);
 router.get('/', resultController.getAllResults);
+router.get('/student/:studentId', resultController.getResultsByStudentId);
 router.get('/:id', resultController.getResultById);
 router.put('/:id', resultController.updateResult);
 router.delete('/:id', resultController.deleteResult);

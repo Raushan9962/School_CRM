@@ -9,9 +9,9 @@ const GPSTracking = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Live GPS Tracking</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="flex justify-between items-center">
+                <h2 className="m-0 text-2xl text-slate-900">Live GPS Tracking</h2>
+                <div className="flex gap-3">
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#475569', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }}></span> On Time
                     </span>
@@ -27,7 +27,7 @@ const GPSTracking = () => {
                     {/* Placeholder for actual map integration (e.g. Google Maps, Leaflet) */}
                     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(226,232,240,1) 100%)', opacity: 0.5 }}></div>
                     <div style={{ textAlign: 'center', zIndex: 1 }}>
-                        <span style={{ fontSize: '48px' }}>🗺️</span>
+                        <span className="text-[48px]">🗺️</span>
                         <h3 style={{ color: '#475569', margin: '16px 0 0 0' }}>Interactive Map View</h3>
                         <p style={{ color: '#64748b', fontSize: '14px' }}>Real-time location of active vehicles</p>
                     </div>
@@ -57,15 +57,15 @@ const GPSTracking = () => {
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                                        <span style={{ color: '#64748b' }}>Route:</span>
+                                        <span className="text-slate-500">Route:</span>
                                         <span style={{ color: '#334155', fontWeight: '500' }}>{bus.route}</span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                                        <span style={{ color: '#64748b' }}>Speed:</span>
+                                        <span className="text-slate-500">Speed:</span>
                                         <span style={{ color: '#334155', fontWeight: '500' }}>{bus.speed}</span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                                        <span style={{ color: '#64748b' }}>Next Stop:</span>
+                                        <span className="text-slate-500">Next Stop:</span>
                                         <span style={{ color: '#334155', fontWeight: '500' }}>{bus.nextStop}</span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '4px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>

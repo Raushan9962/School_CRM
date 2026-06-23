@@ -1,98 +1,152 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, Phone, Clock, Navigation, Bus } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const TransportView = () => {
+    const [buses, setBuses] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchBuses = async () => {
+        try {
+            setLoading(true);
+            const res = await apiFetch(`/buses`);
+            if (res.ok) {
+                const data = await res.json();
+                setBuses(data);
+            }
+        } catch (error) {
+            console.error("Error fetching buses:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchBuses();
+    }, []);
+
+    const myBus = buses.length > 0 ? buses[0] : null;
+
+    const routeSchedule = [
+        { id: 1, time: '07:00 AM', stop: 'School Campus', status: 'Start', isCurrent: false },
+        { id: 2, time: '07:15 AM', stop: 'Station Road', status: 'Passed', isCurrent: false },
+        { id: 3, time: '07:30 AM', stop: 'Central Park Gate', status: 'Your Stop', isCurrent: true },
+        { id: 4, time: '07:45 AM', stop: 'City Mall Junction', status: 'Upcoming', isCurrent: false },
+        { id: 5, time: '08:00 AM', stop: 'School Campus', status: 'End', isCurrent: false }
+    ];
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Transport Details</h2>
-                <button style={{ padding: '8px 16px', background: '#10b981', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(16,185,129,0.2)' }}>
-                    📍 Track Bus Live
-                </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🚌</div>
-                    <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Assigned Bus</p>
-                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>Bus 12 (City Center)</h3>
-                    </div>
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden">
+            
+            {/* Action Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+                <div>
+                    <h2 className="m-0 text-lg text-gray-900 font-semibold">Transport & Route Details</h2>
                 </div>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛑</div>
-                    <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Route</p>
-                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>Route 12</h3>
-                    </div>
-                </div>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>⏰</div>
-                    <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Pickup / Drop</p>
-                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>07:30 AM / 03:45 PM</h3>
-                    </div>
-                </div>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💰</div>
-                    <div>
-                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#64748b' }}>Transport Fee Status</p>
-                        <h3 style={{ margin: 0, fontSize: '18px', color: '#10b981' }}>Paid</h3>
-                    </div>
+                <div className="flex gap-3">
+                    <button className="px-4 py-2 bg-sky-500 border-none rounded text-white text-sm font-medium cursor-pointer flex items-center gap-1.5 hover:bg-sky-600 transition-colors">
+                        <MapPin size={16} /> Track Bus Live
+                    </button>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#1e293b' }}>Driver Details</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', textAlign: 'center' }}>
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>👨‍✈️</div>
+            {loading ? (
+                <div className="p-10 text-center text-gray-500">Loading transport data...</div>
+            ) : !myBus ? (
+                <div className="p-10 text-center text-gray-500">No transport opted or found.</div>
+            ) : (
+                <div className="flex flex-wrap gap-0">
+                    
+                    {/* Left Side: Summary & Driver */}
+                    <div className="flex-1 basis-[300px] p-6 border-r border-slate-200 flex flex-col gap-6">
+                        
+                        {/* Bus Info */}
                         <div>
-                            <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0f172a' }}>Mr. Ramesh Kumar</h4>
-                            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#64748b' }}>Experience: 8 Years</p>
-                            
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                    <span style={{ color: '#64748b', fontSize: '14px' }}>Contact</span>
-                                    <span style={{ color: '#1e293b', fontWeight: '500', fontSize: '14px' }}>+91 9876543210</span>
+                            <h3 className="m-0 mb-4 text-sm text-gray-500 uppercase tracking-wider font-semibold">Assignment</h3>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-sky-50 text-sky-500 flex items-center justify-center">
+                                        <Bus size={20} />
+                                    </div>
+                                    <div>
+                                        <div className="text-xs text-gray-500">Bus Number</div>
+                                        <div className="text-base text-gray-900 font-semibold">Bus {myBus.id} ({myBus.vehicle_number})</div>
+                                    </div>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                    <span style={{ color: '#64748b', fontSize: '14px' }}>Bus No.</span>
-                                    <span style={{ color: '#1e293b', fontWeight: '500', fontSize: '14px' }}>MH 12 AB 1234</span>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                        <Navigation size={20} />
+                                    </div>
+                                    <div>
+                                        <div className="text-xs text-gray-500">Route Name</div>
+                                        <div className="text-base text-gray-900 font-semibold">{myBus.route || 'Main Route'}</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-green-50 text-green-700 flex items-center justify-center">
+                                        <Clock size={20} />
+                                    </div>
+                                    <div>
+                                        <div className="text-xs text-gray-500">Capacity</div>
+                                        <div className="text-base text-gray-900 font-semibold">{myBus.capacity} Seats</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <button style={{ width: '100%', padding: '10px', background: 'white', color: '#3b82f6', border: '1px solid #3b82f6', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', marginTop: '8px' }}>
-                            📞 Call Driver
-                        </button>
-                    </div>
-                </div>
 
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#1e293b' }}>Route Schedule</h3>
-                    <div style={{ position: 'relative', paddingLeft: '24px', borderLeft: '2px dashed #cbd5e1', marginLeft: '12px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        {[
-                            { time: '07:00 AM', stop: 'School Campus', status: 'Start', isCurrent: false },
-                            { time: '07:15 AM', stop: 'Station Road', status: 'Passed', isCurrent: false },
-                            { time: '07:30 AM', stop: 'Central Park Gate', status: 'Your Stop', isCurrent: true },
-                            { time: '07:45 AM', stop: 'City Mall Junction', status: 'Upcoming', isCurrent: false },
-                            { time: '08:00 AM', stop: 'School Campus', status: 'End', isCurrent: false }
-                        ].map((stop, idx) => (
-                            <div key={idx} style={{ position: 'relative' }}>
-                                <div style={{ position: 'absolute', left: '-33px', top: '2px', width: '16px', height: '16px', borderRadius: '50%', background: stop.isCurrent ? '#3b82f6' : (stop.status === 'Passed' || stop.status === 'Start' ? '#10b981' : '#cbd5e1'), border: '4px solid white', boxShadow: '0 0 0 1px #e2e8f0' }}></div>
-                                <div style={{ background: stop.isCurrent ? '#eff6ff' : '#f8fafc', padding: '16px', borderRadius: '12px', border: stop.isCurrent ? '1px solid #bfdbfe' : '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                        <h4 style={{ margin: 0, fontSize: '15px', color: stop.isCurrent ? '#1d4ed8' : '#1e293b' }}>{stop.stop}</h4>
-                                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', background: stop.isCurrent ? '#3b82f6' : (stop.status === 'Passed' || stop.status === 'Start' ? '#dcfce7' : '#f1f5f9'), color: stop.isCurrent ? 'white' : (stop.status === 'Passed' || stop.status === 'Start' ? '#166534' : '#64748b'), fontWeight: '600' }}>
-                                            {stop.status}
-                                        </span>
-                                    </div>
-                                    <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>Expected Time: {stop.time}</p>
+                        <div className="h-px bg-slate-200 w-full"></div>
+
+                        {/* Driver Info */}
+                        <div>
+                            <h3 className="m-0 mb-4 text-sm text-gray-500 uppercase tracking-wider font-semibold">Driver Details</h3>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col gap-3">
+                                <div className="text-base text-gray-900 font-semibold">Assigned Driver ID: {myBus.driver_id || 'Pending'}</div>
+                                <div className="text-sm text-gray-600">Managed By School Admin</div>
+                                <div className="flex items-center justify-between mt-1">
+                                    <span className="text-sm text-gray-900 font-medium">Contact Office</span>
+                                    <button className="px-3 py-1.5 bg-white border border-sky-500 text-sky-500 rounded cursor-pointer flex items-center gap-1.5 text-xs font-medium hover:bg-sky-50 transition-colors">
+                                        <Phone size={14} /> Call
+                                    </button>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+
+                    </div>
+
+                    {/* Right Side: Route Table */}
+                    <div className="flex-[2_1_400px] pb-6">
+                        <table className="w-full border-collapse text-left text-sm">
+                            <thead>
+                                <tr className="border-b border-slate-200 text-gray-900 font-semibold bg-slate-50">
+                                    <th className="p-4 px-6 w-[60px]">Stop</th>
+                                    <th className="p-4 px-6">Location / Landmark</th>
+                                    <th className="p-4 px-6">Scheduled Time</th>
+                                    <th className="p-4 px-6 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {routeSchedule.map((row, idx) => (
+                                    <tr key={idx} className={`border-b border-slate-100 ${row.isCurrent ? 'bg-green-50' : 'bg-transparent hover:bg-slate-50 transition-colors'}`}>
+                                        <td className="p-4 px-6 text-gray-500">{idx + 1}</td>
+                                        <td className={`p-4 px-6 text-gray-900 ${row.isCurrent ? 'font-semibold' : 'font-medium'}`}>
+                                            {row.stop}
+                                            {row.isCurrent && <span className="ml-2 text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded">Current</span>}
+                                        </td>
+                                        <td className="p-4 px-6 text-gray-600">{row.time}</td>
+                                        <td className="p-4 px-6 text-right">
+                                            <span className={`font-semibold text-sm ${
+                                                row.status === 'Passed' ? 'text-gray-400' : (row.status === 'Your Stop' ? 'text-green-700' : 'text-sky-500')
+                                            }`}>
+                                                {row.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
