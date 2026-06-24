@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { Role, School, User, Student, Parent, Teacher, Principal, Accountant, Librarian, TransportManager, Receptionist } = require('../models');
+const { Role, School, User, Student, Parent, Teacher, Principal, Accountant, Librarian, TransportManager, Receptionist, HostelWarden, HRManager } = require('../models');
 const bcrypt = require('bcrypt');
 const { canManageRole } = require('../middleware/rbac');
 
@@ -7,17 +7,21 @@ exports.createUser = async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        
-        const { 
+        const {
             name, email, phone, password, roleName, 
-            gender, dob, address,
-            schoolName, schoolCode, schoolEmail, schoolPhone, schoolAddress, city, state, country, pincode, schoolLogo, schoolWebsite,
+            gender, dob, address, bloodGroup, aadhaarNumber, city, state, pincode, emergencyContact,
+            schoolName, schoolCode, schoolEmail, schoolPhone, schoolAddress, country, schoolLogo, schoolWebsite,
             planId, billingCycle,
             employeeId, qualification, experience, joiningDate, salary, department,
             classId, admissionNo, rollNumber, section, fatherName, motherName, parentPhone, parentEmail, admissionDate, transportRequired,
+            religion, category, guardianName, parentOccupation, parentIncome, board, previousSchool, 
+            medicalAllergies, medicalDisabilities, medicalDoctorName, transportRouteId, transportStop, transportPassNumber,
+            hostelBlock, hostelRoom, hostelBed,
             subject, classAssigned,
             occupation, relation, studentId,
-            vehicleAssigned, routeAssigned, licenseNumber
+            vehicleAssigned, routeAssigned, licenseNumber,
+            hostelBlockAssigned,
+            bankAccount, ifscCode, basicSalary, employmentType, hra, da, ta, otherAllowances, probationPeriod, confirmationDate
         } = req.body;
         
         const creatorRole = req.user.role?.toLowerCase().replace(/\s+/g, '');
@@ -60,7 +64,11 @@ exports.createUser = async (req, res) => {
 
         // 5. Create Core User
         const image = `https://api.dicebear.com/5.x/initials/svg?seed=${name}`;
-        const userData = { name, email, phone: phone || null, password: hashedPassword, roleName: targetRoleName, schoolId: finalSchoolId, image, gender, dob: dob || null, address };
+        const userData = { 
+            name, email, phone: phone || null, password: hashedPassword, roleName: targetRoleName, 
+            schoolId: finalSchoolId, image, gender, dob: dob || null, address,
+            bloodGroup, aadhaarNumber, city, state, pincode, emergencyContact 
+        };
         const newUser = await User.create(userData, client);
         const userId = newUser.id;
 
@@ -69,29 +77,47 @@ exports.createUser = async (req, res) => {
         try {
             if (targetRoleName === "Student") {
                 if (!classId || !admissionNo) throw new Error("Missing student fields");
-                const data = { userId, schoolId: finalSchoolId, classId, admissionNo, rollNumber, section, fatherName, motherName, parentPhone, parentEmail, admissionDate: admissionDate || null, transportRequired: transportRequired === true || transportRequired === 'true', photo: image };
+                const data = { 
+                    userId, schoolId: finalSchoolId, classId, admissionNo, rollNumber, section, 
+                    fatherName, motherName, parentPhone, parentEmail, admissionDate: admissionDate || null, 
+                    transportRequired: transportRequired === true || transportRequired === 'true', photo: image,
+                    religion, category, guardianName, parentOccupation, parentIncome, board, previousSchool,
+                    medicalAllergies, medicalDisabilities, medicalDoctorName,
+                    transportRouteId: transportRouteId || null, transportStop, transportPassNumber,
+                    hostelBlock, hostelRoom, hostelBed
+                };
                 profileRecord = await Student.create(data, client);
             } else if (targetRoleName === "Parent") {
                 const data = { userId, occupation, relation: relation || 'Parent', studentId: studentId || null };
                 profileRecord = await Parent.create(data, client);
             } else if (targetRoleName === "Teacher") {
-                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `TCH-${Date.now()}`, qualification, experience: experience || null, subject, classAssigned, joiningDate: joiningDate || null, salary: salary || null };
+                const data = { 
+                    userId, schoolId: finalSchoolId, employeeId: employeeId || `TCH-${Date.now()}`, qualification, experience: experience || null, 
+                    subject, classAssigned, joiningDate: joiningDate || null, salary: salary || basicSalary || null,
+                    employmentType, bankAccount, ifscCode, basicSalary, hra, da, ta, otherAllowances, probationPeriod, confirmationDate
+                };
                 profileRecord = await Teacher.create(data, client);
             } else if (targetRoleName === "Principal") {
                 const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `PRIN-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, department };
                 profileRecord = await Principal.create(data, client);
             } else if (targetRoleName === "Accountant") {
-                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `ACC-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, salary: salary || null };
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `ACC-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, salary: salary || basicSalary || null, employmentType, bankAccount, ifscCode, basicSalary };
                 profileRecord = await Accountant.create(data, client);
             } else if (targetRoleName === "Librarian") {
-                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `LIB-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null };
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `LIB-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, employmentType, bankAccount, ifscCode, basicSalary };
                 profileRecord = await Librarian.create(data, client);
             } else if (targetRoleName === "Transport Manager") {
-                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `TM-${Date.now()}`, vehicleAssigned, routeAssigned, licenseNumber, joiningDate: joiningDate || null };
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `TM-${Date.now()}`, vehicleAssigned, routeAssigned, licenseNumber, joiningDate: joiningDate || null, employmentType, bankAccount, ifscCode, basicSalary };
                 profileRecord = await TransportManager.create(data, client);
             } else if (targetRoleName === "Receptionist") {
-                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `REC-${Date.now()}`, joiningDate: joiningDate || null, salary: salary || null };
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `REC-${Date.now()}`, joiningDate: joiningDate || null, salary: salary || basicSalary || null, employmentType, bankAccount, ifscCode, basicSalary };
                 profileRecord = await Receptionist.create(data, client);
+            } else if (targetRoleName === "Hostel Warden") {
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `HW-${Date.now()}`, hostelBlockAssigned, joiningDate: joiningDate || null, salary: salary || basicSalary || null, employmentType, bankAccount, ifscCode, basicSalary };
+                profileRecord = await HostelWarden.create(data, client);
+            } else if (targetRoleName === "HR Manager") {
+                const data = { userId, schoolId: finalSchoolId, employeeId: employeeId || `HR-${Date.now()}`, qualification, experience: experience || null, joiningDate: joiningDate || null, salary: salary || basicSalary || null, employmentType, bankAccount, ifscCode, basicSalary };
+                profileRecord = await HRManager.create(data, client);
             }
         } catch (err) {
             await client.query('ROLLBACK');
@@ -130,7 +156,7 @@ exports.createUser = async (req, res) => {
 
 exports.seedRoles = async (req, res) => {
     try {
-        const roles = ["Super Admin", "School Admin", "Principal", "Teacher", "Student", "Parent", "Accountant", "Librarian", "Transport Manager", "Receptionist"];
+        const roles = ["Super Admin", "School Admin", "Principal", "Teacher", "Student", "Parent", "Accountant", "Librarian", "Transport Manager", "Receptionist", "Hostel Warden", "HR Manager"];
         const created = [];
         for (const role of roles) {
             let roleRecord = await Role.findByName(role);
@@ -226,15 +252,19 @@ exports.getSchoolUsers = async (req, res) => {
     }
 };
 
-// GET detailed students for a school
+// GET detailed students for a school (with search, filter, sort)
 exports.getSchoolStudents = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
-        const result = await pool.query(`
+        const { search, classId, section, gender, category, transport, hostel, sortBy, sortOrder } = req.query;
+
+        let query = `
             SELECT 
                 u.id, u.name, u.email, u.phone, u.gender, u.dob, u.image, u.address, u.is_active, u.created_at,
+                u.blood_group, u.aadhaar_number, u.city, u.state, u.pincode, u.emergency_contact,
                 s.admission_no, s.roll_number, s.section, s.admission_date, s.transport_required,
-                s.father_name, s.mother_name, s.parent_phone,
+                s.father_name, s.mother_name, s.parent_phone, s.religion, s.category, 
+                s.transport_route_id, s.hostel_room,
                 c.name as class_name, c.section as class_section,
                 COALESCE(SUM(f.amount), 0) as total_fees_due
             FROM users u
@@ -242,9 +272,54 @@ exports.getSchoolStudents = async (req, res) => {
             LEFT JOIN classes c ON s.class_id = c.id
             LEFT JOIN fees f ON s.id = f.student_id AND f.status != 'Paid'
             WHERE u.school_id = $1 AND u.role_name = 'Student'
-            GROUP BY u.id, s.id, c.id
-            ORDER BY u.created_at DESC
-        `, [schoolId]);
+        `;
+        const params = [schoolId];
+        let paramCount = 2;
+
+        if (search) {
+            query += ` AND (u.name ILIKE $${paramCount} OR s.admission_no ILIKE $${paramCount} OR s.father_name ILIKE $${paramCount} OR u.phone ILIKE $${paramCount})`;
+            params.push(`%${search}%`);
+            paramCount++;
+        }
+        if (classId) {
+            query += ` AND s.class_id = $${paramCount}`;
+            params.push(classId);
+            paramCount++;
+        }
+        if (section) {
+            query += ` AND s.section = $${paramCount}`;
+            params.push(section);
+            paramCount++;
+        }
+        if (gender) {
+            query += ` AND u.gender = $${paramCount}`;
+            params.push(gender);
+            paramCount++;
+        }
+        if (category) {
+            query += ` AND s.category = $${paramCount}`;
+            params.push(category);
+            paramCount++;
+        }
+        if (transport === 'true') {
+            query += ` AND s.transport_required = true`;
+        }
+
+        query += ` GROUP BY u.id, s.id, c.id`;
+
+        // Sorting
+        const validSortFields = {
+            'name': 'u.name',
+            'admission_date': 's.admission_date',
+            'roll_number': 's.roll_number',
+            'fees': 'total_fees_due'
+        };
+        const orderField = validSortFields[sortBy] || 'u.created_at';
+        const orderDir = (sortOrder === 'asc' || sortOrder === 'desc') ? sortOrder.toUpperCase() : 'DESC';
+        
+        query += ` ORDER BY ${orderField} ${orderDir}`;
+
+        const result = await pool.query(query, params);
 
         return res.status(200).json({ success: true, count: result.rows.length, data: result.rows });
     } catch (error) {
@@ -489,5 +564,72 @@ exports.addSchoolFee = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to add fee record' });
+    }
+};
+
+const fs = require('fs');
+const path = require('path');
+
+exports.uploadProfileImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No image file provided' });
+        }
+
+        const userId = req.user.id;
+        const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+
+        // Get old image to delete if it exists and is local
+        const userRes = await pool.query('SELECT image FROM users WHERE id = $1', [userId]);
+        const oldImage = userRes.rows[0]?.image;
+
+        if (oldImage && oldImage.includes('/uploads/')) {
+            const oldFilename = oldImage.split('/uploads/')[1];
+            const oldPath = path.join(__dirname, '..', 'public', 'uploads', oldFilename);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
+
+        await pool.query('UPDATE users SET image = $1 WHERE id = $2', [imageUrl, userId]);
+        
+        // Update student photo if user is a student
+        if (req.user.role === 'Student') {
+            await pool.query('UPDATE students SET photo = $1 WHERE user_id = $2', [imageUrl, userId]);
+        }
+
+        return res.status(200).json({ success: true, message: 'Profile image updated', imageUrl });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to upload image' });
+    }
+};
+
+exports.removeProfileImage = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const userRes = await pool.query('SELECT name, image FROM users WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+        
+        if (user && user.image && user.image.includes('/uploads/')) {
+            const oldFilename = user.image.split('/uploads/')[1];
+            const oldPath = path.join(__dirname, '..', 'public', 'uploads', oldFilename);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
+
+        const fallbackImage = `https://api.dicebear.com/5.x/initials/svg?seed=${user?.name || 'User'}`;
+        await pool.query('UPDATE users SET image = $1 WHERE id = $2', [fallbackImage, userId]);
+
+        if (req.user.role === 'Student') {
+            await pool.query('UPDATE students SET photo = $1 WHERE user_id = $2', [fallbackImage, userId]);
+        }
+
+        return res.status(200).json({ success: true, message: 'Profile image removed', imageUrl: fallbackImage });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to remove image' });
     }
 };

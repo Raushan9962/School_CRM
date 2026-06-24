@@ -43,6 +43,18 @@ async function createTables() {
             );
         `);
         console.log("Staff_attendance table created.");
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS profile_update_requests (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                requested_changes JSONB NOT NULL,
+                status VARCHAR(50) DEFAULT 'Pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                resolved_at TIMESTAMP
+            );
+        `);
+        console.log("Profile update requests table created.");
     } catch (err) {
         console.error("Error creating tables:", err);
     } finally {

@@ -1,43 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
+import TeacherList from './TeacherList';
+import TeacherForm from './TeacherForm';
 
 const TeacherManagement = () => {
-  return (
-    <div className="animate-fade-in">
-      <div className="mb-6">
-        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Teacher Management</h2>
-        <p className="text-slate-500 text-sm mt-1">Manage teachers, attendance, salary, and performance.</p>
-      </div>
-      
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <ActionBtn text="Add Teacher" icon="➕" color="#0ea5e9" />
-        <ActionBtn text="Salary & Payroll" icon="💼" color="#10b981" />
-        <ActionBtn text="Class Assignments" icon="🏫" color="#6366f1" />
-        <ActionBtn text="Performance" icon="📈" color="#f43f5e" />
-      </div>
+    const [view, setView] = useState('list'); // 'list' | 'create'
 
-      <div style={{ 
-        background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', 
-        borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', 
-        border: '1px solid rgba(255,255,255,0.5)' 
-      }}>
-        <h3 className="m-0 mb-4 text-base font-bold text-slate-800">Teacher Directory</h3>
-        <p className="text-slate-500">Teacher profiles and management actions will appear here.</p>
-      </div>
-    </div>
-  );
+    return (
+        <div className="animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Teacher Management</h2>
+                    <p className="text-slate-500 text-sm mt-1">Manage teaching staff, subjects, and performance.</p>
+                </div>
+                <div>
+                    {view === 'list' ? (
+                        <button 
+                            onClick={() => setView('create')}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2"
+                        >
+                            <span>➕</span> Add New Teacher
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={() => setView('list')}
+                            className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
+                        >
+                            Back to List
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {view === 'list' ? <TeacherList /> : <TeacherForm onSave={() => setView('list')} onCancel={() => setView('list')} />}
+        </div>
+    );
 };
-
-const ActionBtn = ({ text, icon, color }) => (
-  <button style={{
-    padding: '12px 20px', borderRadius: '12px', border: 'none',
-    background: `linear-gradient(135deg, ${color}, ${color}dd)`, color: 'white',
-    fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    boxShadow: `0 4px 12px ${color}40`, transition: 'all 0.2s'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <span>{icon}</span> {text}
-  </button>
-);
 
 export default TeacherManagement;

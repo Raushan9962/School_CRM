@@ -34,4 +34,20 @@ router.post('/school-attendance', auth, userController.markSchoolAttendance);
 router.get('/school-fees-history', auth, userController.getSchoolFeesHistory);
 router.post('/school-fees', auth, userController.addSchoolFee);
 
+// Profile Image Management
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/uploads');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `profile-${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
+const upload = multer({ storage });
+
+router.post('/profile-image', auth, upload.single('image'), userController.uploadProfileImage);
+router.delete('/profile-image', auth, userController.removeProfileImage);
+
 module.exports = router;

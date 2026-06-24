@@ -119,3 +119,56 @@ exports.changePassword = async (req, res) => {
         return res.status(500).json({ success: false, message: "Error updating password" });
     }
 };
+
+// Verify Email for forgot password (Mocked OTP)
+exports.verifyEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: "Email is required" });
+
+        const user = await User.findByEmailWithRole(email);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        // Mock sending OTP
+        const otp = '123456';
+        console.log(`Mock OTP for ${email} is ${otp}`);
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP sent to email successfully (Mocked: 123456)",
+            otp: otp // Returning OTP for testing purposes
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Error verifying email" });
+    }
+};
+
+// Reset password using OTP
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ success: false, message: "All fields are required" });
+        }
+
+        if (otp !== '123456') {
+            return res.status(400).json({ success: false, message: "Invalid OTP" });
+        }
+
+        const user = await User.findByEmailWithRole(email);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await User.updatePassword(user.id, hashedNewPassword);
+
+        return res.status(200).json({
+            success: true,
+            message: "Password reset successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Error resetting password" });
+    }
+};

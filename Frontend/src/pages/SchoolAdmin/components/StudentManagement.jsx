@@ -1,43 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
+import StudentList from './StudentList';
+import StudentForm from './StudentForm';
 
 const StudentManagement = () => {
-  return (
-    <div className="animate-fade-in">
-      <div className="mb-6">
-        <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Student Management</h2>
-        <p className="text-slate-500 text-sm mt-1">Manage students, attendance, academics, and transport.</p>
-      </div>
-      
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <ActionBtn text="Add New Student" icon="➕" color="#3b82f6" />
-        <ActionBtn text="View Attendance" icon="📅" color="#10b981" />
-        <ActionBtn text="Academics" icon="🎓" color="#8b5cf6" />
-        <ActionBtn text="Transport Info" icon="🚌" color="#f59e0b" />
-      </div>
+    const [view, setView] = useState('list'); // 'list' | 'create'
 
-      <div style={{ 
-        background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', 
-        borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', 
-        border: '1px solid rgba(255,255,255,0.5)' 
-      }}>
-        <h3 className="m-0 mb-4 text-base font-bold text-slate-800">Student Records</h3>
-        <p className="text-slate-500">Detailed student records and analytics will be displayed here.</p>
-      </div>
-    </div>
-  );
+    return (
+        <div className="animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Student Management</h2>
+                    <p className="text-slate-500 text-sm mt-1">Manage admissions, academics, transport, and more.</p>
+                </div>
+                <div>
+                    {view === 'list' ? (
+                        <button 
+                            onClick={() => setView('create')}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2"
+                        >
+                            <span>➕</span> Add New Student
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={() => setView('list')}
+                            className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
+                        >
+                            Back to List
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {view === 'list' ? <StudentList /> : <StudentForm onSave={() => setView('list')} onCancel={() => setView('list')} />}
+        </div>
+    );
 };
-
-const ActionBtn = ({ text, icon, color }) => (
-  <button style={{
-    padding: '12px 20px', borderRadius: '12px', border: 'none',
-    background: `linear-gradient(135deg, ${color}, ${color}dd)`, color: 'white',
-    fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    boxShadow: `0 4px 12px ${color}40`, transition: 'all 0.2s'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <span>{icon}</span> {text}
-  </button>
-);
 
 export default StudentManagement;

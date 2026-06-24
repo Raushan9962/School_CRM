@@ -57,5 +57,7 @@ router.use('/super-admin', superAdminRoutes);
 router.use('/principal', principalRoutes);
 router.use('/leaves', leaveRoutes);
 router.use('/complaints', complaintRoutes);
+router.use('/profile-updates', require('./profileUpdateRoutes'));
+router.use('/school-admin', require('./schoolAdminRoutes'));
 
 module.exports = router;

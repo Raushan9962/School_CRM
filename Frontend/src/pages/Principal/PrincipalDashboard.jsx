@@ -5,11 +5,18 @@ import DashboardOverview from './components/DashboardOverview';
 import StudentManagement from './components/StudentManagement';
 import TeacherManagement from './components/TeacherManagement';
 import ClassManagement from './components/ClassManagement';
+import SubjectManagement from './components/SubjectManagement';
+import TimetableManagement from './components/TimetableManagement';
+import SyllabusTracking from './components/SyllabusTracking';
 import AttendanceManagement from './components/AttendanceManagement';
 import ExaminationManagement from './components/ExaminationManagement';
+import ExamScheduleManagement from './components/ExamScheduleManagement';
 import FeeManagement from './components/FeeManagement';
 import AdmissionManagement from './components/AdmissionManagement';
 import StaffManagement from './components/StaffManagement';
+import TeacherPerformance from './components/TeacherPerformance';
+import DisciplineManagement from './components/DisciplineManagement';
+import LeaveApproval from './components/LeaveApproval';
 import CommunicationCenter from './components/CommunicationCenter';
 import EventsManagement from './components/EventsManagement';
 import PlaceholderView from './components/PlaceholderView';
@@ -130,10 +137,9 @@ const PrincipalDashboard = () => {
                 { id: 'ac_hw_status', label: 'Submission Status' },
                 { id: 'ac_hw_pending', label: 'Pending Assignments' }
             ]},
-            { id: 'ac_study', label: 'Study Materials', subItems: [
-                { id: 'ac_study_notes', label: 'Notes' },
-                { id: 'ac_study_pdf', label: 'PDF Upload' },
-                { id: 'ac_study_video', label: 'Video Resources' }
+            { id: 'ac_study', label: 'Syllabus Tracking', subItems: [
+                { id: 'ac_study_notes', label: 'Track Progress' },
+                { id: 'ac_study_pdf', label: 'Completion Status' }
             ]}
         ]},
         { id: 'exam_management', label: 'Examination & Results', icon: <FileText size={20} strokeWidth={1.5} />, subItems: [
@@ -335,7 +341,7 @@ const PrincipalDashboard = () => {
                 'sm_performance': <PlaceholderView title="Student Performance" />,
                 'sm_promotions': <PlaceholderView title="Promotions" />,
                 'sm_alumni': <PlaceholderView title="Alumni" />,
-                'sm_discipline': <PlaceholderView title="Discipline" />
+                'sm_discipline': <DisciplineManagement />
             };
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sm_list" />;
         }
@@ -346,14 +352,14 @@ const PrincipalDashboard = () => {
                 { id: 'ac_subjects', label: 'Subjects' },
                 { id: 'ac_timetable', label: 'Timetable' },
                 { id: 'ac_homework', label: 'Homework' },
-                { id: 'ac_study', label: 'Study Materials' }
+                { id: 'ac_study', label: 'Syllabus Tracking' }
             ];
             const contentMap = {
                 'ac_classes': <ClassManagement />,
-                'ac_subjects': <PlaceholderView title="Subjects" />,
-                'ac_timetable': <PlaceholderView title="Timetable" />,
+                'ac_subjects': <SubjectManagement />,
+                'ac_timetable': <TimetableManagement />,
                 'ac_homework': <PlaceholderView title="Homework & Assignments" />,
-                'ac_study': <PlaceholderView title="Study Materials" />
+                'ac_study': <SyllabusTracking />
             };
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="ac_classes" />;
         }
@@ -368,7 +374,7 @@ const PrincipalDashboard = () => {
                 { id: 'ex_report', label: 'Report Cards' }
             ];
             const contentMap = {
-                'ex_setup': <PlaceholderView title="Exam Setup" />,
+                'ex_setup': <ExamScheduleManagement />,
                 'ex_marks': <ExaminationManagement />,
                 'ex_analysis': <PlaceholderView title="Result Analysis" />,
                 'ex_top': <PlaceholderView title="Top Performers" />,
@@ -389,8 +395,8 @@ const PrincipalDashboard = () => {
             const contentMap = {
                 'stf_teachers': <StaffManagement />,
                 'stf_attendance': <PlaceholderView title="Staff Attendance" />,
-                'stf_performance': <PlaceholderView title="Staff Performance" />,
-                'stf_leave': <PlaceholderView title="Leave Management" />,
+                'stf_performance': <TeacherPerformance />,
+                'stf_leave': <LeaveApproval />,
                 'stf_payroll': <PlaceholderView title="Payroll" />
             };
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="stf_teachers" />;

@@ -1,7 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Camera, X } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const TeacherProfile = () => {
     const [activeTab, setActiveTab] = useState('personal');
+
+    const [userImage, setUserImage] = useState('https://ui-avatars.com/api/?name=Anita+Sharma&background=10B981&color=fff&size=128');
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            const userObj = JSON.parse(userStr);
+            if (userObj.image) setUserImage(userObj.image);
+        }
+    }, []);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const res = await apiFetch('/users/profile-image', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUserImage(data.imageUrl);
+                const userObj = JSON.parse(localStorage.getItem('user'));
+                userObj.image = data.imageUrl;
+                localStorage.setItem('user', JSON.stringify(userObj));
+            } else {
+                alert(data.message || 'Error uploading image');
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        }
+    };
+
+    const handleRemoveImage = async () => {
+        try {
+            const res = await apiFetch('/users/profile-image', {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUserImage(data.imageUrl);
+                const userObj = JSON.parse(localStorage.getItem('user'));
+                userObj.image = data.imageUrl;
+                localStorage.setItem('user', JSON.stringify(userObj));
+            } else {
+                alert(data.message || 'Error removing image');
+            }
+        } catch (error) {
+            console.error("Error removing image:", error);
+        }
+    };
 
     const teacher = {
         name: "Anita Sharma",
@@ -47,9 +105,10 @@ const TeacherProfile = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-40px', marginBottom: '24px' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px' }}>
                             <div className="relative">
-                                <img src="https://ui-avatars.com/api/?name=Anita+Sharma&background=10B981&color=fff&size=128" alt="Profile" style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid white', background: 'white', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
-                                <button style={{ position: 'absolute', bottom: 4, right: 4, width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: 'white', border: '2px solid white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    📷
+                                <img src={userImage} alt="Profile" style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid white', background: 'white', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', objectFit: 'cover' }} />
+                                <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+                                <button onClick={() => fileInputRef.current.click()} style={{ position: 'absolute', bottom: 4, right: 4, width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: 'white', border: '2px solid white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Camera size={16} />
                                 </button>
                             </div>
                             <div style={{ paddingBottom: '8px' }}>

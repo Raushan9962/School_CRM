@@ -9,8 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const path = require('path');
+
 // Main entry point for API routes
 app.use('/api', apiRoutes);
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 app.get("/", (req, res) => {
     res.send("School CRM API Server Running...");

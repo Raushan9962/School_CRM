@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, GraduationCap, UserCheck, School, Users, IndianRupee, Library, Bus } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, UserCheck, School, Users, IndianRupee, Library, Bus, CalendarCheck } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ModuleContainer from '../../components/layout/ModuleContainer';
 import PlaceholderView from '../Principal/components/PlaceholderView';
 import DashboardOverview from './components/DashboardOverview';
 import StudentManagement from './components/StudentManagement';
 import TeacherManagement from './components/TeacherManagement';
+import StaffManagement from './components/StaffManagement';
+import StaffAttendance from './components/StaffAttendance';
+import LeaveManagement from './components/LeaveManagement';
 import PrincipalDetails from './components/PrincipalDetails';
 import ParentManagement from './components/ParentManagement';
 import FinanceManagement from './components/FinanceManagement';
 import LibraryManagement from './components/LibraryManagement';
 import TransportManagement from './components/TransportManagement';
+import ProfileUpdatesManagement from './components/ProfileUpdatesManagement';
+import { Briefcase } from "lucide-react";
 
 const SchoolAdminDashboard = () => {
     const navigate = useNavigate();
@@ -51,7 +56,9 @@ const SchoolAdminDashboard = () => {
     const navItems = [
         { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
         { id: 'student', label: 'Student Management', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
-        { id: 'teacher', label: 'Teacher Management', icon: <UserCheck size={20} strokeWidth={1.5} /> },
+        { id: 'teacher', label: 'Teacher Mgmt', icon: <UserCheck size={20} strokeWidth={1.5} /> },
+        { id: 'staff', label: 'Staff Mgmt', icon: <Briefcase size={20} strokeWidth={1.5} /> },
+        { id: 'attendance', label: 'Attendance', icon: <CalendarCheck size={20} strokeWidth={1.5} /> },
         { id: 'principal', label: 'Principal Details', icon: <School size={20} strokeWidth={1.5} /> },
         { id: 'parent', label: 'Parent Management', icon: <Users size={20} strokeWidth={1.5} /> },
         { id: 'finance', label: 'Finance & Accounts', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
@@ -60,20 +67,22 @@ const SchoolAdminDashboard = () => {
     ];
 
     const renderContent = () => {
-        if (activeTab === 'overview') return <DashboardOverview />;
+        if (activeTab === 'overview') return <DashboardOverview setActiveTab={setActiveTab} />;
 
         if (activeTab === 'student') {
             const tabs = [
                 { id: 'sa_stu_list', label: 'Student Records', count: '850' },
                 { id: 'sa_stu_att', label: 'Attendance' },
                 { id: 'sa_stu_acad', label: 'Academics' },
-                { id: 'sa_stu_trans', label: 'Transport Info' }
+                { id: 'sa_stu_trans', label: 'Transport Info' },
+                { id: 'sa_stu_updates', label: 'Profile Updates' }
             ];
             const contentMap = {
                 'sa_stu_list': <StudentManagement />,
                 'sa_stu_att': <PlaceholderView title="Attendance" />,
                 'sa_stu_acad': <PlaceholderView title="Academics" />,
-                'sa_stu_trans': <PlaceholderView title="Transport Info" />
+                'sa_stu_trans': <PlaceholderView title="Transport Info" />,
+                'sa_stu_updates': <ProfileUpdatesManagement />
             };
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sa_stu_list" />;
         }
@@ -87,9 +96,35 @@ const SchoolAdminDashboard = () => {
             const contentMap = {
                 'sa_tea_list': <TeacherManagement />,
                 'sa_tea_perf': <PlaceholderView title="Performance" />,
-                'sa_tea_leave': <PlaceholderView title="Leave Requests" />
+                'sa_tea_leave': <LeaveManagement />
             };
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sa_tea_list" />;
+        }
+
+        if (activeTab === 'staff') {
+            const tabs = [
+                { id: 'staff_list', label: 'Staff Directory' },
+                { id: 'staff_attendance', label: 'Staff Attendance' },
+                { id: 'staff_leave', label: 'Leave Requests' },
+            ];
+            const contentMap = {
+                staff_list: <StaffManagement />,
+                staff_attendance: <StaffAttendance />,
+                staff_leave: <LeaveManagement />,
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="staff_list" />;
+        }
+
+        if (activeTab === 'attendance') {
+            const tabs = [
+                { id: 'att_stu', label: 'Student Attendance' },
+                { id: 'att_staff', label: 'Staff Attendance' }
+            ];
+            const contentMap = {
+                'att_stu': <PlaceholderView title="Student Attendance" />,
+                'att_staff': <StaffAttendance />
+            };
+            return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="att_stu" />;
         }
 
         if (activeTab === 'principal') {
@@ -160,7 +195,7 @@ const SchoolAdminDashboard = () => {
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sa_tr_routes" />;
         }
 
-        return <DashboardOverview />;
+        return <DashboardOverview setActiveTab={setActiveTab} />;
     };
 
     const getActiveTitle = () => {

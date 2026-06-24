@@ -9,8 +9,10 @@ const Accountant = require('./Accountant');
 const Librarian = require('./Librarian');
 const TransportManager = require('./TransportManager');
 const Receptionist = require('./Receptionist');
+const HostelWarden = require('./HostelWarden');
+const HRManager = require('./HRManager');
 
 module.exports = {
     Role, School, User, Student, Parent, Teacher, Principal, 
-    Accountant, Librarian, TransportManager, Receptionist
+    Accountant, Librarian, TransportManager, Receptionist, HostelWarden, HRManager
 };
