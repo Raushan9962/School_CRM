@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Phone, Mail, FileText, ArrowRight } from 'lucide-react';
-import StaffForm from './StaffForm';
+import { Users, Plus, Phone, Mail, ArrowRight } from 'lucide-react';
 import apiFetch from '../../../services/api';
 import PremiumTable from '../../../components/ui/PremiumTable';
+import StaffForm from './StaffForm';
 
-const StaffManagement = () => {
-    const [view, setView] = useState('list'); // 'list' | 'create'
+const GenericRoleManagement = ({ roleName, title, description }) => {
+    const [view, setView] = useState('list');
     const [staff, setStaff] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -16,18 +16,17 @@ const StaffManagement = () => {
             const res = await apiFetch('/users/school-users');
             const data = await res.json();
             if (data.success) {
-                const allUsers = data.data;
-                const filteredStaff = allUsers.filter(u => 
-                    u.role !== 'Student' && 
-                    u.role !== 'Teacher' && 
-                    u.role !== 'Parent' && 
-                    u.role !== 'School Admin' &&
-                    u.role !== 'Super Admin'
-                );
-                setStaff(filteredStaff);
+                // Filter by exact role, or roles that match
+                let filtered;
+                if (roleName === 'Transport Staff') {
+                    filtered = data.data.filter(u => u.role === 'Transport Manager' || u.role === 'Driver' || u.role === 'Transport Staff');
+                } else {
+                    filtered = data.data.filter(u => u.role === roleName);
+                }
+                setStaff(filtered);
             }
         } catch (error) {
-            console.error("Error fetching staff:", error);
+            console.error(`Error fetching ${roleName}:`, error);
         } finally {
             setLoading(false);
         }
@@ -37,15 +36,15 @@ const StaffManagement = () => {
         if (view === 'list') {
             fetchStaff();
         }
-    }, [view]);
+    }, [view, roleName]);
 
     if (view === 'create') {
         return (
             <div className="animate-fade-in">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">Staff Management</h2>
-                        <p className="text-slate-500 text-sm mt-1">Manage accountants, librarians, wardens, HR, and other staff.</p>
+                        <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">{title}</h2>
+                        <p className="text-slate-500 text-sm mt-1">{description}</p>
                     </div>
                     <div>
                         <button 
@@ -56,21 +55,20 @@ const StaffManagement = () => {
                         </button>
                     </div>
                 </div>
-                <StaffForm onSave={() => setView('list')} onCancel={() => setView('list')} />
+                {/* Notice we force the role if the form allows it, but StaffForm has its own role dropdown.
+                    For simplicity, we let StaffForm handle it as before, or the user can select. */}
+                <StaffForm onSave={() => setView('list')} onCancel={() => setView('list')} initialRole={roleName} />
             </div>
         );
     }
 
-    const filteredStaffList = staff.filter(s => 
+    const filteredList = staff.filter(s => 
         s.name?.toLowerCase().includes(search.toLowerCase()) || 
-        s.email?.toLowerCase().includes(search.toLowerCase()) ||
-        s.role?.toLowerCase().includes(search.toLowerCase())
+        s.email?.toLowerCase().includes(search.toLowerCase())
     );
 
     const kpiCards = [
-        { label: 'Total Staff', value: staff.length, active: true },
-        { label: 'Accountants', value: staff.filter(s => s.role === 'Accountant').length, active: false },
-        { label: 'Librarians', value: staff.filter(s => s.role === 'Librarian').length, active: false }
+        { label: `Total ${roleName}s`, value: staff.length, active: true }
     ];
 
     const actions = (
@@ -78,13 +76,13 @@ const StaffManagement = () => {
             onClick={() => setView('create')}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
         >
-            <Plus size={16} strokeWidth={3} /> Add New Staff
+            <Plus size={16} strokeWidth={3} /> Add New {roleName}
         </button>
     );
 
     const columns = [
         { 
-            label: 'Staff Member', 
+            label: 'Profile Details', 
             sortable: true,
             render: (row) => (
                 <div className="flex items-center gap-3">
@@ -128,10 +126,10 @@ const StaffManagement = () => {
 
     return (
         <PremiumTable 
-            title="Staff Directory"
+            title={title}
             actions={actions}
             columns={columns} 
-            data={filteredStaffList} 
+            data={filteredList} 
             kpiCards={kpiCards}
             onSearch={setSearch}
             loading={loading}
@@ -139,4 +137,4 @@ const StaffManagement = () => {
     );
 };
 
-export default StaffManagement;
+export default GenericRoleManagement;

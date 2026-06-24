@@ -15,10 +15,10 @@ const ModuleContainer = ({ tabs, contentMap, defaultTab }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <FilterBar />
-            <SubNavTabs 
-                tabs={tabs} 
-                activeTab={activeSubTab} 
-                onTabChange={setActiveSubTab} 
+            <SubNavTabs
+                tabs={tabs}
+                activeTab={activeSubTab}
+                onTabChange={setActiveSubTab}
             />
             <div style={{ flex: 1, overflowY: 'auto' }}>
                 {renderContent()}

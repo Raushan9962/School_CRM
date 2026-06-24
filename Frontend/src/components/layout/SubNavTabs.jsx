@@ -2,7 +2,14 @@ import React from 'react';
 
 const SubNavTabs = ({ tabs, activeTab, onTabChange }) => {
     return (
-        <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '16px', marginBottom: '16px' }}>
+        <div className="hide-scrollbar" style={{ 
+            display: 'flex', gap: '8px', overflowX: 'auto', 
+            paddingBottom: '16px', marginBottom: '16px',
+            position: 'sticky', top: '-16px', zIndex: 30,
+            backgroundColor: '#f4f7f6',
+            paddingTop: '16px',
+            marginTop: '-16px'
+        }}>
             {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (

@@ -72,7 +72,7 @@ const DashboardLayout = ({
     };
 
     return (
-        <div className="flex min-h-screen bg-[#f4f7f6] font-inter">
+        <div className="flex h-screen overflow-hidden bg-[#f4f7f6] font-inter">
             {/* Mobile Overlay */}
             {isMobile && isSidebarOpen && (
                 <div 
@@ -154,7 +154,7 @@ const DashboardLayout = ({
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto bg-[#f4f7f6] p-4 lg:p-8">
+                <div className="flex-1 overflow-y-auto bg-[#f4f7f6] px-4 lg:px-8 pb-4 lg:pb-8 pt-4 relative">
                     <div className="mx-auto max-w-[1600px] h-full">
                         {children}
                     </div>

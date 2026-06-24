@@ -12,9 +12,27 @@ exports.getDashboardStats = async (req, res) => {
         const teachersRes = await pool.query(`SELECT COUNT(*) FROM users WHERE role_name = 'Teacher' AND school_id = $1`, [schoolId]);
         const totalTeachers = parseInt(teachersRes.rows[0].count);
 
-        // 3. Total Staff (All non-teaching staff like Accountant, Librarian, Receptionist, Transport Manager, etc.)
-        const staffRes = await pool.query(`SELECT COUNT(*) FROM users WHERE role_name NOT IN ('Student', 'Teacher', 'School Admin', 'Super Admin') AND school_id = $1`, [schoolId]);
-        const totalStaff = parseInt(staffRes.rows[0].count);
+        // 3. Specific Staff Roles
+        const roles = ['Accountant', 'Librarian', 'Receptionist', 'Transport Staff', 'Hostel Warden', 'HR'];
+        const staffRes = await pool.query(`SELECT role_name, COUNT(*) FROM users WHERE role_name = ANY($1) AND school_id = $2 GROUP BY role_name`, [roles, schoolId]);
+        
+        const staffCounts = {
+            totalAccountants: 0,
+            totalLibrarians: 0,
+            totalReceptionists: 0,
+            totalTransportStaff: 0,
+            totalWardens: 0,
+            totalHR: 0
+        };
+
+        staffRes.rows.forEach(row => {
+            if (row.role_name === 'Accountant') staffCounts.totalAccountants = parseInt(row.count);
+            if (row.role_name === 'Librarian') staffCounts.totalLibrarians = parseInt(row.count);
+            if (row.role_name === 'Receptionist') staffCounts.totalReceptionists = parseInt(row.count);
+            if (row.role_name === 'Transport Staff') staffCounts.totalTransportStaff = parseInt(row.count);
+            if (row.role_name === 'Hostel Warden') staffCounts.totalWardens = parseInt(row.count);
+            if (row.role_name === 'HR') staffCounts.totalHR = parseInt(row.count);
+        });
 
         // 4. Today Attendance (Students Present %)
         const attendanceRes = await pool.query(`
@@ -60,7 +78,7 @@ exports.getDashboardStats = async (req, res) => {
             data: {
                 totalStudents,
                 totalTeachers,
-                totalStaff,
+                ...staffCounts,
                 todayAttendancePercent,
                 feesCollected,
                 pendingFees,

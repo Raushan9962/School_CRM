@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon, CheckCircle, XCircle, Clock } from 'lucide-re
 import apiFetch from '../../../services/api';
 import PremiumTable from '../../../components/ui/PremiumTable';
 
-const StaffAttendance = () => {
+const StaffAttendance = ({ roleFilter }) => {
     const [staffList, setStaffList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -15,7 +15,15 @@ const StaffAttendance = () => {
             const res = await apiFetch(`/school-admin/staff-attendance?date=${date}`);
             const data = await res.json();
             if (data.success) {
-                setStaffList(data.data);
+                let filtered = data.data;
+                if (roleFilter) {
+                    if (roleFilter === 'Transport Staff') {
+                        filtered = filtered.filter(u => u.role === 'Transport Manager' || u.role === 'Driver' || u.role === 'Transport Staff');
+                    } else {
+                        filtered = filtered.filter(u => u.role === roleFilter);
+                    }
+                }
+                setStaffList(filtered);
             }
         } catch (error) {
             console.error('Error fetching staff attendance:', error);

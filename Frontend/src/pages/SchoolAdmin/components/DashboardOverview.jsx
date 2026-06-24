@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { ArrowUpRight, Bell } from 'lucide-react';
 import { 
-    Users, UserCheck, Briefcase, CalendarCheck, 
-    IndianRupee, CreditCard, BookOpen, UserPlus, 
-    Bell, Cake, ArrowUpRight 
-} from 'lucide-react';
+    FcReadingEbook, 
+    FcBusinesswoman, 
+    FcOrganization, 
+    FcCalendar, 
+    FcCurrencyExchange, 
+    FcDebt, 
+    FcLibrary, 
+    FcAddDatabase, 
+    FcSms, 
+    FcInvite,
+    FcCalculator,
+    FcCallback,
+    FcAutomotive,
+    FcHome,
+    FcManager
+} from 'react-icons/fc';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -35,7 +48,12 @@ const DashboardOverview = ({ setActiveTab }) => {
     const [stats, setStats] = useState({
         totalStudents: 0,
         totalTeachers: 0,
-        totalStaff: 0,
+        totalAccountants: 0,
+        totalLibrarians: 0,
+        totalReceptionists: 0,
+        totalTransportStaff: 0,
+        totalWardens: 0,
+        totalHR: 0,
         todayAttendancePercent: 0,
         feesCollected: 0,
         pendingFees: 0,
@@ -64,16 +82,21 @@ const DashboardOverview = ({ setActiveTab }) => {
     }, []);
 
     const statCards = [
-        { title: 'Total Students', value: stats.totalStudents, icon: <Users size={20} />, color: '#3b82f6', bg: '#eff6ff', borderTop: 'border-t-blue-500', tab: 'student' },
-        { title: 'Total Teachers', value: stats.totalTeachers, icon: <UserCheck size={20} />, color: '#10b981', bg: '#ecfdf5', borderTop: 'border-t-emerald-500', tab: 'teacher' },
-        { title: 'Total Staff', value: stats.totalStaff, icon: <Briefcase size={20} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'principal' },
-        { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <CalendarCheck size={20} />, color: '#f59e0b', bg: '#fffbeb', borderTop: 'border-t-amber-500', tab: 'student' },
-        { title: 'Fees Collected', value: `₹${stats.feesCollected.toLocaleString()}`, icon: <IndianRupee size={20} />, color: '#14b8a6', bg: '#f0fdfa', borderTop: 'border-t-teal-500', tab: 'finance' },
-        { title: 'Pending Fees', value: `₹${stats.pendingFees.toLocaleString()}`, icon: <CreditCard size={20} />, color: '#ef4444', bg: '#fef2f2', borderTop: 'border-t-rose-500', tab: 'finance' },
-        { title: 'Upcoming Exams', value: `${stats.upcomingExams} Days`, icon: <BookOpen size={20} />, color: '#6366f1', bg: '#eef2ff', borderTop: 'border-t-indigo-500', tab: 'student' },
-        { title: 'New Admissions', value: stats.newAdmissions, icon: <UserPlus size={20} />, color: '#ec4899', bg: '#fdf2f8', borderTop: 'border-t-pink-500', tab: 'student' },
-        { title: 'Notifications', value: stats.notifications, icon: <Bell size={20} />, color: '#eab308', bg: '#fefce8', borderTop: 'border-t-yellow-500', tab: 'overview' },
-        { title: 'Birthday Today', value: stats.birthdayToday, icon: <Cake size={20} />, color: '#f43f5e', bg: '#fff1f2', borderTop: 'border-t-rose-500', tab: 'student' },
+        { title: 'Total Students', value: stats.totalStudents, icon: <FcReadingEbook size={28} />, color: '#3b82f6', bg: '#eff6ff', borderTop: 'border-t-blue-500', tab: 'student' },
+        { title: 'Total Teachers', value: stats.totalTeachers, icon: <FcBusinesswoman size={28} />, color: '#10b981', bg: '#ecfdf5', borderTop: 'border-t-emerald-500', tab: 'teacher' },
+        { title: 'Accountants', value: stats.totalAccountants, icon: <FcCalculator size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'accountant' },
+        { title: 'Librarians', value: stats.totalLibrarians, icon: <FcLibrary size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'librarian' },
+        { title: 'Receptionists', value: stats.totalReceptionists, icon: <FcCallback size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'receptionist' },
+        { title: 'Transport Staff', value: stats.totalTransportStaff, icon: <FcAutomotive size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'transport_staff' },
+        { title: 'Hostel Wardens', value: stats.totalWardens, icon: <FcHome size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'warden' },
+        { title: 'HR Managers', value: stats.totalHR, icon: <FcManager size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'hr' },
+        { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <FcCalendar size={28} />, color: '#f59e0b', bg: '#fffbeb', borderTop: 'border-t-amber-500', tab: 'student' },
+        { title: 'Fees Collected', value: `₹${stats.feesCollected.toLocaleString()}`, icon: <FcCurrencyExchange size={28} />, color: '#14b8a6', bg: '#f0fdfa', borderTop: 'border-t-teal-500', tab: 'finance' },
+        { title: 'Pending Fees', value: `₹${stats.pendingFees.toLocaleString()}`, icon: <FcDebt size={28} />, color: '#ef4444', bg: '#fef2f2', borderTop: 'border-t-rose-500', tab: 'finance' },
+        { title: 'Upcoming Exams', value: `${stats.upcomingExams} Days`, icon: <FcLibrary size={28} />, color: '#6366f1', bg: '#eef2ff', borderTop: 'border-t-indigo-500', tab: 'student' },
+        { title: 'New Admissions', value: stats.newAdmissions, icon: <FcAddDatabase size={28} />, color: '#ec4899', bg: '#fdf2f8', borderTop: 'border-t-pink-500', tab: 'student' },
+        { title: 'Notifications', value: stats.notifications, icon: <FcSms size={28} />, color: '#eab308', bg: '#fefce8', borderTop: 'border-t-yellow-500', tab: 'overview' },
+        { title: 'Birthday Today', value: stats.birthdayToday, icon: <FcInvite size={28} />, color: '#f43f5e', bg: '#fff1f2', borderTop: 'border-t-rose-500', tab: 'student' },
     ];
 
     if (loading) {
@@ -98,7 +121,7 @@ const DashboardOverview = ({ setActiveTab }) => {
                     >
                         <div className="flex justify-between items-start">
                             <p className="text-[13px] font-semibold text-slate-500">{card.title}</p>
-                            <div className="p-1.5 rounded-lg" style={{ backgroundColor: card.bg, color: card.color }}>
+                            <div className="w-10 h-10 rounded-[10px] flex items-center justify-center border border-white/40 shadow-sm" style={{ backgroundColor: card.bg }}>
                                 {card.icon}
                             </div>
                         </div>

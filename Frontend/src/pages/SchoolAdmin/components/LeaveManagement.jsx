@@ -3,7 +3,7 @@ import { Check, X, FileText } from 'lucide-react';
 import apiFetch from '../../../services/api';
 import PremiumTable from '../../../components/ui/PremiumTable';
 
-const LeaveManagement = () => {
+const LeaveManagement = ({ roleFilter }) => {
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -14,7 +14,15 @@ const LeaveManagement = () => {
             const res = await apiFetch('/school-admin/leaves');
             const data = await res.json();
             if (data.success) {
-                setLeaves(data.data);
+                let filtered = data.data;
+                if (roleFilter) {
+                    if (roleFilter === 'Transport Staff') {
+                        filtered = filtered.filter(l => l.role === 'Transport Manager' || l.role === 'Driver' || l.role === 'Transport Staff');
+                    } else {
+                        filtered = filtered.filter(l => l.role === roleFilter);
+                    }
+                }
+                setLeaves(filtered);
             }
         } catch (error) {
             console.error('Error fetching leaves:', error);

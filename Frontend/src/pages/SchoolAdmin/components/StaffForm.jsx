@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import apiFetch from '../../../services/api';
 
-const StaffForm = ({ onSave, onCancel }) => {
+const StaffForm = ({ onSave, onCancel, initialRole }) => {
     const [loading, setLoading] = useState(false);
     
     const [formData, setFormData] = useState({
-        roleName: 'Accountant', // Default
+        roleName: initialRole || 'Accountant', // Default
         name: '', email: '', phone: '', gender: '', dob: '', address: '',
         employeeId: '', qualification: '', experience: '', joiningDate: '', basicSalary: '',
         employmentType: 'Regular', bankAccount: '', ifscCode: '',
