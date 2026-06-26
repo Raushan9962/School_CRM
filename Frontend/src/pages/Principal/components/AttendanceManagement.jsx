@@ -1,95 +1,135 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar, CheckCircle, Clock, XCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import apiFetch from '../../../services/api';
-
-const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
-const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
-
+import PremiumTable from '../../../components/ui/PremiumTable';
 
 const AttendanceManagement = () => {
-  const [data, setData] = useState({ studentAvg: '0%', teacherAvg: '0%', trends: [] });
-  const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await apiFetch('/principal/attendance', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('API not ready');
-        const json = await res.json();
-        setData({
-          studentAvg: json.data.studentAvg || '0%',
-          teacherAvg: json.data.teacherAvg || '0%',
-          trends: json.data.trends || []
-        });
-      } catch (err) {
-        // Fallback to Hardcoded Data
-        setData({
-          studentAvg: '94.5%',
-          teacherAvg: '98.2%',
-          trends: [
-            { class: 'Class 10', rate: '96%', color: '#10b981' },
-            { class: 'Class 9', rate: '92%', color: '#f59e0b' },
-            { class: 'Class 12', rate: '98%', color: '#3b82f6' },
-            { class: 'Class 8', rate: '89%', color: '#ef4444' }
-          ]
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    const [classData, setClassData] = useState([]);
 
-  return (
-    <div className="dashboard-section animate-fade-in" className="p-6">
-      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Attendance Management</h2>
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <ActionBtn text="View Reports" icon="📊" />
-        <ActionBtn text="Export Attendance" icon="⬇️" />
-      </div>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        <div className="glass-panel" style={{...panelStyle, textAlign: 'center'}}>
-          <p style={{ color: '#64748b', fontWeight: '600', margin: '0 0 8px' }}>Average Student Attendance</p>
-          <h3 style={{ fontSize: '36px', margin: 0, color: '#10b981' }}>{loading ? '...' : data.studentAvg}</h3>
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            try {
+                // Replace with actual class-wise attendance summary API when available
+                const res = await apiFetch('/principal/attendance/summary?date=' + date);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.data) {
+                        setClassData(data.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching class attendance summary:", err);
+            }
+        };
+        fetchAttendance();
+    }, [date]);
+
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredData = classData.filter(d => 
+        d.className?.toLowerCase().includes(search.toLowerCase()) || 
+        d.classTeacher?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    if (activeKpi === 'Highest') {
+        filteredData = filteredData.filter(d => d.status === 'Excellent');
+    } else if (activeKpi === 'Attention') {
+        filteredData = filteredData.filter(d => d.status === 'Critical' || d.status === 'Needs Review');
+    }
+
+    const kpiCards = [
+        { label: 'Overall Student Avg', value: '91.5%', active: activeKpi === 'All', onClick: () => setActiveKpi('All'), sublabel: 'vs 89.2% last week' },
+        { label: 'Staff/Teacher Avg', value: '96.2%', active: false, sublabel: 'Consistent' },
+        { label: 'Highest Attendance', value: 'Class VIII-A', active: activeKpi === 'Highest', onClick: () => setActiveKpi('Highest'), sublabel: '100% Present' },
+        { label: 'Requires Attention', value: 'Class VIII-B', active: activeKpi === 'Attention', onClick: () => setActiveKpi('Attention'), sublabel: '79.4% Present' }
+    ];
+
+    const columns = [
+        { 
+            label: 'Class & Section', 
+            sortable: true,
+            render: (row) => (
+                <div>
+                    <p className="font-bold text-slate-800 m-0">{row.className} - {row.section}</p>
+                    <p className="text-[11px] text-slate-500 m-0">Room: {row.id}0{row.section === 'A' ? 1 : 2}</p>
+                </div>
+            )
+        },
+        { 
+            label: 'Class Teacher', 
+            sortable: true,
+            render: (row) => <span className="text-slate-600 font-medium">{row.classTeacher}</span>
+        },
+        { 
+            label: 'Student Headcount', 
+            render: (row) => (
+                <div className="flex flex-col items-center">
+                    <span className="font-bold text-slate-800">{row.totalStudents}</span>
+                    <div className="flex gap-2 text-[11px] mt-1">
+                        <span className="text-emerald-600 font-medium">{row.present} P</span>
+                        <span className="text-rose-600 font-medium">{row.absent} A</span>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            label: 'Attendance %', 
+            sortable: true,
+            render: (row) => {
+                let colorClass = 'text-emerald-600';
+                let Icon = TrendingUp;
+                if (row.attendanceRate < 85) { colorClass = 'text-amber-500'; Icon = Minus; }
+                if (row.attendanceRate < 80) { colorClass = 'text-rose-500'; Icon = TrendingDown; }
+                
+                return (
+                    <div className={`flex items-center justify-center gap-1 font-bold ${colorClass}`}>
+                        <Icon size={14} />
+                        {row.attendanceRate}%
+                    </div>
+                );
+            }
+        },
+        { 
+            label: 'Status', 
+            render: (row) => {
+                let badgeClass = 'bg-emerald-100 text-emerald-700';
+                if (row.status === 'Needs Review') badgeClass = 'bg-amber-100 text-amber-700';
+                if (row.status === 'Critical') badgeClass = 'bg-rose-100 text-rose-700';
+                
+                return (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${badgeClass}`}>
+                        {row.status}
+                    </span>
+                );
+            }
+        }
+    ];
+
+    const actions = (
+        <div className="flex items-center gap-3 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
+            <Calendar className="text-slate-400" size={16} />
+            <input 
+                type="date" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)}
+                className="focus:outline-none text-sm font-medium text-slate-700 bg-transparent"
+            />
         </div>
-        <div className="glass-panel" style={{...panelStyle, textAlign: 'center'}}>
-          <p style={{ color: '#64748b', fontWeight: '600', margin: '0 0 8px' }}>Average Teacher Attendance</p>
-          <h3 style={{ fontSize: '36px', margin: 0, color: '#3b82f6' }}>{loading ? '...' : data.teacherAvg}</h3>
-        </div>
-      </div>
+    );
 
-      <div className="glass-panel" style={panelStyle}>
-        <h3 style={panelTitleStyle}>Class-wise Attendance Trends</h3>
-        {loading ? <p className="text-slate-500">Loading trends...</p> : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-            {(!data.trends || data.trends.length === 0) ? <p className="text-slate-500">No trend data available.</p> : data.trends.map((t, idx) => (
-              <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: `1px solid ${t.color}40`, textAlign: 'center' }}>
-                <p style={{ margin: '0 0 8px', fontWeight: '600', color: '#475569' }}>{t.class}</p>
-                <h4 style={{ margin: 0, fontSize: '24px', color: t.color }}>{t.rate}</h4>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <PremiumTable 
+            title="Daily Attendance Overview"
+            actions={actions}
+            columns={columns} 
+            data={filteredData} 
+            kpiCards={kpiCards}
+            onSearch={setSearch}
+        />
+    );
 };
-
-const ActionBtn = ({ text, icon }) => (
-  <button style={{
-    padding: '12px 20px', borderRadius: '12px', border: 'none',
-    background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white',
-    fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', transition: 'all 0.2s'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <span>{icon}</span> {text}
-  </button>
-);
-
 
 export default AttendanceManagement;

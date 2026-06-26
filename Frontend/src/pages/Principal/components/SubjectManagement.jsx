@@ -24,15 +24,25 @@ const SubjectManagement = () => {
                 apiFetch('/school-admin/teachers') // using school admin's teacher list for simplicity
             ]);
             
-            const subData = await subRes.json();
-            const clsData = await clsRes.json();
-            const tchrData = await tchrRes.json();
-            
-            if (subData.success) setSubjects(subData.data);
-            if (clsData.success) setClasses(clsData.data);
-            if (tchrData.success) setTeachers(tchrData.data);
+            if (subRes.ok) {
+                const subData = await subRes.json();
+                if (subData.success) setSubjects(subData.data || []);
+            } else {
+                setSubjects([]);
+            }
+
+            if (clsRes.ok) {
+                const clsData = await clsRes.json();
+                if (clsData.success) setClasses(clsData.data);
+            }
+
+            if (tchrRes.ok) {
+                const tchrData = await tchrRes.json();
+                if (tchrData.success) setTeachers(tchrData.data);
+            }
         } catch (err) {
             console.error("Failed to fetch subjects data", err);
+            setSubjects([]);
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PlaceholderView from '../../Principal/components/PlaceholderView';
 
 const ExamManagement = () => {
     const [activeTab, setActiveTab] = useState('marks');
@@ -117,10 +118,8 @@ const ExamManagement = () => {
             )}
 
             {activeTab === 'analytics' && (
-                <div style={{ padding: '40px', textAlign: 'center', background: 'white', borderRadius: '16px', border: '1px dashed #cbd5e1', color: '#64748b' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
-                    <h3 style={{ margin: '0 0 8px 0', color: '#1e293b' }}>Subject Analytics</h3>
-                    <p style={{ margin: 0 }}>Charts showing average marks, pass percentages, and subject performance will appear here.</p>
+                <div className="mt-4">
+                    <PlaceholderView title="Subject Analytics" />
                 </div>
             )}
 

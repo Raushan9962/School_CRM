@@ -46,41 +46,49 @@ const PlaceholderView = ({ title }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!endpoint) {
-                setLoading(false);
-                return;
-            }
             try {
-                const token = localStorage.getItem('token');
-                const response = await apiFetch(`${endpoint}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (!response.ok) throw new Error("Network response was not ok");
-                const json = await response.json();
-                
-                if (json.data) {
-                    if (Array.isArray(json.data)) {
-                        setData(json.data);
-                        setKpiData({ total: json.data.length });
-                    } else if (typeof json.data === 'object') {
-                        if (json.data.recent) {
-                            setData(json.data.recent);
-                            setKpiData(json.data);
-                        } else {
-                            setKpiData(json.data);
-                            setData([]);
+                if (endpoint) {
+                    const token = localStorage.getItem('token');
+                    const response = await apiFetch(`${endpoint}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.ok) {
+                        const json = await response.json();
+                        if (json.data) {
+                            if (Array.isArray(json.data) && json.data.length > 0) {
+                                setData(json.data);
+                                setKpiData({ total: json.data.length });
+                                setLoading(false);
+                                return;
+                            } else if (typeof json.data === 'object') {
+                                if (json.data.recent && json.data.recent.length > 0) {
+                                    setData(json.data.recent);
+                                    setKpiData(json.data);
+                                    setLoading(false);
+                                    return;
+                                } else if (Object.keys(json.data).length > 0) {
+                                    setKpiData(json.data);
+                                    setData([]);
+                                    setLoading(false);
+                                    return;
+                                }
+                            }
                         }
                     }
                 }
             } catch (err) {
                 console.error("Error fetching generic data:", err);
-            } finally {
-                setLoading(false);
             }
+
+            // Fallback to empty data if no API data or no endpoint
+            setData([]);
+            setKpiData({ total: 0 });
+            setLoading(false);
+            
         };
         fetchData();
-    }, [endpoint]);
+    }, [endpoint, category]);
 
     const formatHeader = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
 
@@ -88,12 +96,25 @@ const PlaceholderView = ({ title }) => {
     const kpi2 = kpiData?.totalCollected ? `₹${kpiData.totalCollected}` : (kpiData?.studentAvg || 'N/A');
     const kpi3 = kpiData?.pending ? `₹${kpiData.pending}` : (kpiData?.teacherAvg || 'N/A');
 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    const kpiLabel1 = category === 'finance' ? 'Total Expected' : 'Total Records';
+    const kpiLabel2 = category === 'finance' ? 'Total Collected' : (category === 'attendance' ? 'Student Avg' : 'Active / Success');
+    const kpiLabel3 = category === 'finance' ? 'Pending' : (category === 'attendance' ? 'Teacher Avg' : 'Pending Actions');
+
     const kpiCards = [
-        { label: category === 'finance' ? 'Total Expected' : 'Total Records', value: kpi1, active: true },
-        { label: category === 'finance' ? 'Total Collected' : (category === 'attendance' ? 'Student Avg' : 'Active / Success'), value: kpi2, active: false },
-        { label: category === 'finance' ? 'Pending' : (category === 'attendance' ? 'Teacher Avg' : 'Pending Actions'), value: kpi3, active: false },
-        { label: 'This Month', value: '+12%', sublabel: 'vs last month', active: false }
+        { label: kpiLabel1, value: kpi1, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: kpiLabel2, value: kpi2, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') },
+        { label: kpiLabel3, value: kpi3, active: activeKpi === 'Pending', onClick: () => setActiveKpi('Pending') },
+        { label: 'This Month', value: '+12%', sublabel: 'vs last month', active: activeKpi === 'Month', onClick: () => setActiveKpi('Month') }
     ];
+
+    let filteredData = data;
+    if (activeKpi === 'Active') {
+        filteredData = data.filter(d => ['Active', 'Present', 'Approved', 'Paid', 'Completed'].includes(d.Status || d.status));
+    } else if (activeKpi === 'Pending') {
+        filteredData = data.filter(d => ['Pending', 'Late', 'On Leave', 'Pending Review', 'Scheduled'].includes(d.Status || d.status));
+    }
 
     let columns = [];
     if (data && data.length > 0) {
@@ -122,8 +143,9 @@ const PlaceholderView = ({ title }) => {
             <PremiumTable 
                 title={title}
                 columns={columns} 
-                data={data} 
+                data={filteredData} 
                 kpiCards={kpiCards} 
+                onSearch={() => {}}
             />
 
             {(category === 'finance' || category === 'academic' || category === 'attendance') && (

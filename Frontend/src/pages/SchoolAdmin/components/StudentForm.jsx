@@ -13,7 +13,7 @@ const StudentForm = ({ onSave, onCancel }) => {
         // Personal
         name: '', dob: '', gender: '', bloodGroup: '', aadhaarNumber: '', religion: '', category: '',
         // Contact
-        address: '', city: '', state: '', pincode: '', phone: '', email: '',
+        address: '', city: '', state: '', pincode: '', phone: '', email: '', password: '',
         // Parent
         fatherName: '', motherName: '', guardianName: '', parentOccupation: '', parentIncome: '', parentPhone: '', parentEmail: '',
         // Academic
@@ -124,6 +124,7 @@ const StudentForm = ({ onSave, onCancel }) => {
                         <div><label className={labelClass}>Pincode</label><input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Student Phone (Optional)</label><input type="text" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Student Email (Optional)</label><input type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} /></div>
+                        <div><label className={labelClass}>Student Password</label><input type="text" name="password" placeholder="Defaults to 123456" value={formData.password} onChange={handleChange} className={inputClass} /></div>
                     </div>
                 </div>
 

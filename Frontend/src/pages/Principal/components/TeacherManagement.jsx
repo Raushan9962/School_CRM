@@ -1,155 +1,188 @@
 import React, { useState, useEffect } from 'react';
+import { UserPlus, BookOpen, GraduationCap, CheckCircle, Clock, Heart, Award } from 'lucide-react';
 import apiFetch from '../../../services/api';
-
-const panelStyle = { background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' };
-const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
+import PremiumTable from '../../../components/ui/PremiumTable';
 
 const TeacherManagement = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', subject: '', experience: '' });
+    const [search, setSearch] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
-  const fetchTeachers = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const res = await apiFetch('/principal/teachers', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('API not ready');
-      const json = await res.json();
-      setTeachers(json.data);
-    } catch (err) {
-      setTeachers([
-        { id: 1, name: 'Mr. Vivek Singh', subject: 'Mathematics', exp: '8 Years', status: 'Present' },
-        { id: 2, name: 'Mrs. Neha Roy', subject: 'Physics', exp: '5 Years', status: 'On Leave' }
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [teachers, setTeachers] = useState([]);
 
-  useEffect(() => {
-    fetchTeachers();
-  }, []);
-
-  const handleAddTeacher = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      const res = await apiFetch('/teachers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          employeeId: 'EMP-' + Math.floor(Math.random() * 100000),
-          subject: formData.subject,
-          experience: formData.experience,
-          schoolId: 1 // Example school id
-        })
-      });
-      if(res.ok) {
-        setShowModal(false);
-        setFormData({ firstName: '', lastName: '', subject: '', experience: '' });
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const res = await apiFetch('/principal/teachers');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.data) {
+                        setTeachers(data.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching teachers:", err);
+            }
+        };
         fetchTeachers();
-      } else {
-        alert('Failed to add teacher.');
-      }
-    } catch(err) {
-      alert('Error connecting to backend.');
-      console.error(err);
-    }
-  };
+    }, []);
 
-  return (
-    <div className="dashboard-section animate-fade-in" className="p-6">
-      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Teacher Management</h2>
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <ActionBtn text="Add New Teacher" icon="➕" onClick={() => setShowModal(true)} />
-        <ActionBtn text="Approve Leave" icon="🏖️" />
-        <ActionBtn text="View Performance" icon="📊" />
-      </div>
-      
-      <div className="glass-panel" style={panelStyle}>
-        <h3 style={panelTitleStyle}>Teacher Directory</h3>
-        {loading ? <p className="text-slate-500">Loading teachers...</p> : (
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                <th className="p-3">Name</th>
-                <th className="p-3">Subject</th>
-                <th className="p-3">Experience</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teachers.map((t, idx) => (
-                <tr key={t.id || idx} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#1e293b', fontWeight: '500' }}>
-                  <td className="p-3">{t.name}</td>
-                  <td className="p-3 text-slate-500">{t.subject}</td>
-                  <td className="p-3">{t.exp}</td>
-                  <td className="p-3">
-                    <span style={{ 
-                      padding: '4px 10px', borderRadius: '12px', fontSize: '12px',
-                      background: t.status === 'Present' ? '#d1fae5' : '#fee2e2',
-                      color: t.status === 'Present' ? '#059669' : '#dc2626'
-                    }}>{t.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+    const [activeKpi, setActiveKpi] = useState('All');
 
-      {showModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 100, backdropFilter: 'blur(4px)'
-        }}>
-          <div className="animate-fade-in" style={{ background: 'white', padding: '32px', borderRadius: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ margin: '0 0 20px', fontSize: '20px', color: '#0f172a' }}>Add New Teacher</h3>
-            <form onSubmit={handleAddTeacher} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">First Name</label>
-                <input required type="text" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Last Name</label>
-                <input required type="text" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Subject Specialization</label>
-                <input required type="text" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Experience (Years)</label>
-                <input required type="number" value={formData.experience} onChange={e => setFormData({...formData, experience: e.target.value})} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500" />
-              </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#0ea5e9', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Save Teacher</button>
-              </div>
-            </form>
-          </div>
+    let filteredData = teachers.filter(t => 
+        t.name?.toLowerCase().includes(search.toLowerCase()) || 
+        t.subject?.toLowerCase().includes(search.toLowerCase()) ||
+        t.id?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    if (activeKpi === 'Present') filteredData = filteredData.filter(t => t.status === 'Present');
+    if (activeKpi === 'On Leave') filteredData = filteredData.filter(t => t.status === 'On Leave' || t.status === 'Half Day');
+
+    const totalTeachers = teachers.length;
+    const presentTeachers = teachers.filter(t => t.status === 'Present').length;
+    const onLeaveTeachers = teachers.filter(t => ['On Leave', 'Half Day'].includes(t.status)).length;
+    
+    let totalExp = 0;
+    let expCount = 0;
+    teachers.forEach(t => {
+        const expMatch = String(t.experience || t.exp || '').match(/(\d+)/);
+        if (expMatch) {
+            totalExp += parseInt(expMatch[1], 10);
+            expCount++;
+        }
+    });
+    const avgExp = expCount > 0 ? (totalExp / expCount).toFixed(1) : 0;
+    const attendancePct = totalTeachers > 0 ? Math.round((presentTeachers / totalTeachers) * 100) : 0;
+
+    const kpiCards = [
+        { label: 'Total Teachers', value: totalTeachers.toString(), active: activeKpi === 'All', onClick: () => setActiveKpi('All'), sublabel: 'Full Time' },
+        { label: 'Present Today', value: presentTeachers.toString(), active: activeKpi === 'Present', onClick: () => setActiveKpi('Present'), sublabel: `${attendancePct}% Attendance` },
+        { label: 'On Leave', value: onLeaveTeachers.toString(), active: activeKpi === 'On Leave', onClick: () => setActiveKpi('On Leave'), sublabel: 'Approved' },
+        { label: 'Avg Experience', value: `${avgExp} Yrs`, active: activeKpi === 'Experience', onClick: () => setActiveKpi('Experience'), sublabel: 'Highly Qualified' }
+    ];
+
+    const columns = [
+        { 
+            label: 'Teacher Profile', 
+            sortable: true,
+            render: (row) => (
+                <div className="flex items-center gap-3">
+                    <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${row.avatarSeed}&backgroundColor=0284c7`} alt={row.name} className="w-10 h-10 rounded-full border border-slate-200" />
+                    <div className="text-left">
+                        <p className="font-bold text-slate-800 m-0 leading-tight">{row.name}</p>
+                        <p className="text-[11px] text-slate-500 m-0 font-medium">ID: {row.id}</p>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            label: 'Subject', 
+            sortable: true,
+            render: (row) => (
+                <div className="flex items-center gap-2 text-slate-700 font-medium">
+                    <BookOpen size={14} className="text-blue-500" />
+                    {row.subject}
+                </div>
+            )
+        },
+        { 
+            label: 'Qualifications & Exp', 
+            render: (row) => (
+                <div className="text-left">
+                    <div className="flex items-center gap-1 text-slate-700 font-bold text-[12px]">
+                        <Award size={12} className="text-amber-500" />
+                        {row.experience}
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">
+                        <GraduationCap size={12} />
+                        {row.qualifications}
+                    </div>
+                </div>
+            )
+        },
+        { 
+            label: 'Today\'s Status', 
+            render: (row) => {
+                let badgeClass = 'bg-slate-100 text-slate-600';
+                let Icon = Clock;
+                if (row.status === 'Present') { badgeClass = 'bg-emerald-100 text-emerald-700'; Icon = CheckCircle; }
+                if (row.status === 'On Leave') { badgeClass = 'bg-rose-100 text-rose-700'; Icon = Heart; }
+                if (row.status === 'Half Day') { badgeClass = 'bg-amber-100 text-amber-700'; Icon = Clock; }
+                
+                return (
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider ${badgeClass}`}>
+                        <Icon size={12} />
+                        {row.status}
+                    </span>
+                );
+            }
+        },
+        { 
+            label: 'Actions', 
+            render: (row) => (
+                <div className="flex justify-center gap-2">
+                    <button className="px-3 py-1 bg-white border border-slate-200 text-blue-600 rounded hover:bg-blue-50 font-semibold text-xs transition-colors">Profile</button>
+                    <button className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded hover:bg-slate-50 font-semibold text-xs transition-colors">Schedule</button>
+                </div>
+            )
+        }
+    ];
+
+    const actions = (
+        <button 
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200"
+        >
+            <UserPlus size={16} /> Add New Teacher
+        </button>
+    );
+
+    return (
+        <div className="relative">
+            <PremiumTable 
+                title="Teacher Directory"
+                actions={actions}
+                columns={columns} 
+                data={filteredData} 
+                kpiCards={kpiCards}
+                onSearch={setSearch}
+            />
+
+            {showModal && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                            <h3 className="text-lg font-bold text-slate-800 m-0">Add New Teacher</h3>
+                            <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">×</button>
+                        </div>
+                        <form className="p-6 flex flex-col gap-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">First Name</label>
+                                    <input type="text" placeholder="e.g. Rajesh" className="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">Last Name</label>
+                                    <input type="text" placeholder="e.g. Kumar" className="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">Subject Specialization</label>
+                                <input type="text" placeholder="e.g. Physics" className="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">Experience (Years)</label>
+                                <input type="number" placeholder="e.g. 5" className="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" />
+                            </div>
+                            <div className="flex gap-3 mt-4 pt-4 border-t border-slate-100">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition-colors">Cancel</button>
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">Save Teacher</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
-
-const ActionBtn = ({ text, icon, onClick }) => (
-  <button onClick={onClick} style={{
-    padding: '12px 20px', borderRadius: '12px', border: 'none',
-    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)', color: 'white',
-    fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)', transition: 'all 0.2s'
-  }}
-  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-    <span>{icon}</span> {text}
-  </button>
-);
 
 export default TeacherManagement;

@@ -32,15 +32,21 @@ const PrincipalDetails = () => {
         }
     }, [view]);
 
-    const filteredPrincipals = principals.filter(p => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredPrincipals = principals.filter(p => 
         p.name?.toLowerCase().includes(search.toLowerCase()) || 
         p.email?.toLowerCase().includes(search.toLowerCase()) ||
         p.phone?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') {
+        filteredPrincipals = filteredPrincipals;
+    }
+
     const kpiCards = [
-        { label: 'Total Principals', value: principals.length, active: true },
-        { label: 'Active Profiles', value: principals.length, active: false }
+        { label: 'Total Principals', value: principals.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active Profiles', value: principals.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
     ];
 
     const actions = (

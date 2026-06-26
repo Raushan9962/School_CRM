@@ -4,10 +4,21 @@ const principalController = require('../controllers/principalController');
 const { auth } = require('../middleware/auth'); // Optional if using auth
 
 // GET dashboard statistics
-router.get('/dashboard-stats', principalController.getDashboardStats);
+router.get('/dashboard-stats', auth, principalController.getDashboardStats);
+router.get('/dashboard-alerts', auth, principalController.getDashboardAlerts);
+
+// Tasks & Delegation
+router.get('/tasks', auth, principalController.getTasks);
+router.post('/tasks', auth, principalController.createTask);
+router.put('/tasks/:id/status', auth, principalController.updateTaskStatus);
+
+// Grievances & Complaints
+router.get('/grievances', auth, principalController.getGrievances);
+router.post('/grievances', auth, principalController.createGrievance);
+router.put('/grievances/:id/status', auth, principalController.updateGrievanceStatus);
 
 // GET Daily Attendance QR token
-router.get('/attendance-qr', principalController.getDailyAttendanceQR);
+router.get('/attendance-qr', auth, principalController.getDailyAttendanceQR);
 
 router.get('/classes', auth, principalController.getClasses);
 router.post('/classes', auth, principalController.createClass);

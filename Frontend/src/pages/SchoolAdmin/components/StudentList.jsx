@@ -34,11 +34,19 @@ const StudentList = () => {
         fetchStudents();
     }, [search, filterClass]);
 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredStudents = students;
+
+    if (activeKpi === 'Active') filteredStudents = filteredStudents.filter(s => s.is_active);
+    if (activeKpi === 'Inactive') filteredStudents = filteredStudents.filter(s => !s.is_active);
+    if (activeKpi === 'Transport') filteredStudents = filteredStudents.filter(s => s.transport_required);
+
     const kpiCards = [
-        { label: 'All Students', value: students.length, active: filterClass === '' },
-        { label: 'Active', value: students.filter(s => s.is_active).length, active: false },
-        { label: 'Inactive', value: students.filter(s => !s.is_active).length, active: false },
-        { label: 'Transport Users', value: students.filter(s => s.transport_required).length, active: false }
+        { label: 'All Students', value: students.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active', value: students.filter(s => s.is_active).length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') },
+        { label: 'Inactive', value: students.filter(s => !s.is_active).length, active: activeKpi === 'Inactive', onClick: () => setActiveKpi('Inactive') },
+        { label: 'Transport Users', value: students.filter(s => s.transport_required).length, active: activeKpi === 'Transport', onClick: () => setActiveKpi('Transport') }
     ];
 
     const columns = [
@@ -103,7 +111,7 @@ const StudentList = () => {
     return (
         <PremiumTable 
             columns={columns} 
-            data={students} 
+            data={filteredStudents} 
             kpiCards={kpiCards}
             onSearch={setSearch}
         />

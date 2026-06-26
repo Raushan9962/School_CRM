@@ -6,7 +6,7 @@ const StaffForm = ({ onSave, onCancel, initialRole }) => {
     
     const [formData, setFormData] = useState({
         roleName: initialRole || 'Accountant', // Default
-        name: '', email: '', phone: '', gender: '', dob: '', address: '',
+        name: '', email: '', password: '', phone: '', gender: '', dob: '', address: '',
         employeeId: '', qualification: '', experience: '', joiningDate: '', basicSalary: '',
         employmentType: 'Regular', bankAccount: '', ifscCode: '',
         // Specific fields
@@ -62,6 +62,7 @@ const StaffForm = ({ onSave, onCancel, initialRole }) => {
                     <div className="md:col-span-3 mt-4"><h4 className="font-semibold text-slate-700 mb-2 border-t pt-4">Personal Details</h4></div>
                     <div><label className={labelClass}>Full Name *</label><input required type="text" name="name" value={formData.name} onChange={handleChange} className={inputClass} /></div>
                     <div><label className={labelClass}>Email *</label><input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} /></div>
+                    <div><label className={labelClass}>Password</label><input type="text" name="password" placeholder="Defaults to 123456" value={formData.password} onChange={handleChange} className={inputClass} /></div>
                     <div><label className={labelClass}>Phone *</label><input required type="text" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} /></div>
                     <div>
                         <label className={labelClass}>Gender</label>

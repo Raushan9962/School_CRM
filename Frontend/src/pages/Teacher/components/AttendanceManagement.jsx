@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PlaceholderView from '../../Principal/components/PlaceholderView';
 
 const AttendanceManagement = () => {
     const [activeTab, setActiveTab] = useState('mark');
@@ -117,10 +118,8 @@ const AttendanceManagement = () => {
 
             {/* Placeholder for other tabs */}
             {['daily', 'monthly', 'subject'].includes(activeTab) && (
-                <div style={{ padding: '40px', textAlign: 'center', background: 'white', borderRadius: '16px', border: '1px dashed #cbd5e1', color: '#64748b' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-                    <h3 style={{ margin: '0 0 8px 0', color: '#1e293b' }}>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Attendance View</h3>
-                    <p style={{ margin: 0 }}>Detailed reports and analytics will be displayed here.</p>
+                <div className="mt-4">
+                    <PlaceholderView title={`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Attendance View`} />
                 </div>
             )}
         </div>

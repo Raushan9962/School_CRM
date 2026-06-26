@@ -11,10 +11,14 @@ const TeacherList = () => {
     const fetchTeachers = async () => {
         setLoading(true);
         try {
-            const res = await apiFetch('/users/teachers');
-            const data = await res.json();
-            if (data.success) {
-                setTeachers(data.data);
+            const res = await apiFetch('/users/school-teachers');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    setTeachers(data.data);
+                }
+            } else {
+                console.warn("Failed to fetch teachers, status:", res.status);
             }
         } catch (error) {
             console.error('Error fetching teachers:', error);
@@ -27,17 +31,23 @@ const TeacherList = () => {
         fetchTeachers();
     }, []);
 
-    const filteredTeachers = teachers.filter(t => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredTeachers = teachers.filter(t => 
         t.name?.toLowerCase().includes(search.toLowerCase()) || 
         t.employee_id?.toLowerCase().includes(search.toLowerCase()) ||
         t.subject?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') filteredTeachers = filteredTeachers.filter(t => t.is_active);
+    if (activeKpi === 'Inactive') filteredTeachers = filteredTeachers.filter(t => !t.is_active);
+    if (activeKpi === 'New This Month') filteredTeachers = filteredTeachers.filter(t => t.created_at && new Date(t.created_at) > new Date(Date.now() - 30*24*60*60*1000));
+
     const kpiCards = [
-        { label: 'All Teachers', value: teachers.length, active: search === '' },
-        { label: 'Active', value: teachers.filter(t => t.is_active).length, active: false },
-        { label: 'Inactive', value: teachers.filter(t => !t.is_active).length, active: false },
-        { label: 'New This Month', value: teachers.filter(t => t.created_at && new Date(t.created_at) > new Date(Date.now() - 30*24*60*60*1000)).length, active: false }
+        { label: 'All Teachers', value: teachers.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active', value: teachers.filter(t => t.is_active).length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') },
+        { label: 'Inactive', value: teachers.filter(t => !t.is_active).length, active: activeKpi === 'Inactive', onClick: () => setActiveKpi('Inactive') },
+        { label: 'New This Month', value: teachers.filter(t => t.created_at && new Date(t.created_at) > new Date(Date.now() - 30*24*60*60*1000)).length, active: activeKpi === 'New This Month', onClick: () => setActiveKpi('New This Month') }
     ];
 
     const columns = [
@@ -72,7 +82,12 @@ const TeacherList = () => {
         },
         { 
             label: 'Contact', 
-            render: (row) => <span className="text-slate-600">{row.phone || 'N/A'}</span>
+            render: (row) => (
+                <div className="text-left">
+                    <p className="m-0 text-slate-700 font-medium">{row.phone || 'N/A'}</p>
+                    <p className="m-0 text-[11px] text-slate-500">{row.email || 'N/A'}</p>
+                </div>
+            )
         },
         { 
             label: 'Experience', 

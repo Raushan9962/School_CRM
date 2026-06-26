@@ -52,16 +52,22 @@ const LeaveManagement = ({ roleFilter }) => {
         }
     };
 
-    const filteredLeaves = leaves.filter(l => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredLeaves = leaves.filter(l => 
         l.applicant_name?.toLowerCase().includes(search.toLowerCase()) || 
         l.applicant_role?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Pending') filteredLeaves = filteredLeaves.filter(l => l.status === 'Pending');
+    if (activeKpi === 'Approved') filteredLeaves = filteredLeaves.filter(l => l.status === 'Approved');
+    if (activeKpi === 'Rejected') filteredLeaves = filteredLeaves.filter(l => l.status === 'Rejected');
+
     const kpiCards = [
-        { label: 'Total Requests', value: leaves.length, active: true },
-        { label: 'Pending', value: leaves.filter(l => l.status === 'Pending').length, active: false },
-        { label: 'Approved', value: leaves.filter(l => l.status === 'Approved').length, active: false },
-        { label: 'Rejected', value: leaves.filter(l => l.status === 'Rejected').length, active: false }
+        { label: 'Total Requests', value: leaves.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Pending', value: leaves.filter(l => l.status === 'Pending').length, active: activeKpi === 'Pending', onClick: () => setActiveKpi('Pending') },
+        { label: 'Approved', value: leaves.filter(l => l.status === 'Approved').length, active: activeKpi === 'Approved', onClick: () => setActiveKpi('Approved') },
+        { label: 'Rejected', value: leaves.filter(l => l.status === 'Rejected').length, active: activeKpi === 'Rejected', onClick: () => setActiveKpi('Rejected') }
     ];
 
     const columns = [

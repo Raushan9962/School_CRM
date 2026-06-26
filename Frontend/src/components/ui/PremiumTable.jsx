@@ -17,54 +17,76 @@ const PremiumTable = ({
     const totalPages = Math.ceil(data.length / rowsPerPage);
     const paginatedData = data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
+    const handleExport = () => {
+        if (!data || data.length === 0) {
+            alert("No data available to export");
+            return;
+        }
+
+        // Generate CSV from raw data objects
+        const keys = Object.keys(data[0]);
+        const csvContent = [
+            keys.join(','),
+            ...data.map(row => 
+                keys.map(k => {
+                    let val = row[k];
+                    if (val === null || val === undefined) val = '';
+                    val = String(val).replace(/"/g, '""');
+                    if (val.search(/("|,|\n)/g) >= 0) {
+                        val = `"${val}"`;
+                    }
+                    return val;
+                }).join(',')
+            )
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${title ? title.replace(/\s+/g, '_') : 'Export'}_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="w-full animate-fade-in">
             {/* Title & Top Actions */}
-            {(title || actions) && (
-                <div className="flex items-center justify-between mb-4">
-                    {title && <h2 className="text-xl font-bold text-slate-800">{title}</h2>}
-                    {actions && <div className="flex gap-2">{actions}</div>}
+            {(title || actions || onSearch) && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+                    {title && <h2 className="text-xl font-bold text-slate-800 m-0">{title}</h2>}
+                    
+                    <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        {/* Parent Actions (e.g. Date Picker) */}
+                        {actions && <div className="flex items-center gap-2">{actions}</div>}
+                        
+                        {/* Search Input */}
+                        {onSearch && (
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                    <Search size={14} className="text-slate-400" />
+                                </div>
+                                <input 
+                                    type="text" 
+                                    placeholder="Search..." 
+                                    onChange={(e) => onSearch(e.target.value)}
+                                    className="pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 w-full sm:w-64 transition-all placeholder:text-slate-400 text-slate-700"
+                                />
+                            </div>
+                        )}
+                        
+                        {/* Export Button */}
+                        <button 
+                            onClick={handleExport}
+                            className="flex items-center gap-2 px-4 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-teal-600 hover:bg-teal-50 bg-white transition-colors shadow-sm"
+                        >
+                            <Download size={16} /> Export
+                        </button>
+                    </div>
                 </div>
             )}
 
-            {/* Top Toolbar (Addble Style) */}
-            <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-2 rounded-t-xl border border-slate-200 border-b-0">
-                {/* Filter Dropdown */}
-                <button className="flex items-center justify-between w-full md:w-32 px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 transition-colors">
-                    <span>Filter</span>
-                    <ChevronDown size={14} />
-                </button>
-                
-                {/* Date Picker (Mocked) */}
-                <button className="flex items-center gap-2 w-full md:w-64 px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 transition-colors">
-                    <Calendar size={14} className="text-blue-500" />
-                    <span>06/01/2026 - 06/24/2026</span>
-                </button>
-
-                {/* Default Sort */}
-                <button className="flex items-center justify-between w-full md:w-32 px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 transition-colors">
-                    <span>Default</span>
-                    <ChevronDown size={14} />
-                </button>
-
-                {/* Search Bar */}
-                <div className="flex-1 relative w-full">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <Search size={14} className="text-slate-400" />
-                    </div>
-                    <input 
-                        type="text" 
-                        placeholder="Search..." 
-                        onChange={(e) => onSearch && onSearch(e.target.value)}
-                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all placeholder:text-slate-400 text-slate-700"
-                    />
-                </div>
-
-                {/* Export Button */}
-                <button className="flex items-center justify-center gap-2 w-full md:w-auto px-4 py-1.5 border border-slate-200 rounded text-sm font-medium text-teal-600 hover:bg-teal-50 transition-colors">
-                    Export
-                </button>
-            </div>
 
             {/* KPI Segmented Cards */}
             {kpiCards && kpiCards.length > 0 && (
@@ -92,7 +114,7 @@ const PremiumTable = ({
             )}
 
             {/* The Table */}
-            <div className={`bg-white border border-slate-200 overflow-x-auto ${kpiCards && kpiCards.length > 0 ? '' : 'rounded-b-xl'}`}>
+            <div className={`bg-white border border-slate-200 overflow-x-auto rounded-t-xl ${kpiCards && kpiCards.length > 0 ? '' : 'rounded-b-xl'}`}>
                 <table className="w-full text-left border-collapse min-w-[800px]">
                     <thead className="bg-white border-b border-slate-100">
                         <tr>

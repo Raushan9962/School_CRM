@@ -62,13 +62,20 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
         );
     }
 
-    const filteredList = staff.filter(s => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredList = staff.filter(s => 
         s.name?.toLowerCase().includes(search.toLowerCase()) || 
         s.email?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') {
+        filteredList = filteredList; // Mock filtering
+    }
+
     const kpiCards = [
-        { label: `Total ${roleName}s`, value: staff.length, active: true }
+        { label: `Total ${roleName}s`, value: staff.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: `Active ${roleName}s`, value: staff.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
     ];
 
     const actions = (

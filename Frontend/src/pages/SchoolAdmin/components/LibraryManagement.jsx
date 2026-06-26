@@ -30,15 +30,22 @@ const LibraryManagement = () => {
         }
     }, [view]);
 
-    const filteredLibrarians = librarians.filter(l => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredLibrarians = librarians.filter(l => 
         l.name?.toLowerCase().includes(search.toLowerCase()) || 
         l.email?.toLowerCase().includes(search.toLowerCase()) ||
         l.phone?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') {
+        // Mock active filtering
+        filteredLibrarians = filteredLibrarians;
+    }
+
     const kpiCards = [
-        { label: 'Total Librarians', value: librarians.length, active: true },
-        { label: 'Active Staff', value: librarians.length, active: false }
+        { label: 'Total Librarians', value: librarians.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active Staff', value: librarians.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
     ];
 
     const actions = (

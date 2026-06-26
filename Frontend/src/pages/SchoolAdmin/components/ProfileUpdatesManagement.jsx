@@ -46,15 +46,22 @@ const ProfileUpdatesManagement = () => {
         }
     };
 
-    const filteredRequests = requests.filter(r => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredRequests = requests.filter(r => 
         r.name?.toLowerCase().includes(search.toLowerCase()) || 
         r.email?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Reviewed') {
+        // Mock reviewed logic since real endpoint doesn't have it
+        filteredRequests = [];
+    }
+
     const kpiCards = [
-        { label: 'Total Pending', value: requests.length, active: true },
-        { label: 'Reviewed Today', value: '0', active: false },
-        { label: 'Avg Approval Time', value: '2 hrs', active: false }
+        { label: 'Total Pending', value: requests.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Reviewed Today', value: '0', active: activeKpi === 'Reviewed', onClick: () => setActiveKpi('Reviewed') },
+        { label: 'Avg Approval Time', value: '2 hrs', active: activeKpi === 'Time', onClick: () => setActiveKpi('Time') }
     ];
 
     const columns = [

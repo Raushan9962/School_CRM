@@ -6,7 +6,7 @@ const TeacherForm = ({ onSave, onCancel }) => {
     
     const [formData, setFormData] = useState({
         roleName: 'Teacher',
-        name: '', email: '', phone: '', gender: '', dob: '', address: '',
+        name: '', email: '', password: '', phone: '', gender: '', dob: '', address: '',
         employeeId: '', qualification: '', experience: '', subject: '', classAssigned: '', joiningDate: '', basicSalary: '',
         employmentType: 'Regular', bankAccount: '', ifscCode: ''
     });
@@ -52,6 +52,7 @@ const TeacherForm = ({ onSave, onCancel }) => {
                     </div>
                     <div><label className={labelClass}>Full Name *</label><input required type="text" name="name" value={formData.name} onChange={handleChange} className={inputClass} /></div>
                     <div><label className={labelClass}>Email *</label><input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} /></div>
+                    <div><label className={labelClass}>Password</label><input type="text" name="password" placeholder="Defaults to 123456" value={formData.password} onChange={handleChange} className={inputClass} /></div>
                     <div><label className={labelClass}>Phone *</label><input required type="text" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} /></div>
                     <div>
                         <label className={labelClass}>Gender</label>

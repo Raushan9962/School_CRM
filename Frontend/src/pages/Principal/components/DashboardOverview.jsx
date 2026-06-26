@@ -1,303 +1,327 @@
 import React, { useState, useEffect } from 'react';
+import { ArrowUpRight, Bell, QrCode, X } from 'lucide-react';
 import QRCode from 'react-qr-code';
-import StatCard from '../../../components/layout/StatCard';
+import { 
+    FcReadingEbook, 
+    FcBusinesswoman, 
+    FcOrganization, 
+    FcCalendar, 
+    FcCurrencyExchange, 
+    FcDebt, 
+    FcLibrary, 
+    FcAddDatabase, 
+    FcSms, 
+    FcInvite,
+    FcCalculator,
+    FcCallback,
+    FcAutomotive,
+    FcHome,
+    FcManager
+} from 'react-icons/fc';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 import apiFetch from '../../../services/api';
-import { QrCode, X } from 'lucide-react';
 
-const panelStyle = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '16px',
-  padding: '24px',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
-  border: '1px solid rgba(255,255,255,0.5)',
-  display: 'flex',
-  flexDirection: 'column'
-};
+const DashboardOverview = ({ setActiveTab }) => {
+    const [stats, setStats] = useState({
+        totalStudents: 0,
+        totalTeachers: 0,
+        totalAccountants: 0,
+        totalLibrarians: 0,
+        totalReceptionists: 0,
+        totalTransportStaff: 0,
+        totalWardens: 0,
+        totalHR: 0,
+        todayAttendancePercent: 0,
+        feesCollected: 0,
+        pendingFees: 0,
+        upcomingExams: 0,
+        newAdmissions: 0,
+        notifications: 0,
+        birthdayToday: 0
+    });
+    const [loading, setLoading] = useState(true);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [qrPayload, setQrPayload] = useState(null);
+    const [alerts, setAlerts] = useState({ criticalAlerts: [], pendingLeaves: [] });
 
-const panelTitleStyle = { margin: '0 0 16px', fontSize: '16px', fontWeight: '700', color: '#1e293b' };
-
-const DashboardOverview = () => {
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [qrPayload, setQrPayload] = useState(null);
-  const [data, setData] = useState({
-    stats: { students: 0, teachers: 0, present: 0, absent: 0, feesCollected: 0, pendingFees: 0, passPercentage: '0%', teacherAttendance: '0%' },
-    exams: [],
-    notices: [],
-    topStudents: [],
-    weakStudents: [],
-    monthlyAttendance: [],
-    revenueGraph: [],
-    pendingApprovals: [],
-    loading: true
-  });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await apiFetch('/principal/dashboard-stats', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('API not ready');
-        const json = await res.json();
-        setData({ ...json, loading: false });
-      } catch (err) {
-        // Fallback Mock Data
-        setData({
-          stats: { students: 1240, teachers: 85, present: 1150, absent: 90, feesCollected: 450000, pendingFees: 120000, passPercentage: '98%', teacherAttendance: '95%' },
-          exams: [{ id: 1, title: 'Term 2 Final', date: '2026-12-15' }],
-          notices: [{ id: 1, title: 'Sports Day', date: '2026-11-20' }],
-          topStudents: [{ id: 1, name: 'Aarav Sharma', total_marks: 480 }],
-          weakStudents: [{ id: 3, name: 'Rohan Kumar', failed_subjects: 2 }],
-          monthlyAttendance: [{ month: 'Jan', pct: 92 }, { month: 'Feb', pct: 95 }],
-          revenueGraph: [{ month: 'Jan', amount: 120000 }],
-          pendingApprovals: [{ id: 1, title: 'Leave Request - John' }],
-          loading: false
-        });
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleGenerateQR = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        const res = await apiFetch('/principal/attendance-qr', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setQrPayload(data.qrPayload);
-            setShowQRModal(true);
-        } else {
-            alert('Failed to generate QR code');
+    const handleGenerateQR = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await apiFetch('/principal/attendance-qr', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setQrPayload(data.qrPayload || data.data?.token || 'test-qr-token');
+                setShowQRModal(true);
+            } else {
+                alert('Failed to generate QR code');
+            }
+        } catch (err) {
+            console.error("Error generating QR:", err);
+            alert('Error generating QR code');
         }
-    } catch (err) {
-        console.error("Error generating QR:", err);
-        alert('Error generating QR code');
+    };
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const [statsRes, alertsRes] = await Promise.all([
+                    apiFetch('/principal/dashboard-stats', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    apiFetch('/principal/dashboard-alerts', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const statsData = await statsRes.json();
+                if (statsData.success) {
+                    setStats(statsData.data);
+                }
+
+                if (alertsRes.ok) {
+                    const alertsData = await alertsRes.json();
+                    if (alertsData.success) {
+                        setAlerts(alertsData.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching dashboard stats:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    const statCards = [
+        { title: 'Total Students', value: stats.totalStudents, icon: <FcReadingEbook size={28} />, color: '#3b82f6', bg: '#eff6ff', borderTop: 'border-t-blue-500', tab: 'students' },
+        { title: 'Total Teachers', value: stats.totalTeachers, icon: <FcBusinesswoman size={28} />, color: '#10b981', bg: '#ecfdf5', borderTop: 'border-t-emerald-500', tab: 'teachers' },
+        { title: 'Accountants', value: stats.totalAccountants, icon: <FcCalculator size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'finance' },
+        { title: 'Librarians', value: stats.totalLibrarians, icon: <FcLibrary size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'library' },
+        { title: 'Receptionists', value: stats.totalReceptionists, icon: <FcCallback size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'announcements' },
+        { title: 'Transport Staff', value: stats.totalTransportStaff, icon: <FcAutomotive size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'transport' },
+        { title: 'Hostel Wardens', value: stats.totalWardens, icon: <FcHome size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'overview' },
+        { title: 'HR Managers', value: stats.totalHR, icon: <FcManager size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'overview' },
+        { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <FcCalendar size={28} />, color: '#f59e0b', bg: '#fffbeb', borderTop: 'border-t-amber-500', tab: 'students' },
+        { title: 'Fees Collected', value: `₹${stats.feesCollected.toLocaleString()}`, icon: <FcCurrencyExchange size={28} />, color: '#14b8a6', bg: '#f0fdfa', borderTop: 'border-t-teal-500', tab: 'finance' },
+        { title: 'Pending Fees', value: `₹${stats.pendingFees.toLocaleString()}`, icon: <FcDebt size={28} />, color: '#ef4444', bg: '#fef2f2', borderTop: 'border-t-rose-500', tab: 'finance' },
+        { title: 'Upcoming Exams', value: `${stats.upcomingExams} Days`, icon: <FcLibrary size={28} />, color: '#6366f1', bg: '#eef2ff', borderTop: 'border-t-indigo-500', tab: 'exams' },
+        { title: 'New Admissions', value: stats.newAdmissions, icon: <FcAddDatabase size={28} />, color: '#ec4899', bg: '#fdf2f8', borderTop: 'border-t-pink-500', tab: 'students' },
+        { title: 'Notifications', value: stats.notifications, icon: <FcSms size={28} />, color: '#eab308', bg: '#fefce8', borderTop: 'border-t-yellow-500', tab: 'announcements' },
+        { title: 'Birthday Today', value: stats.birthdayToday, icon: <FcInvite size={28} />, color: '#f43f5e', bg: '#fff1f2', borderTop: 'border-t-rose-500', tab: 'students' },
+    ];
+
+    if (loading) {
+        return <div className="p-8 text-center text-slate-500">Loading Dashboard Stats...</div>;
     }
-  };
 
-  if (data.loading) return <div style={{ padding: '24px', color: '#64748b' }}>Loading comprehensive dashboard data...</div>;
-
-  return (
-    <div className="dashboard-section animate-fade-in p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-800 m-0">Principal Dashboard</h2>
-        <button 
-            onClick={handleGenerateQR}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm cursor-pointer border-none"
-        >
-            <QrCode size={18} />
-            Generate Daily Attendance QR
-        </button>
-      </div>
-
-      {showQRModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col items-center p-8 relative">
-                <button 
-                    onClick={() => setShowQRModal(false)} 
-                    className="absolute top-4 right-4 p-1 hover:bg-slate-200 rounded-full transition-colors cursor-pointer border-none bg-transparent"
-                >
-                    <X size={20} className="text-slate-500" />
-                </button>
-                <h3 className="font-bold text-xl text-slate-800 mb-2 mt-4 text-center">Daily Attendance QR</h3>
-                <p className="text-slate-500 text-sm mb-8 text-center">Display this QR code for students and staff to scan using their mobile apps.</p>
-                
-                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                    {qrPayload && <QRCode value={qrPayload} size={250} level="H" />}
+    return (
+        <div className="animate-fade-in max-w-[1600px] mx-auto pb-10">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">Overview</h2>
+                <div className="flex gap-2">
+                    <button 
+                        onClick={handleGenerateQR}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm cursor-pointer border-none text-sm"
+                    >
+                        <QrCode size={16} />
+                        Generate Daily Attendance QR
+                    </button>
+                    <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Generate Report</button>
                 </div>
-                
-                <p className="text-xs text-slate-400 mt-8">Valid for today only ({new Date().toLocaleDateString()})</p>
+            </div>
+            
+            {showQRModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col items-center p-8 relative">
+                        <button 
+                            onClick={() => setShowQRModal(false)} 
+                            className="absolute top-4 right-4 p-1 hover:bg-slate-200 rounded-full transition-colors cursor-pointer border-none bg-transparent"
+                        >
+                            <X size={20} className="text-slate-500" />
+                        </button>
+                        <h3 className="font-bold text-xl text-slate-800 mb-2 mt-4 text-center">Daily Attendance QR</h3>
+                        <p className="text-slate-500 text-sm mb-8 text-center">Display this QR code for students and staff to scan using their mobile apps.</p>
+                        
+                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                            {qrPayload && <QRCode value={qrPayload} size={250} level="H" />}
+                        </div>
+                        
+                        <p className="text-xs text-slate-400 mt-8">Valid for today only ({new Date().toLocaleDateString()})</p>
+                    </div>
+                </div>
+            )}
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {statCards.map((card, idx) => (
+                    <div 
+                        key={idx} 
+                        onClick={() => setActiveTab(card.tab)}
+                        className={`bg-white rounded-xl border border-slate-200 border-t-2 ${card.borderTop} shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer p-4 flex flex-col justify-between h-[120px]`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <p className="text-[13px] font-semibold text-slate-500">{card.title}</p>
+                            <div className="w-10 h-10 rounded-[10px] flex items-center justify-center border border-white/40 shadow-sm" style={{ backgroundColor: card.bg }}>
+                                {card.icon}
+                            </div>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <h3 className="text-2xl font-bold text-slate-800 tracking-tight">{card.value}</h3>
+                            <div className="flex items-center text-emerald-500 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
+                                <ArrowUpRight size={12} />
+                                <span>2.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Critical Alerts Panel */}
+                <div className="bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5 flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            Critical Alerts
+                        </h3>
+                        <button className="text-[12px] text-blue-600 font-semibold hover:underline bg-transparent border-none cursor-pointer">View All</button>
+                    </div>
+                    <div className="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar max-h-[300px]">
+                        {alerts.criticalAlerts.length === 0 ? (
+                            <div className="text-center text-sm text-slate-500 py-4">No critical alerts today.</div>
+                        ) : (
+                            alerts.criticalAlerts.map((alert) => (
+                                <div key={alert.id} className={`p-3 rounded-lg border ${
+                                    alert.severity === 'high' ? 'bg-rose-50/50 border-rose-100' : 
+                                    alert.severity === 'medium' ? 'bg-amber-50/50 border-amber-100' : 'bg-blue-50/50 border-blue-100'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                                            alert.severity === 'high' ? 'text-rose-600' : 
+                                            alert.severity === 'medium' ? 'text-amber-600' : 'text-blue-600'
+                                        }`}>{alert.type}</span>
+                                        <span className="text-[10px] font-medium text-slate-400">{alert.time}</span>
+                                    </div>
+                                    <p className="text-[13px] font-medium text-slate-800 leading-snug m-0">{alert.message}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Quick Approvals (Pending Leaves) */}
+                <div className="bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5 flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-[15px] font-bold text-slate-800">Quick Approvals</h3>
+                        <span className="text-[11px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{alerts.pendingLeaves.length} Pending</span>
+                    </div>
+                    <div className="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar max-h-[300px]">
+                        {alerts.pendingLeaves.length === 0 ? (
+                            <div className="text-center text-sm text-slate-500 py-4">No pending approvals.</div>
+                        ) : (
+                            alerts.pendingLeaves.map((leave) => (
+                                <div key={leave.id} className="p-3 rounded-lg border border-slate-100 bg-slate-50/50 flex flex-col gap-2">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="text-[13px] font-bold text-slate-800 m-0">{leave.applicant}</p>
+                                            <p className="text-[11px] text-slate-500 m-0">{leave.role} • {leave.type}</p>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button className="p-1 rounded bg-emerald-100 text-emerald-600 hover:bg-emerald-200 cursor-pointer border-none" title="Approve">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            </button>
+                                            <button className="p-1 rounded bg-rose-100 text-rose-600 hover:bg-rose-200 cursor-pointer border-none" title="Reject">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p className="text-[11px] text-slate-600 font-medium m-0 truncate">{leave.duration}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    <button onClick={() => setActiveTab('leave')} className="mt-3 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors border-none cursor-pointer">
+                        View All Requests
+                    </button>
+                </div>
+
+                {/* Revenue Trend Chart */}
+                <div className="bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-[15px] font-bold text-slate-800">Revenue Trend</h3>
+                        <select className="text-sm border border-slate-200 rounded-md px-2 py-1 bg-slate-50 text-slate-600 outline-none">
+                            <option>This Year</option>
+                            <option>Last Year</option>
+                        </select>
+                    </div>
+                    <div className="h-[250px] w-full">
+                        <Bar 
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: '#1e293b',
+                                        padding: 10,
+                                        titleFont: { size: 13 },
+                                        bodyFont: { size: 14, weight: 'bold' },
+                                        callbacks: {
+                                            label: (context) => `₹${context.raw.toLocaleString()}`
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: { grid: { display: false } },
+                                    y: { 
+                                        border: { display: false },
+                                        grid: { color: '#f1f5f9' },
+                                        ticks: {
+                                            callback: (value) => `₹${value / 1000}k`
+                                        }
+                                    }
+                                }
+                            }} 
+                            data={{
+                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                                datasets: [{
+                                    label: 'Revenue',
+                                    data: [45000, 72000, 50000, 95000, 68000, 85000],
+                                    backgroundColor: '#3b82f6',
+                                    borderRadius: 4,
+                                    barPercentage: 0.6
+                                }]
+                            }} 
+                        />
+                    </div>
+                </div>
             </div>
         </div>
-      )}
-      
-      {/* Top Row: 3 Large Stat Cards (Matching User Sample) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px', marginBottom: '24px' }}>
-        <StatCard 
-            title="Student Overview" 
-            metrics={[
-                { label: 'Total Students', value: data.stats.students.toLocaleString() },
-                { label: 'Present Today', value: data.stats.present.toLocaleString() },
-                { label: 'Absent Today', value: data.stats.absent.toLocaleString() },
-                { label: 'Pass Percentage', value: data.stats.passPercentage }
-            ]}
-        />
-        <StatCard 
-            title="Financial Summary" 
-            metrics={[
-                { label: "Today's Collection", value: `₹${data.stats.feesCollected.toLocaleString()}` },
-                { label: 'Pending Fees', value: `₹${data.stats.pendingFees.toLocaleString()}` }
-            ]}
-            bottomComponent={
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <select style={{ padding: '6px 12px', border: 'none', background: 'transparent', color: '#475569', fontSize: '14px', cursor: 'pointer', outline: 'none' }}>
-                        <option>Today</option>
-                        <option>This Week</option>
-                        <option>This Month</option>
-                    </select>
-                </div>
-            }
-        />
-        <StatCard 
-            title="Staff Overview" 
-            extraHeaderIcon={<span className="material-icons">refresh</span>}
-            metrics={[
-                { label: 'Total Teachers', value: data.stats.teachers.toLocaleString() },
-                { label: 'Teacher Attendance', value: data.stats.teacherAttendance }
-            ]}
-            bottomComponent={
-                <div style={{ textAlign: 'right' }}>
-                    <a href="#" style={{ color: '#0ea5e9', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>View All Staff</a>
-                </div>
-            }
-        />
-      </div>
-
-      {/* Middle Grid: 5 Panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '24px', marginBottom: '24px' }}>
-        
-        {/* Top 10 Students */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Top 10 Students 🏆</h3>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.topStudents.length === 0 ? <p className="text-slate-500">No result data available.</p> : (
-              <table className="w-full border-collapse text-left text-sm">
-                <thead>
-                  <tr style={{ color: '#94a3b8', borderBottom: '1px solid #e2e8f0' }}>
-                    <th style={{ padding: '8px 0' }}>Name</th>
-                    <th style={{ padding: '8px 0', textAlign: 'right' }}>Total Marks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.topStudents.map((s, i) => (
-                    <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td style={{ padding: '8px 0', fontWeight: '600', color: '#334155' }}>{i + 1}. {s.name}</td>
-                      <td style={{ padding: '8px 0', textAlign: 'right', color: '#10b981', fontWeight: 'bold' }}>{s.total_marks}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-
-        {/* Weak Students */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Weak Students Alerts ⚠️</h3>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.weakStudents.length === 0 ? <p className="text-slate-500">No failing students found!</p> : (
-              <ul className="list-none p-0 m-0">
-                {data.weakStudents.map((s) => (
-                  <li key={s.id} style={{ padding: '10px', background: '#fef2f2', borderLeft: '4px solid #ef4444', borderRadius: '4px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: '600', color: '#7f1d1d' }}>{s.name}</span>
-                    <span style={{ fontSize: '12px', background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '12px' }}>{s.failed_subjects} Fails</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* Upcoming Exams */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Upcoming Exams 📝</h3>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.exams.length === 0 ? <p className="text-slate-500">No upcoming exams scheduled.</p> : (
-              <ul className="list-none p-0 m-0">
-                {data.exams.map((e) => (
-                  <li key={e.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: '600', color: '#334155' }}>{e.title}</span>
-                    <span style={{ fontSize: '12px', color: '#6366f1', background: '#e0e7ff', padding: '2px 8px', borderRadius: '12px' }}>{new Date(e.date).toLocaleDateString()}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* Recent Notices */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Recent Notices 📢</h3>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.notices.length === 0 ? <p className="text-slate-500">No recent notices.</p> : (
-              <ul className="list-none p-0 m-0">
-                {data.notices.map((n) => (
-                  <li key={n.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ fontWeight: '600', color: '#334155' }}>{n.title}</span>
-                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>{new Date(n.date).toLocaleString()}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* Pending Approvals */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Pending Approvals ⏳</h3>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '250px' }}>
-            {data.pendingApprovals.length === 0 ? <p className="text-slate-500">All caught up!</p> : (
-              <ul className="list-none p-0 m-0">
-                {data.pendingApprovals.map((p) => (
-                  <li key={p.id} style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: '600', color: '#334155', fontSize: '14px' }}>{p.title}</span>
-                    <button style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Review</button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-      </div>
-
-      {/* Bottom Row: 2 Analytics Graphs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', gap: '24px' }}>
-        
-        {/* Monthly Attendance Graph */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Monthly Attendance % 📈</h3>
-          <div style={{ height: '250px', display: 'flex', alignItems: 'flex-end', gap: '16px', padding: '20px 0 0', borderBottom: '2px solid #e2e8f0' }}>
-            {data.monthlyAttendance.map((item, index) => {
-              const heightPct = Math.min(100, Math.max(0, item.pct));
-              return (
-                <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>{heightPct}%</div>
-                  <div style={{ width: '100%', maxWidth: '40px', height: `${heightPct * 2}px`, background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)', borderRadius: '8px 8px 0 0' }}></div>
-                  <div style={{ fontSize: '12px', color: '#475569' }}>{item.month}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Revenue Graph */}
-        <div className="glass-panel" style={panelStyle}>
-          <h3 style={panelTitleStyle}>Fee Revenue (Past 6 Months) 📉</h3>
-          <div style={{ height: '250px', display: 'flex', alignItems: 'flex-end', gap: '16px', padding: '20px 0 0', borderBottom: '2px solid #e2e8f0' }}>
-            {data.revenueGraph.map((item, index) => {
-              // Scale heights based on max revenue (assuming max ~250000 for visuals)
-              const maxRev = Math.max(...data.revenueGraph.map(r => r.amount), 1);
-              const heightPct = (item.amount / maxRev) * 100;
-              return (
-                <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 'bold' }}>{(item.amount/1000).toFixed(0)}k</div>
-                  <div style={{ width: '100%', maxWidth: '40px', height: `${heightPct * 2}px`, background: 'linear-gradient(180deg, #f59e0b 0%, #d97706 100%)', borderRadius: '8px 8px 0 0' }}></div>
-                  <div style={{ fontSize: '12px', color: '#475569' }}>{item.month}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  );
+    );
 };
 
 export default DashboardOverview;

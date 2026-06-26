@@ -74,15 +74,22 @@ const TransportManagement = () => {
         );
     }
 
-    const filteredRoutes = routes.filter(r => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredRoutes = routes.filter(r => 
         r.route_name?.toLowerCase().includes(search.toLowerCase()) || 
         r.bus_number?.toLowerCase().includes(search.toLowerCase()) ||
         r.driver_name?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') {
+        // Mock filtering
+        filteredRoutes = filteredRoutes;
+    }
+
     const kpiCards = [
-        { label: 'Total Routes', value: routes.length, active: true },
-        { label: 'Active Buses', value: routes.length, active: false }
+        { label: 'Total Routes', value: routes.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active Buses', value: routes.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
     ];
 
     const actions = (

@@ -18,86 +18,99 @@ exports.getDailyAttendanceQR = async (req, res) => {
 exports.getDashboardStats = async (req, res) => {
     try {
         const pool = require('../config/db');
-        const schoolId = req.user.schoolId;
+        let schoolId = req.user.schoolId;
+
+        // Fallback for older tokens that might not have schoolId
+        if (!schoolId && req.user.id) {
+            const userRes = await pool.query('SELECT school_id FROM users WHERE id = $1', [req.user.id]);
+            if (userRes.rows.length > 0) {
+                schoolId = userRes.rows[0].school_id;
+            }
+        }
         
-        // 1 & 2. Total Students and Teachers
-        const studentsCount = await pool.query('SELECT COUNT(*) FROM students WHERE school_id = $1', [schoolId]);
-        const teachersCount = await pool.query('SELECT COUNT(*) FROM teachers WHERE school_id = $1', [schoolId]);
+        // 1. Total Students
+        const studentsRes = await pool.query(`SELECT COUNT(*) FROM students WHERE school_id = $1`, [schoolId]);
+        const totalStudents = parseInt(studentsRes.rows[0].count);
+
+        // 2. Total Teachers
+        const teachersRes = await pool.query(`SELECT COUNT(*) FROM teachers WHERE school_id = $1`, [schoolId]);
+        const totalTeachers = parseInt(teachersRes.rows[0].count);
+
+        // 3. Specific Staff Roles
+        const roles = ['Accountant', 'Librarian', 'Receptionist', 'Transport Staff', 'Hostel Warden', 'HR'];
+        const staffRes = await pool.query(`SELECT role_name, COUNT(*) FROM users WHERE role_name = ANY($1) AND school_id = $2 GROUP BY role_name`, [roles, schoolId]);
         
-        // 3 & 4 & 11. Today's Attendance (Present/Absent/Teacher)
-        const attendanceData = await pool.query(`
-            SELECT 
-                COUNT(*) as total, 
-                SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
-                SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent
+        const staffCounts = {
+            totalAccountants: 0,
+            totalLibrarians: 0,
+            totalReceptionists: 0,
+            totalTransportStaff: 0,
+            totalWardens: 0,
+            totalHR: 0
+        };
+
+        staffRes.rows.forEach(row => {
+            if (row.role_name === 'Accountant') staffCounts.totalAccountants = parseInt(row.count);
+            if (row.role_name === 'Librarian') staffCounts.totalLibrarians = parseInt(row.count);
+            if (row.role_name === 'Receptionist') staffCounts.totalReceptionists = parseInt(row.count);
+            if (row.role_name === 'Transport Staff') staffCounts.totalTransportStaff = parseInt(row.count);
+            if (row.role_name === 'Hostel Warden') staffCounts.totalWardens = parseInt(row.count);
+            if (row.role_name === 'HR') staffCounts.totalHR = parseInt(row.count);
+        });
+
+        // 4. Today Attendance (Students Present %)
+        const attendanceRes = await pool.query(`
+            SELECT COUNT(*) 
             FROM attendance a
             JOIN students s ON a.student_id = s.id
-            WHERE s.school_id = $1 AND a.date = CURRENT_DATE
+            WHERE s.school_id = $1 AND a.date = CURRENT_DATE AND a.status = 'Present'
         `, [schoolId]);
-        let presentCount = attendanceData.rows[0].present || 0;
-        let absentCount = attendanceData.rows[0].absent || 0;
-        
-        // Mock teacher attendance for now
-        let teacherAttendancePct = '95%';
+        const presentCount = parseInt(attendanceRes.rows[0].count);
+        let todayAttendancePercent = 0;
+        if (totalStudents > 0) {
+            todayAttendancePercent = Math.round((presentCount / totalStudents) * 100);
+        }
 
-        // 5 & 6. Fees Collection (Today's Collection & Pending)
-        const feesData = await pool.query(`SELECT SUM(amount) as collected FROM fees f JOIN students s ON f.student_id = s.id WHERE s.school_id = $1 AND f.status = 'Paid' AND f.created_at >= CURRENT_DATE`, [schoolId]);
-        const feesCollected = feesData.rows[0].collected || 0;
-        const pendingFeesData = await pool.query(`SELECT SUM(amount) as pending FROM fees f JOIN students s ON f.student_id = s.id WHERE s.school_id = $1 AND f.status = 'Pending'`, [schoolId]);
-        const pendingFees = pendingFeesData.rows[0].pending || 0;
+        // 5. Fees Collected (This month)
+        const feesRes = await pool.query(`
+            SELECT SUM(f.amount) 
+            FROM fees f
+            JOIN students s ON f.student_id = s.id
+            WHERE s.school_id = $1 AND f.status = 'Paid' 
+            AND EXTRACT(MONTH FROM f.paid_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM f.paid_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        `, [schoolId]);
+        const feesCollected = parseInt(feesRes.rows[0].sum) || 0;
 
-        // 7. Upcoming Exams (mock)
-        const exams = await pool.query(`SELECT id, name as title, date FROM exams WHERE school_id = $1 AND date >= CURRENT_DATE ORDER BY date ASC LIMIT 5`, [schoolId]).catch(() => ({rows: []}));
-        
-        // 14. Recent Notices (mock)
-        const notices = await pool.query(`SELECT id, title, created_at as date FROM notices WHERE school_id = $1 ORDER BY created_at DESC LIMIT 5`, [schoolId]).catch(() => ({rows: []}));
+        // 6. Pending Fees
+        const pendingFeesRes = await pool.query(`
+            SELECT SUM(f.amount) 
+            FROM fees f
+            JOIN students s ON f.student_id = s.id
+            WHERE s.school_id = $1 AND f.status != 'Paid'
+        `, [schoolId]);
+        const pendingFees = parseInt(pendingFeesRes.rows[0].sum) || 0;
 
-        // 8. Top 10 Students (mocked since results table may not have school_id yet)
-        const topStudents = { rows: [] };
-
-        // 9. Weak Students (Grades F)
-        const weakStudents = { rows: [] };
-
-        // 10. School Pass Percentage (mocked)
-        let passPct = '85%';
-
-        // 12. Monthly Attendance Graph
-        // Mocking grouping by month for now
-        const monthlyAttendance = [
-            { month: 'Jan', pct: 92 }, { month: 'Feb', pct: 95 }, { month: 'Mar', pct: 88 },
-            { month: 'Apr', pct: 94 }, { month: 'May', pct: 97 }, { month: 'Jun', pct: 96 }
-        ];
-
-        // 13. Revenue Graph
-        const revenueGraph = [
-            { month: 'Jan', amount: 120000 }, { month: 'Feb', amount: 150000 }, { month: 'Mar', amount: 110000 },
-            { month: 'Apr', amount: 200000 }, { month: 'May', amount: 180000 }, { month: 'Jun', amount: 220000 }
-        ];
-
-        // 15. Pending Approvals
-        const pendingApprovals = [
-            { id: 1, title: 'Leave Request - John Doe' },
-            { id: 2, title: 'Fee Discount - Sarah Smith' }
-        ];
+        // Mock data for Phase 1 where tables don't exist yet
+        const upcomingExams = 0; 
+        const newAdmissions = 0; 
+        const notifications = 0;  
+        const birthdayToday = 0;  
 
         res.status(200).json({
-            stats: {
-                students: parseInt(studentsCount.rows[0].count),
-                teachers: parseInt(teachersCount.rows[0].count),
-                present: parseInt(presentCount),
-                absent: parseInt(absentCount),
-                feesCollected: feesCollected,
-                pendingFees: pendingFees,
-                passPercentage: passPct,
-                teacherAttendance: teacherAttendancePct
-            },
-            exams: exams.rows,
-            notices: notices.rows,
-            topStudents: topStudents.rows,
-            weakStudents: weakStudents.rows,
-            monthlyAttendance: monthlyAttendance,
-            revenueGraph: revenueGraph,
-            pendingApprovals: pendingApprovals
+            success: true,
+            data: {
+                totalStudents,
+                totalTeachers,
+                ...staffCounts,
+                todayAttendancePercent,
+                feesCollected,
+                pendingFees,
+                upcomingExams, 
+                newAdmissions,
+                notifications,
+                birthdayToday
+            }
         });
     } catch (error) {
         console.error("Error fetching dashboard stats:", error);
@@ -935,5 +948,150 @@ exports.getStudentResults = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error fetching results' });
+    }
+};
+
+// ==========================================
+// PRINCIPAL SPECIFIC NEW MODULES (PHASE 2)
+// ==========================================
+
+// Dashboard Alerts (Critical Alerts & Quick Approvals)
+exports.getDashboardAlerts = async (req, res) => {
+    try {
+        const pool = require('../config/db');
+        const schoolId = req.user.schoolId;
+
+        // Fetch pending leaves for quick approval
+        const pendingLeaves = await pool.query(`
+            SELECT l.id, 'General' as leave_type, l.start_date, l.end_date, l.reason, u.name as user_name, u.role_name
+            FROM leaves l
+            JOIN users u ON l.user_id = u.id
+            WHERE u.school_id = $1 AND l.status = 'Pending'
+            ORDER BY l.created_at DESC
+            LIMIT 5
+        `, [schoolId]);
+
+        // Mocking some critical alerts for now
+        const criticalAlerts = [
+            { id: 1, type: 'attendance', message: '3 Teachers are absent today without prior notice.', severity: 'high', time: '8:30 AM' },
+            { id: 2, type: 'transport', message: 'Bus Route 4 (City Center) is delayed by 20 mins.', severity: 'medium', time: '7:45 AM' },
+            { id: 3, type: 'discipline', message: 'New bullying complaint reported in Class 9-B.', severity: 'high', time: '9:15 AM' }
+        ];
+
+        res.status(200).json({
+            success: true,
+            data: {
+                criticalAlerts,
+                pendingLeaves: pendingLeaves.rows.map(l => ({
+                    id: l.id,
+                    applicant: l.user_name,
+                    role: l.role_name,
+                    type: l.leave_type,
+                    duration: `${new Date(l.start_date).toLocaleDateString()} to ${new Date(l.end_date).toLocaleDateString()}`,
+                    reason: l.reason
+                }))
+            }
+        });
+    } catch (err) {
+        console.error("Error fetching dashboard alerts:", err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Tasks & Delegation
+let mockTasks = [
+    { id: 'TSK-001', title: 'Submit Monthly Attendance Report', assignedTo: 'Mrs. Sunita Verma', priority: 'High', status: 'Pending', dueDate: '2026-06-30' },
+    { id: 'TSK-002', title: 'Review Science Fair Proposals', assignedTo: 'Dr. Anil Mehra', priority: 'Medium', status: 'In Progress', dueDate: '2026-07-05' },
+    { id: 'TSK-003', title: 'Update Library Catalog', assignedTo: 'Librarian', priority: 'Low', status: 'Completed', dueDate: '2026-06-25' }
+];
+
+exports.getTasks = async (req, res) => {
+    try {
+        res.status(200).json({ success: true, data: mockTasks });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.createTask = async (req, res) => {
+    try {
+        const { title, assignedTo, priority, dueDate } = req.body;
+        const newTask = {
+            id: `TSK-00${mockTasks.length + 1}`,
+            title,
+            assignedTo,
+            priority,
+            status: 'Pending',
+            dueDate
+        };
+        mockTasks.unshift(newTask);
+        res.status(201).json({ success: true, message: 'Task assigned successfully', data: newTask });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.updateTaskStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const taskIndex = mockTasks.findIndex(t => t.id === id);
+        if (taskIndex !== -1) {
+            mockTasks[taskIndex].status = status;
+            res.status(200).json({ success: true, message: 'Task updated', data: mockTasks[taskIndex] });
+        } else {
+            res.status(404).json({ message: 'Task not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Grievances & Complaints
+let mockGrievances = [
+    { id: 'GRV-001', subject: 'Inadequate drinking water in North Wing', raisedBy: 'Parent (Class 10)', category: 'Infrastructure', status: 'Open', date: '2026-06-25' },
+    { id: 'GRV-002', subject: 'Unfair marking in Science term test', raisedBy: 'Student (Class 11)', category: 'Academic', status: 'Investigating', date: '2026-06-24' },
+    { id: 'GRV-003', subject: 'Smartboard not working in Lab 2', raisedBy: 'Dr. Anil Mehra (Teacher)', category: 'IT Support', status: 'Resolved', date: '2026-06-20' }
+];
+
+exports.getGrievances = async (req, res) => {
+    try {
+        res.status(200).json({ success: true, data: mockGrievances });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.createGrievance = async (req, res) => {
+    try {
+        const { subject, raisedBy, category } = req.body;
+        const newGrievance = {
+            id: `GRV-00${mockGrievances.length + 1}`,
+            subject,
+            raisedBy,
+            category,
+            status: 'Open',
+            date: new Date().toISOString().split('T')[0]
+        };
+        mockGrievances.unshift(newGrievance);
+        res.status(201).json({ success: true, message: 'Grievance recorded', data: newGrievance });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+exports.updateGrievanceStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const index = mockGrievances.findIndex(g => g.id === id);
+        if (index !== -1) {
+            mockGrievances[index].status = status;
+            res.status(200).json({ success: true, message: 'Grievance status updated', data: mockGrievances[index] });
+        } else {
+            res.status(404).json({ message: 'Grievance not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
     }
 };

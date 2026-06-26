@@ -22,11 +22,19 @@ const FinanceManagement = () => {
                 apiFetch('/school-admin/expenses')
             ]);
             
-            const feeData = await feeRes.json();
-            const expData = await expRes.json();
-            
-            if (feeData.success) setFees(feeData.data);
-            if (expData.success) setExpenses(expData.data);
+            if (feeRes.ok) {
+                const feeData = await feeRes.json();
+                if (feeData.success) setFees(feeData.data);
+            } else {
+                console.warn("Failed to fetch fees, status:", feeRes.status);
+            }
+
+            if (expRes.ok) {
+                const expData = await expRes.json();
+                if (expData.success) setExpenses(expData.data);
+            } else {
+                console.warn("Failed to fetch expenses, status:", expRes.status);
+            }
         } catch (error) {
             console.error('Error fetching finance data:', error);
         } finally {
@@ -145,7 +153,7 @@ const FinanceManagement = () => {
     const kpiCards = [
         { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, active: tab === 'fees', onClick: () => setTab('fees') },
         { label: 'Total Expenses', value: `₹${totalExpenses.toLocaleString()}`, active: tab === 'expenses', onClick: () => setTab('expenses') },
-        { label: 'Net Balance', value: `₹${netBalance.toLocaleString()}`, active: false }
+        { label: 'Net Balance', value: `₹${netBalance.toLocaleString()}`, active: tab === 'net', onClick: () => setTab('net') }
     ];
 
     const actions = (
@@ -225,8 +233,8 @@ const FinanceManagement = () => {
         <PremiumTable 
             title="Finance Management"
             actions={actions}
-            columns={tab === 'fees' ? feeColumns : expenseColumns} 
-            data={tab === 'fees' ? filteredFees : filteredExpenses} 
+            columns={tab === 'fees' || tab === 'net' ? feeColumns : expenseColumns} 
+            data={tab === 'fees' || tab === 'net' ? filteredFees : filteredExpenses} 
             kpiCards={kpiCards}
             onSearch={setSearch}
             loading={loading}

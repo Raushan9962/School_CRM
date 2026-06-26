@@ -54,20 +54,26 @@ const StaffAttendance = ({ roleFilter }) => {
         }
     };
 
-    const filteredStaff = staffList.filter(s => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredStaff = staffList.filter(s => 
         s.name?.toLowerCase().includes(search.toLowerCase()) || 
         s.role?.toLowerCase().includes(search.toLowerCase())
     );
+
+    if (activeKpi === 'Present') filteredStaff = filteredStaff.filter(s => s.status === 'Present');
+    if (activeKpi === 'Absent') filteredStaff = filteredStaff.filter(s => s.status === 'Absent');
+    if (activeKpi === 'Half Day') filteredStaff = filteredStaff.filter(s => s.status === 'Half Day');
 
     const presentCount = staffList.filter(s => s.status === 'Present').length;
     const absentCount = staffList.filter(s => s.status === 'Absent').length;
     const hdCount = staffList.filter(s => s.status === 'Half Day').length;
 
     const kpiCards = [
-        { label: 'Total Staff', value: staffList.length, active: true },
-        { label: 'Present', value: presentCount, active: false },
-        { label: 'Absent', value: absentCount, active: false },
-        { label: 'Half Day', value: hdCount, active: false }
+        { label: 'Total Staff', value: staffList.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Present', value: presentCount, active: activeKpi === 'Present', onClick: () => setActiveKpi('Present') },
+        { label: 'Absent', value: absentCount, active: activeKpi === 'Absent', onClick: () => setActiveKpi('Absent') },
+        { label: 'Half Day', value: hdCount, active: activeKpi === 'Half Day', onClick: () => setActiveKpi('Half Day') }
     ];
 
     const actions = (

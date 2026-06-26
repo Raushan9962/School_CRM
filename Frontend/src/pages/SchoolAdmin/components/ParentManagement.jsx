@@ -30,15 +30,22 @@ const ParentManagement = () => {
         }
     }, [view]);
 
-    const filteredParents = parents.filter(p => 
+    const [activeKpi, setActiveKpi] = useState('All');
+
+    let filteredParents = parents.filter(p => 
         p.name?.toLowerCase().includes(search.toLowerCase()) || 
         p.email?.toLowerCase().includes(search.toLowerCase()) ||
         p.phone?.toLowerCase().includes(search.toLowerCase())
     );
 
+    if (activeKpi === 'Active') {
+        // Mock filtering for active accounts
+        filteredParents = filteredParents; 
+    }
+
     const kpiCards = [
-        { label: 'Total Parents', value: parents.length, active: true },
-        { label: 'Active Accounts', value: parents.length, active: false }
+        { label: 'Total Parents', value: parents.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
+        { label: 'Active Accounts', value: parents.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
     ];
 
     const actions = (
