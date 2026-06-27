@@ -26,7 +26,7 @@ const TransportOverview = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
                 {stats.map((stat, idx) => (
                     <div key={idx} style={{ 
@@ -49,8 +49,8 @@ const TransportOverview = () => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Recent Transport Requests</h3>
                     <ul className="list-none p-0 m-0">
                         <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -70,7 +70,7 @@ const TransportOverview = () => {
                     </ul>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Maintenance Alerts</h3>
                     <ul className="list-none p-0 m-0">
                         <li style={{ padding: '12px 0', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '12px', alignItems: 'center' }}>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { Plus, Search, CheckCircle2, XCircle, ArrowLeftRight } from 'lucide-react';
 
 const RefundManagement = () => {
-    const [activeTab, setActiveTab] = useState('requests');
+    const [view, setView] = useState('requests'); // 'requests' or 'initiate'
 
     const refunds = [
         { id: 'REF-2001', origTxn: 'TXN-98101', student: 'Aarav Patel', amount: '₹ 5,000', reason: 'Excess fee paid by mistake', status: 'Pending' },
@@ -9,143 +10,159 @@ const RefundManagement = () => {
         { id: 'REF-2003', origTxn: 'TXN-97999', student: 'Diya Sharma', amount: '₹ 2,000', reason: 'Double payment online', status: 'Processed' }
     ];
 
-    return (
-        <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Refund Management</h2>
-                {activeTab === 'requests' && (
-                    <button onClick={() => setActiveTab('initiate')} style={{ padding: '10px 20px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(14,165,233,0.2)' }}>
-                        ➕ Initiate Refund
-                    </button>
-                )}
-            </div>
-
-            <div className="flex gap-4 border-b border-slate-200 pb-4">
-                {['requests', 'initiate'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        style={{
-                            padding: '8px 16px',
-                            background: activeTab === tab ? '#0ea5e9' : 'white',
-                            color: activeTab === tab ? 'white' : '#64748b',
-                            border: activeTab === tab ? 'none' : '1px solid #cbd5e1',
-                            borderRadius: '20px',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            textTransform: 'capitalize'
-                        }}
-                    >
-                        {tab === 'requests' ? 'Refund Requests' : 'Initiate Refund'}
-                    </button>
-                ))}
-            </div>
-
-            {activeTab === 'requests' && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
-                        <input type="text" placeholder="Search Refund ID or TXN ID..." style={{ flex: 1, padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
-                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
-                            <option value="">All Statuses</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Processed">Processed</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
+    if (view === 'initiate') {
+        return (
+            <div className="animate-fade-in bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6 max-w-3xl">
+                <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800 m-0">Initiate Refund</h2>
+                        <p className="text-xs text-slate-500 mt-1">Start a new refund process for a student</p>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-left">
-                            <thead className="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Refund ID & Orig TXN</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Student</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Refund Amount</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Reason</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {refunds.map((r, idx) => (
-                                    <tr key={idx} className="border-b border-slate-200">
-                                        <td className="px-6 py-4">
-                                            <p className="m-0 mb-1 text-sm font-semibold text-slate-800">{r.id}</p>
-                                            <span className="text-xs text-slate-500">Orig: {r.origTxn}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-slate-700">{r.student}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1e293b', fontWeight: '600' }}>{r.amount}</td>
-                                        <td className="px-6 py-4 text-sm text-slate-600">{r.reason}</td>
-                                        <td className="px-6 py-4">
-                                            <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', 
-                                                background: r.status === 'Processed' ? '#dcfce7' : r.status === 'Pending' ? '#fef3c7' : '#e0e7ff', 
-                                                color: r.status === 'Processed' ? '#166534' : r.status === 'Pending' ? '#d97706' : '#4f46e5' }}>
-                                                {r.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 flex gap-2">
-                                            {r.status === 'Pending' && (
-                                                <>
-                                                    <button style={{ padding: '6px 12px', background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Approve</button>
-                                                    <button style={{ padding: '6px 12px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Reject</button>
-                                                </>
-                                            )}
-                                            {r.status === 'Approved' && (
-                                                <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#0ea5e9', border: '1px solid #bae6fd', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Process Payout</button>
-                                            )}
-                                            {r.status === 'Processed' && (
-                                                <button style={{ padding: '6px 12px', background: 'white', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Receipt</button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <button onClick={() => setView('requests')} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200 transition-colors">Back</button>
                 </div>
-            )}
 
-            {activeTab === 'initiate' && (
-                <div style={{ background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', maxWidth: '800px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
+                <form onSubmit={(e) => { e.preventDefault(); setView('requests'); }} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block mb-2 text-sm font-medium text-slate-700">Original Transaction ID</label>
-                            <div className="flex gap-3">
-                                <input type="text" placeholder="e.g. TXN-98234" style={{ flex: 1, padding: '12px 16px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }} />
-                                <button style={{ padding: '12px 24px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Verify TXN</button>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-slate-700">Refund Amount (₹)</label>
-                                <input type="number" placeholder="Enter amount to refund" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
-                            </div>
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-slate-700">Refund Method</label>
-                                <select className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
-                                    <option>Bank Transfer (NEFT/IMPS)</option>
-                                    <option>Original Payment Method</option>
-                                    <option>Cash</option>
-                                    <option>Cheque</option>
-                                </select>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Search Original Transaction ID *</label>
+                            <div className="flex gap-2">
+                                <input type="text" required placeholder="e.g. TXN-12345" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
+                                <button type="button" className="px-3 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200">Verify</button>
                             </div>
                         </div>
                         <div>
-                            <label className="block mb-2 text-sm font-medium text-slate-700">Reason for Refund</label>
-                            <textarea rows="3" placeholder="Provide justification..." className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none resize-y"></textarea>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Refund Amount (₹) *</label>
+                            <input type="number" required placeholder="0" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
                         </div>
-                        <div>
-                            <label className="block mb-2 text-sm font-medium text-slate-700">Bank Account Details (If transferring to Bank)</label>
-                            <input type="text" placeholder="A/C No, IFSC, Account Holder Name" className="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
-                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Reason for Refund *</label>
+                        <textarea required rows="2" placeholder="Explain why this refund is being initiated..." className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
                     </div>
                     
-                    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-slate-200">
-                        <button onClick={() => setActiveTab('requests')} className="px-6 py-3 bg-white border border-slate-300 rounded-lg text-slate-600 font-semibold cursor-pointer">Cancel</button>
-                        <button style={{ padding: '12px 24px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Initiate Refund</button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Refund Method *</label>
+                            <select required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
+                                <option value="original">Original Payment Method</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="wallet">Adjust in Next Fee</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Bank Account / Details (if applicable)</label>
+                            <input type="text" placeholder="Account No. / UPI ID" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
+                        </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 mt-4">
+                        <button type="button" onClick={() => setView('requests')} className="px-4 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200">Cancel</button>
+                        <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700 flex items-center gap-1">
+                            <CheckCircle2 size={14} /> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+
+    return (
+        <div className="animate-fade-in space-y-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                <div>
+                    <h1 className="text-xl font-bold text-slate-800 m-0">Refund Management</h1>
+                    <p className="text-slate-500 text-xs mt-1">Manage and process student fee refunds</p>
+                </div>
+                <button 
+                    onClick={() => setView('initiate')}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded text-sm font-bold hover:bg-blue-700 shadow-sm"
+                >
+                    <Plus size={16} /> Initiate Refund
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-white border border-slate-200 rounded p-3">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Total Processed (MTD)</p>
+                    <p className="text-base font-bold text-emerald-600 m-0">₹ 24,000</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded p-3">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Pending Approval</p>
+                    <p className="text-base font-bold text-amber-600 m-0">1</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded p-3">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Pending Processing</p>
+                    <p className="text-base font-bold text-blue-600 m-0">1</p>
+                </div>
+            </div>
+
+            <div className="bg-white rounded shadow-sm border border-slate-200">
+                <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1.5 m-0">
+                        <ArrowLeftRight size={16} className="text-blue-600" /> Refund Requests
+                    </h3>
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <input 
+                            type="text" 
+                            placeholder="Search ID..." 
+                            className="w-48 pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500"
+                        />
                     </div>
                 </div>
-            )}
+                
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold">Refund ID & Orig TXN</th>
+                                <th className="px-4 py-2 font-bold">Student</th>
+                                <th className="px-4 py-2 font-bold">Refund Amount</th>
+                                <th className="px-4 py-2 font-bold">Reason</th>
+                                <th className="px-4 py-2 font-bold">Status</th>
+                                <th className="px-4 py-2 font-bold text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-xs">
+                            {refunds.map((r, idx) => (
+                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-4 py-2.5">
+                                        <div className="font-bold text-slate-800">{r.id}</div>
+                                        <div className="text-[10px] text-slate-500">Orig: {r.origTxn}</div>
+                                    </td>
+                                    <td className="px-4 py-2.5 text-slate-700">{r.student}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{r.amount}</td>
+                                    <td className="px-4 py-2.5 text-slate-600">{r.reason}</td>
+                                    <td className="px-4 py-2.5">
+                                        <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded ${
+                                            r.status === 'Processed' ? 'bg-emerald-50 text-emerald-700' : 
+                                            r.status === 'Pending' ? 'bg-amber-50 text-amber-700' : 
+                                            'bg-blue-50 text-blue-700'
+                                        }`}>
+                                            {r.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-2.5 text-right flex justify-end gap-1.5">
+                                        {r.status === 'Pending' && (
+                                            <>
+                                                <button className="px-2 py-1 bg-emerald-50 text-emerald-700 font-bold rounded hover:bg-emerald-100 border border-emerald-100">Approve</button>
+                                                <button className="px-2 py-1 bg-red-50 text-red-600 font-bold rounded hover:bg-red-100 border border-red-100">Reject</button>
+                                            </>
+                                        )}
+                                        {r.status === 'Approved' && (
+                                            <button className="px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded hover:bg-blue-100 border border-blue-100">Process</button>
+                                        )}
+                                        {r.status === 'Processed' && (
+                                            <button className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200">Receipt</button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };

@@ -156,13 +156,13 @@ const SchoolRegister = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col items-center py-8 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl border-t-4 border-indigo-600 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl border-t-4 border-indigo-600 overflow-hidden">
 
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="px-8 pt-8 pb-6 border-b border-gray-100">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h2 className="text-2xl font-extrabold text-gray-800">{isSuperAdmin ? 'Register New School' : 'Register New User'}</h2>
+              <h2 className="text-xl font-extrabold text-gray-800">{isSuperAdmin ? 'Register New School' : 'Register New User'}</h2>
               <p className="text-sm text-gray-500 mt-0.5">{isSuperAdmin ? 'Fill in all details to register a school and its admin account' : 'Create a new user account for your school'}</p>
             </div>
             <button
@@ -178,7 +178,7 @@ const SchoolRegister = () => {
 
         {/* ── Alert Message ────────────────────────────────────────────── */}
         {message && (
-          <div className={`mx-8 mt-6 p-4 rounded-xl text-center font-semibold text-sm ${
+          <div className={`mx-8 mt-4 p-4 rounded-xl text-center font-semibold text-sm ${
             messageType === 'success'
               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
               : 'bg-red-50 text-red-700 border border-red-200'
@@ -193,7 +193,7 @@ const SchoolRegister = () => {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">1</span>
-              <h3 className="text-lg font-bold text-gray-800">{isSuperAdmin ? 'Admin User Details' : 'User Details'}</h3>
+              <h3 className="text-sm font-bold text-gray-800">{isSuperAdmin ? 'Admin User Details' : 'User Details'}</h3>
             </div>
             
             {!isSuperAdmin && (
@@ -249,7 +249,7 @@ const SchoolRegister = () => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">2</span>
-                <h3 className="text-lg font-bold text-gray-800">School Information</h3>
+                <h3 className="text-sm font-bold text-gray-800">School Information</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -298,10 +298,10 @@ const SchoolRegister = () => {
 
           {/* ── Section 3: Subscription Plan ──────────────────────────── */}
           {isSuperAdmin && (
-            <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+            <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
               <div className="flex items-center gap-3 mb-5">
                 <span className="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">3</span>
-                <h3 className="text-lg font-bold text-indigo-800">Choose Subscription Plan</h3>
+                <h3 className="text-sm font-bold text-indigo-800">Choose Subscription Plan</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -337,12 +337,12 @@ const SchoolRegister = () => {
 
               {/* Price Preview */}
               {selectedPlan !== '' && (
-                <div className="mt-5 flex items-center justify-between bg-white rounded-xl px-6 py-4 shadow-sm border border-indigo-100">
+                <div className="mt-5 flex items-center justify-between bg-white rounded-xl px-4 py-2 shadow-sm border border-indigo-100">
                   <div>
                     <p className="text-xs text-gray-500 font-medium">Estimated Pricing</p>
                     <p className="text-3xl font-extrabold text-indigo-600 mt-0.5">
                       ₹{price.toLocaleString('en-IN')}
-                      <span className="text-base text-gray-400 font-normal ml-1">/{billingCycle === 'Monthly' ? 'month' : 'year'}</span>
+                      <span className="text-sm text-gray-400 font-normal ml-1">/{billingCycle === 'Monthly' ? 'month' : 'year'}</span>
                     </p>
                   </div>
                   <div className="text-right">

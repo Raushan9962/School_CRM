@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { BarChart3, FileText, Download, Printer, Table, PieChart } from 'lucide-react';
 
 const FinancialReports = () => {
     const [reportType, setReportType] = useState('daily_collection');
+    const [dateRange, setDateRange] = useState({
+        from: new Date().toISOString().split('T')[0],
+        to: new Date().toISOString().split('T')[0]
+    });
 
     const reportOptions = [
         { id: 'daily_collection', label: 'Daily Collection Report' },
@@ -10,49 +15,85 @@ const FinancialReports = () => {
         { id: 'expense_report', label: 'Expense Report' },
         { id: 'profit_loss', label: 'Profit & Loss Report' },
         { id: 'salary_report', label: 'Salary Report' },
-        { id: 'transport_fee', label: 'Transport Fee Report' }
+        { id: 'transport_fee', label: 'Transport Fee Report' },
+        { id: 'general_ledger', label: 'General Ledger' }
     ];
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="animate-fade-in space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Financial Reports & Analytics</h2>
+                <div>
+                    <h1 className="text-xl font-bold text-slate-800 m-0">Financial Reports & Analytics</h1>
+                    <p className="text-slate-500 text-xs mt-1">Generate and export detailed financial statements</p>
+                </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <select 
-                    value={reportType}
-                    onChange={(e) => setReportType(e.target.value)}
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', minWidth: '250px' }}
-                >
-                    {reportOptions.map(opt => (
-                        <option key={opt.id} value={opt.id}>{opt.label}</option>
-                    ))}
-                </select>
-                <input type="date" style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
-                <span style={{ alignSelf: 'center', color: '#64748b' }}>to</span>
-                <input type="date" style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
-                <button style={{ padding: '10px 24px', background: '#0ea5e9', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Generate Report</button>
-            </div>
-
-            <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ textAlign: 'center', color: '#64748b' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-                        📊
+            <div className="bg-white p-4 rounded shadow-sm border border-slate-200">
+                <div className="flex flex-col md:flex-row items-end gap-3">
+                    <div className="flex-1 w-full md:w-auto">
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Report Type</label>
+                        <select 
+                            value={reportType}
+                            onChange={(e) => setReportType(e.target.value)}
+                            className="w-full px-3 py-1.5 rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-xs text-slate-700"
+                        >
+                            {reportOptions.map(opt => (
+                                <option key={opt.id} value={opt.id}>{opt.label}</option>
+                            ))}
+                        </select>
                     </div>
-                    <h3 style={{ margin: '0 0 8px 0', color: '#1e293b' }}>
+                    
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">From Date</label>
+                            <input 
+                                type="date" 
+                                value={dateRange.from}
+                                onChange={e => setDateRange({...dateRange, from: e.target.value})}
+                                className="w-full px-3 py-1.5 rounded border border-slate-300 outline-none focus:ring-1 focus:ring-blue-500 text-xs" 
+                            />
+                        </div>
+                        <div className="mt-4"><span className="text-slate-400 font-medium text-xs">to</span></div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">To Date</label>
+                            <input 
+                                type="date" 
+                                value={dateRange.to}
+                                onChange={e => setDateRange({...dateRange, to: e.target.value})}
+                                className="w-full px-3 py-1.5 rounded border border-slate-300 outline-none focus:ring-1 focus:ring-blue-500 text-xs" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-xs font-bold hover:bg-blue-700 shadow-sm whitespace-nowrap w-full md:w-auto mt-2 md:mt-0">
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-white rounded shadow-sm border border-slate-200 min-h-[300px] flex flex-col items-center justify-center p-6">
+                <div className="text-center max-w-sm">
+                    <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-blue-100">
+                        <BarChart3 size={24} />
+                    </div>
+                    
+                    <h3 className="text-sm font-bold text-slate-800 mb-2 m-0">
                         {reportOptions.find(o => o.id === reportType)?.label}
                     </h3>
-                    <p style={{ margin: '0 0 24px 0' }}>Data visualization and detailed tabular report will be displayed here.</p>
-                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                        <button style={{ padding: '10px 20px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            📄 Download PDF
+                    
+                    <p className="text-slate-500 text-xs mb-6 leading-relaxed">
+                        Select date ranges and click "Generate Report" to view data visualization and detailed tabular records here.
+                    </p>
+                    
+                    <div className="flex flex-wrap justify-center gap-2">
+                        <button className="px-3 py-1.5 bg-white text-slate-700 border border-slate-200 rounded font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs shadow-sm">
+                            <FileText size={14} className="text-red-500" /> PDF
                         </button>
-                        <button style={{ padding: '10px 20px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            📊 Export to Excel
+                        <button className="px-3 py-1.5 bg-white text-slate-700 border border-slate-200 rounded font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs shadow-sm">
+                            <Table size={14} className="text-emerald-500" /> Excel
                         </button>
-                        <button style={{ padding: '10px 20px', background: '#eff6ff', color: '#3b82f6', border: '1px solid #bfdbfe', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            🖨️ Print Report
+                        <button className="px-3 py-1.5 bg-white text-slate-700 border border-slate-200 rounded font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs shadow-sm">
+                            <Printer size={14} className="text-slate-500" /> Print
                         </button>
                     </div>
                 </div>

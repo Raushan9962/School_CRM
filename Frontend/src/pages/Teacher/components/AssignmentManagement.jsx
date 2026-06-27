@@ -1,168 +1,230 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
+import { BookOpen, Plus, X, CheckCircle, AlertTriangle, Clock, Users, ClipboardList } from 'lucide-react';
 
 const AssignmentManagement = () => {
-    const [activeTab, setActiveTab] = useState('list');
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [assignments, setAssignments] = useState([]);
+    const [classes, setClasses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [msg, setMsg] = useState('');
+    const [form, setForm] = useState({ title: '', description: '', class_id: '', subject_id: '', due_date: '', max_marks: '10' });
 
-    const assignments = [
-        { id: 'ASN-001', title: 'Newton\'s Laws of Motion', class: 'Class 10 - A', dueDate: '25-Oct-2026', total: 45, submitted: 40, pending: 5, status: 'Active' },
-        { id: 'ASN-002', title: 'Chemical Reactions', class: 'Class 9 - B', dueDate: '20-Oct-2026', total: 40, submitted: 40, pending: 0, status: 'Closed' }
-    ];
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const fetchAll = async () => {
+        try {
+            const [asnRes, clsRes] = await Promise.all([
+                apiFetch('/teacher-portal/assignments', { headers }).then(r => r.json()),
+                apiFetch('/teacher-portal/my-classes', { headers }).then(r => r.json())
+            ]);
+            if (asnRes.success) setAssignments(asnRes.data);
+            if (clsRes.success) setClasses(clsRes.data);
+        } catch (e) { console.error(e); } finally { setLoading(false); }
+    };
+
+    useEffect(() => { fetchAll(); }, []);
+
+    const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const createAssignment = async () => {
+        if (!form.title || !form.class_id || !form.due_date) {
+            setMsg('error:Title, Class, and Due Date are required.');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            const res = await apiFetch('/teacher-portal/assignments', {
+                method: 'POST',
+                headers: { ...headers, 'Content-Type': 'application/json' },
+                body: JSON.stringify(form)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setMsg('success:Assignment created successfully!');
+                setIsModalOpen(false);
+                setForm({ title: '', description: '', class_id: '', subject_id: '', due_date: '', max_marks: '10' });
+                fetchAll();
+            } else {
+                setMsg('error:' + (data.message || 'Failed to create.'));
+            }
+        } catch (e) {
+            setMsg('error:Network error.');
+        } finally {
+            setSubmitting(false);
+            setTimeout(() => setMsg(''), 4000);
+        }
+    };
+
+    const isError = msg.startsWith('error:');
+    const msgText = msg.replace(/^(error|success):/, '');
+
+    const totalAssignments = assignments.length;
+    const activeAssignments = assignments.filter(a => (a.status || 'Active') === 'Active').length;
+    const overdue = assignments.filter(a => a.due_date && new Date(a.due_date) < new Date() && (a.status || 'Active') === 'Active').length;
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Assignment Management</h2>
-                <button onClick={() => setIsCreateModalOpen(true)} className="px-5 py-2.5 bg-blue-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center gap-2 shadow-md shadow-blue-500/20 hover:bg-blue-600 transition">
-                    ➕ Create Assignment
+        <div className="flex flex-col gap-5">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 className="m-0 text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <BookOpen size={22} className="text-indigo-600" /> Assignments & Homework
+                </h2>
+                <button 
+                    onClick={() => setIsModalOpen(true)} 
+                    className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm shadow-sm transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                    <Plus size={18} strokeWidth={2.5} /> Create Assignment
                 </button>
             </div>
 
-            {/* Statistics */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>📋</div>
-                    <div>
-                        <p className="m-0 mb-1 text-[13px] text-slate-500">Total Assignments</p>
-                        <h3 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>12</h3>
-                    </div>
+            {/* Status Message */}
+            {msg && (
+                <div className={`p-3 rounded-xl flex items-center gap-2 font-semibold text-sm border ${
+                    isError ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}>
+                    {isError ? <AlertTriangle size={16} /> : <CheckCircle size={16} />} {msgText}
                 </div>
-                <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>⏳</div>
-                    <div>
-                        <p className="m-0 mb-1 text-[13px] text-slate-500">Pending Reviews</p>
-                        <h3 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>28</h3>
-                    </div>
-                </div>
-            </div>
+            )}
 
-            {/* Assignments List */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
-                    {['list', 'review'].map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            style={{
-                                padding: '8px 16px',
-                                background: activeTab === tab ? '#eff6ff' : 'transparent',
-                                color: activeTab === tab ? '#3b82f6' : '#64748b',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: '600',
-                                fontSize: '14px',
-                                cursor: 'pointer',
-                                textTransform: 'capitalize'
-                            }}
-                        >
-                            {tab === 'list' ? 'All Assignments' : 'Review Submissions'}
-                        </button>
-                    ))}
-                </div>
-
-                {activeTab === 'list' && (
-                    <table className="w-full border-collapse text-left">
-                        <thead className="bg-slate-50 border-b border-slate-200">
-                            <tr>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Assignment Details</th>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Class</th>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Due Date</th>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Stats (Sub/Pen)</th>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
-                                <th className="px-6 py-4 text-sm font-semibold text-slate-600">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {assignments.map((asn, idx) => (
-                                <tr key={idx} className="border-b border-slate-200">
-                                    <td className="px-6 py-4">
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '500', color: '#1e293b' }}>{asn.title}</p>
-                                        <span className="text-xs text-slate-500">{asn.id}</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-slate-600">{asn.class}</td>
-                                    <td className="px-6 py-4 text-sm text-slate-600">{asn.dueDate}</td>
-                                    <td className="px-6 py-4">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                                            <span style={{ color: '#10b981', fontWeight: '600' }}>{asn.submitted}</span> /
-                                            <span style={{ color: '#ef4444', fontWeight: '600' }}>{asn.pending}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: asn.status === 'Active' ? '#dcfce7' : '#f1f5f9', color: asn.status === 'Active' ? '#166534' : '#64748b' }}>
-                                            {asn.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <button className="px-3 py-1.5 bg-blue-50 text-blue-500 border-none rounded-md text-[13px] font-medium cursor-pointer hover:bg-blue-100 transition-colors">View Details</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-
-                {activeTab === 'review' && (
-                    <div className="p-6">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', marginBottom: '16px' }}>
-                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>I</div>
-                                <div>
-                                    <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#1e293b' }}>Ishaan Singh (Roll No: 4)</h4>
-                                    <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>Submitted "Newton's Laws of Motion" • 2 hours ago</p>
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                <button style={{ padding: '6px 12px', border: '1px solid #cbd5e1', background: 'white', borderRadius: '6px', color: '#475569', fontSize: '13px', cursor: 'pointer' }}>View File</button>
-                                <input type="number" placeholder="Marks/10" style={{ width: '80px', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }} />
-                                <button style={{ padding: '6px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>Save</button>
-                            </div>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                    { label: 'Total Assignments', value: totalAssignments, color: 'text-blue-600', bg: 'bg-blue-50', icon: <ClipboardList size={28} className="text-blue-600" /> },
+                    { label: 'Active', value: activeAssignments, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: <CheckCircle size={28} className="text-emerald-600" /> },
+                    { label: 'Overdue', value: overdue, color: 'text-red-600', bg: 'bg-red-50', icon: <AlertTriangle size={28} className="text-red-600" /> },
+                ].map((c, i) => (
+                    <div key={i} className="bg-white rounded-xl p-5 flex items-center gap-4 border border-slate-200 shadow-sm">
+                        <div className={`${c.bg} p-2.5 rounded-xl flex items-center justify-center`}>
+                            {c.icon}
+                        </div>
+                        <div>
+                            <p className="m-0 mb-1 text-xl font-extrabold text-slate-900">{c.value}</p>
+                            <p className="m-0 text-[13px] font-bold text-slate-500">{c.label}</p>
                         </div>
                     </div>
+                ))}
+            </div>
+
+            {/* Assignment Table */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center">
+                    <h3 className="m-0 text-sm font-bold text-slate-900">All Assignments</h3>
+                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">{assignments.length} total</span>
+                </div>
+                {loading ? (
+                    <div className="p-10 text-center text-slate-400 font-medium">Loading...</div>
+                ) : assignments.length === 0 ? (
+                    <div className="p-16 text-center flex flex-col items-center">
+                        <BookOpen size={48} strokeWidth={1.5} className="text-slate-200 mb-4" />
+                        <h3 className="text-slate-600 font-bold m-0 mb-1 text-sm">No assignments yet</h3>
+                        <p className="text-slate-400 m-0 text-sm">Create your first assignment!</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse whitespace-nowrap min-w-[800px]">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    {['Assignment', 'Class', 'Due Date', 'Submissions', 'Status'].map(h => (
+                                        <th key={h} className="px-5 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {assignments.map((a, i) => {
+                                    const isPastDue = a.due_date && new Date(a.due_date) < new Date();
+                                    const status = isPastDue ? 'Closed' : (a.status || 'Active');
+                                    const statusClasses = status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200';
+                                    const submitted = parseInt(a.submitted_count) || 0;
+                                    const total = parseInt(a.total_students) || 0;
+                                    const pending = Math.max(0, total - submitted);
+                                    
+                                    return (
+                                        <tr key={a.id || i} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="px-5 py-4">
+                                                <p className="m-0 mb-1 font-bold text-[14px] text-slate-800">{a.title}</p>
+                                                <p className="m-0 text-xs text-slate-500 font-medium">{a.subject_name || 'General'} • {a.max_marks} marks</p>
+                                            </td>
+                                            <td className="px-5 py-4 text-[13px] font-bold text-slate-600">
+                                                {a.class_name ? `Class ${a.class_name} ${a.section || ''}` : '—'}
+                                            </td>
+                                            <td className={`px-5 py-4 text-[13px] ${isPastDue ? 'text-red-600 font-bold' : 'text-slate-600 font-medium'}`}>
+                                                <div className="flex items-center gap-1.5">
+                                                    {isPastDue && <Clock size={14} />}
+                                                    {a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN') : '—'}
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                {total > 0 ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[14px] font-bold text-emerald-500">{submitted}</span>
+                                                        <span className="text-slate-300">/</span>
+                                                        <span className="text-[13px] font-semibold text-slate-500">{total}</span>
+                                                        {pending > 0 && <span className="text-xs text-red-500 font-bold ml-1">({pending} pending)</span>}
+                                                    </div>
+                                                ) : <span className="text-slate-300 text-[13px] font-medium">—</span>}
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${statusClasses}`}>{status}</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
 
-            {/* Create Assignment Modal */}
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="m-0 text-xl text-slate-900">Create New Assignment</h3>
-                            <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+            {/* Create Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-lg p-4 md:p-5 w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="m-0 text-lg font-bold text-slate-900">Create New Assignment</h3>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+                                <X size={16} />
+                            </button>
                         </div>
                         
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-5">
                             <div>
-                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Select Class</label>
-                                <select className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
-                                    <option>Class 10 - A (Science)</option>
-                                    <option>Class 9 - B (Physics)</option>
+                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Select Class <span className="text-red-500">*</span></label>
+                                <select name="class_id" value={form.class_id} onChange={handleChange} 
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white cursor-pointer">
+                                    <option value="">— Choose Class —</option>
+                                    {classes.map(c => <option key={c.id} value={c.id}>Class {c.name} {c.section}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Assignment Title</label>
-                                <input type="text" placeholder="e.g. Chapter 1 Exercise" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
+                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Assignment Title <span className="text-red-500">*</span></label>
+                                <input type="text" name="title" value={form.title} onChange={handleChange} placeholder="e.g. Chapter 4 – Exercise 4.1" 
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text" />
                             </div>
                             <div>
-                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Description</label>
-                                <textarea rows="3" placeholder="Instructions for students..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}></textarea>
+                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Instructions (Optional)</label>
+                                <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="What should students do?" 
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none placeholder:text-slate-400" />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Due Date</label>
-                                    <input type="date" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
+                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Due Date <span className="text-red-500">*</span></label>
+                                    <input type="date" name="due_date" value={form.due_date} onChange={handleChange} min={new Date().toISOString().split('T')[0]} 
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text" />
                                 </div>
                                 <div>
-                                    <label className="block mb-1.5 text-sm font-medium text-slate-700">Total Marks</label>
-                                    <input type="number" placeholder="e.g. 10" className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
+                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Total Marks</label>
+                                    <input type="number" name="max_marks" value={form.max_marks} onChange={handleChange} min={1} 
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text" />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block mb-1.5 text-sm font-medium text-slate-700">Attachment (Optional)</label>
-                                <input type="file" style={{ fontSize: '14px', color: '#64748b' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                                <button onClick={() => setIsCreateModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#f1f5f9', border: 'none', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-                                <button onClick={() => setIsCreateModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>Create</button>
+                            <div className="flex gap-3 mt-4 pt-4 border-t border-slate-100">
+                                <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-colors">Cancel</button>
+                                <button onClick={createAssignment} disabled={submitting} className={`flex-[2] py-3.5 rounded-xl text-white font-bold flex justify-center items-center gap-2 transition-colors shadow-sm ${submitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                                    {submitting ? 'Creating...' : <><Plus size={18} strokeWidth={2.5} /> Create Assignment</>}
+                                </button>
                             </div>
                         </div>
                     </div>

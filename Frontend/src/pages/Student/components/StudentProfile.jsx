@@ -156,7 +156,7 @@ const StudentProfile = () => {
     const documents = ["Aadhar Card", "Previous Marksheet", "Transfer Certificate"];
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             {/* Header & Actions */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
@@ -187,7 +187,7 @@ const StudentProfile = () => {
             {/* Profile Information */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
                 {/* Personal Info */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><User size={20} /> Personal Details</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <DetailItem label="Date of Birth" value={student.dob ? new Date(student.dob).toLocaleDateString() : 'N/A'} />
@@ -200,7 +200,7 @@ const StudentProfile = () => {
                 </div>
 
                 {/* Parent & Emergency Info */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><Users size={20} /> Parent Details</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                         {/* If we had a specific parents table join, we would show father/mother. For now generic */}
@@ -211,7 +211,7 @@ const StudentProfile = () => {
                 </div>
 
                 {/* Transport & Hostel Info */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><Bus size={20} /> Transport & Hostel</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <DetailItem label="Transport Status" value="Not Opted" />
@@ -220,7 +220,7 @@ const StudentProfile = () => {
                 </div>
 
                 {/* Documents Info */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><FolderOpen size={20} /> Submitted Documents</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {documents.map((doc, idx) => (

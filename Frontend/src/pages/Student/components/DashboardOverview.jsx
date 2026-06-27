@@ -181,7 +181,7 @@ const DashboardOverview = ({ onNavigate }) => {
     };
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <QRScannerModal 
                 isOpen={isScannerOpen} 
                 onClose={() => setIsScannerOpen(false)} 
@@ -190,7 +190,7 @@ const DashboardOverview = ({ onNavigate }) => {
 
             {/* Header Title */}
             <div className="flex justify-between items-center mb-2 flex-wrap gap-4">
-                <h1 className="m-0 text-2xl font-semibold text-slate-800 tracking-wide uppercase">
+                <h1 className="m-0 text-xl font-semibold text-slate-800 tracking-wide uppercase">
                     {user.name || 'STUDENT DASHBOARD'}
                 </h1>
                 <div className="flex gap-2">
@@ -210,7 +210,7 @@ const DashboardOverview = ({ onNavigate }) => {
                         <Clock size={24} />
                     </div>
                     <div>
-                        <h3 className="m-0 text-sky-900 font-bold text-base">Next Class: Mathematics</h3>
+                        <h3 className="m-0 text-sky-900 font-bold text-sm">Next Class: Mathematics</h3>
                         <p className="m-0 text-sky-700 text-sm mt-1">Starts in 15 mins (10:30 AM) • Room 101</p>
                     </div>
                 </div>
@@ -222,7 +222,7 @@ const DashboardOverview = ({ onNavigate }) => {
             </div>
 
             {/* Core Stats Grid - Matches Screenshot */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <StatCard 
                     title="Attendance"
                     metrics={[
@@ -230,7 +230,7 @@ const DashboardOverview = ({ onNavigate }) => {
                         { label: 'Days Attended', value: Math.floor(user.attendance * 2.2) }
                     ]}
                     bottomComponent={
-                        <div className="flex items-center gap-6 mt-2">
+                        <div className="flex items-center gap-4 mt-2">
                             <div className="flex items-center border-b border-slate-300 pb-1">
                                 <select className="border-none bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer p-0 pr-4 appearance-none">
                                     <option>Date</option>
@@ -293,7 +293,7 @@ const DashboardOverview = ({ onNavigate }) => {
                 </div>
 
                 {/* Today's Schedule & Quick Alerts */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4">
                     <div style={panelStyle}>
                         <h3 style={{ ...panelTitleStyle, color: '#f59e0b' }}><BellRing size={20} /> Quick Alerts</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

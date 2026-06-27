@@ -95,7 +95,7 @@ const LeaveView = () => {
         <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
                     <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
                         Leave Type <ChevronDown size={16} />
@@ -123,7 +123,7 @@ const LeaveView = () => {
                     >
                         <div className="flex justify-between items-start w-full">
                             <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-2xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
                         </div>
                         <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
                     </button>
@@ -180,7 +180,7 @@ const LeaveView = () => {
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-6 py-4 border-t border-slate-200 text-gray-600 text-sm gap-6">
+            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
                 <div className="flex items-center gap-2">
                     Rows per page: 
                     <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
@@ -199,11 +199,11 @@ const LeaveView = () => {
             {/* Apply Leave Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-[400px] p-6 relative shadow-xl">
+                    <div className="bg-white rounded-lg w-[400px] p-4 relative shadow-xl">
                         <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 bg-transparent border-none cursor-pointer text-gray-500 hover:text-gray-700 transition-colors">
                             <X size={20} />
                         </button>
-                        <h2 className="m-0 mb-5 text-lg text-gray-900 font-semibold">Apply for Leave</h2>
+                        <h2 className="m-0 mb-5 text-sm text-gray-900 font-semibold">Apply for Leave</h2>
                         
                         <form onSubmit={handleApplyLeave} className="flex flex-col gap-4">
                             <div>

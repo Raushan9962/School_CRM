@@ -2,14 +2,14 @@ import React from 'react';
 
 const Recommendations = () => {
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Recommendations & Alerts</h2>
+                <h2 className="m-0 text-xl text-slate-900">Recommendations & Alerts</h2>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4">
                 {/* Academic Recommendations */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         💡 Academic Recommendations
                     </h3>
@@ -28,7 +28,7 @@ const Recommendations = () => {
                 </div>
 
                 {/* Discipline Alerts */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         ⚠️ Discipline & Attendance Alerts
                     </h3>

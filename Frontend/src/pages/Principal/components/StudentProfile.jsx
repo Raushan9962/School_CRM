@@ -24,7 +24,7 @@ const StudentProfile = ({ studentId, onBack }) => {
         fetchProfile();
     }, [studentId]);
 
-    if (loading || !profile) return <div className="p-8 text-center text-slate-500">Loading student profile...</div>;
+    if (loading || !profile) return <div className="p-5 text-center text-slate-500">Loading student profile...</div>;
 
     const { basic_info, contact_info, parent_details, academic_info, attendance_summary, performance, fee_info, documents, discipline, timeline, insights } = profile;
 
@@ -33,7 +33,7 @@ const StudentProfile = ({ studentId, onBack }) => {
             {/* Header & Insights */}
             <div className="flex items-center gap-4 mb-8">
                 <button onClick={onBack} className="p-2 rounded-full hover:bg-slate-200 transition-colors">
-                    <span className="text-xl">⬅️</span>
+                    <span className="text-lg">⬅️</span>
                 </button>
                 <h2 className="text-3xl font-extrabold text-indigo-950 m-0 flex-1">Student Profile</h2>
                 <div className="flex gap-2">
@@ -43,7 +43,7 @@ const StudentProfile = ({ studentId, onBack }) => {
             </div>
 
             {/* Top Principal Insights */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <InsightCard title="Attendance" value={insights.attendance} icon="📅" color="text-emerald-600" bg="bg-emerald-50" />
                 <InsightCard title="Performance" value={`${insights.performance} Grade`} icon="📈" color="text-blue-600" bg="bg-blue-50" />
                 <InsightCard title="Fee Status" value={`Pending ₹${insights.fee_pending}`} icon="💰" color="text-red-500" bg="bg-red-50" />
@@ -59,7 +59,7 @@ const StudentProfile = ({ studentId, onBack }) => {
                     <SectionCard title="BASIC INFORMATION">
                         <div className="flex flex-col items-center text-center mb-8 border-b border-slate-100 pb-6">
                             <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-4xl mb-4 border-4 border-white shadow-lg">{basic_info.photo}</div>
-                            <h3 className="text-xl font-bold text-slate-800">{basic_info.name}</h3>
+                            <h3 className="text-lg font-bold text-slate-800">{basic_info.name}</h3>
                             <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs font-bold mt-2">Class {basic_info.class} - {basic_info.section}</span>
                         </div>
                         <IconRow icon={CreditCard} text={`Admission No: ${basic_info.admission_number}`} />
@@ -113,19 +113,19 @@ const StudentProfile = ({ studentId, onBack }) => {
                             <SectionCard title="ATTENDANCE">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-slate-50 p-4 rounded-xl text-center">
-                                        <div className="text-2xl font-bold text-slate-800">{attendance_summary.working_days}</div>
+                                        <div className="text-xl font-bold text-slate-800">{attendance_summary.working_days}</div>
                                         <div className="text-xs font-semibold text-slate-500">Working Days</div>
                                     </div>
                                     <div className="bg-emerald-50 p-4 rounded-xl text-center">
-                                        <div className="text-2xl font-bold text-emerald-600">{attendance_summary.present}</div>
+                                        <div className="text-xl font-bold text-emerald-600">{attendance_summary.present}</div>
                                         <div className="text-xs font-semibold text-emerald-600">Present</div>
                                     </div>
                                     <div className="bg-red-50 p-4 rounded-xl text-center">
-                                        <div className="text-2xl font-bold text-red-500">{attendance_summary.absent}</div>
+                                        <div className="text-xl font-bold text-red-500">{attendance_summary.absent}</div>
                                         <div className="text-xs font-semibold text-red-500">Absent</div>
                                     </div>
                                     <div className="bg-amber-50 p-4 rounded-xl text-center">
-                                        <div className="text-2xl font-bold text-amber-500">{attendance_summary.late}</div>
+                                        <div className="text-xl font-bold text-amber-500">{attendance_summary.late}</div>
                                         <div className="text-xs font-semibold text-amber-500">Late Days</div>
                                     </div>
                                 </div>
@@ -183,11 +183,11 @@ const StudentProfile = ({ studentId, onBack }) => {
 };
 
 const InsightCard = ({ title, value, icon, color, bg }) => (
-    <div className={`p-6 rounded-2xl flex items-center gap-4 shadow-sm border border-slate-100 bg-white`}>
-        <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center text-2xl`}>{icon}</div>
+    <div className={`p-4 rounded-lg flex items-center gap-4 shadow-sm border border-slate-100 bg-white`}>
+        <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center text-xl`}>{icon}</div>
         <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">{title}</div>
-            <div className={`text-xl font-black ${color}`}>{value}</div>
+            <div className={`text-lg font-black ${color}`}>{value}</div>
         </div>
     </div>
 );

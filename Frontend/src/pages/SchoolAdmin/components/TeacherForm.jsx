@@ -43,10 +43,10 @@ const TeacherForm = ({ onSave, onCancel }) => {
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-6 border-b pb-2">Add New Teacher</h3>
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+            <h3 className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">Add New Teacher</h3>
             <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div className="md:col-span-3">
                         <h4 className="font-semibold text-slate-700 mb-2">Personal Details</h4>
                     </div>

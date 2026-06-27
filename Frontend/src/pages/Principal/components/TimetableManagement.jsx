@@ -117,16 +117,16 @@ const TimetableManagement = () => {
     
     const filteredTimetables = timetables.filter(t => t.class_id.toString() === selectedClass.toString());
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading timetable...</div>;
+    if (loading) return <div className="p-5 text-center text-slate-500">Loading timetable...</div>;
 
     const inputClass = "w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm";
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
-        <div className="animate-fade-in p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="animate-fade-in p-4">
+            <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h2 className="text-2xl font-extrabold text-slate-800 m-0">Timetable Management</h2>
+                    <h2 className="text-xl font-extrabold text-slate-800 m-0">Timetable Management</h2>
                     <p className="text-slate-500 text-sm mt-1">Create and manage weekly schedules for classes.</p>
                 </div>
                 <div className="flex gap-3">
@@ -158,8 +158,8 @@ const TimetableManagement = () => {
                 </div>
             )}
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
-                <div className="flex items-center gap-4 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4">
+                <div className="flex items-center gap-4 mb-4">
                     <label className="font-semibold text-slate-700">Select Class:</label>
                     <select 
                         value={selectedClass} 
@@ -215,7 +215,7 @@ const TimetableManagement = () => {
                                                 );
                                             })
                                         ) : (
-                                            <td className="border border-slate-200 p-6 text-center text-slate-400 italic">No periods scheduled</td>
+                                            <td className="border border-slate-200 p-4 text-center text-slate-400 italic">No periods scheduled</td>
                                         )}
                                     </tr>
                                 );
@@ -227,8 +227,8 @@ const TimetableManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Add Timetable Period</h3>
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Add Timetable Period</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -287,13 +287,13 @@ const TimetableManagement = () => {
             {/* Assign & Notify Modal */}
             {isAssignModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <div className="flex items-center gap-3 mb-4">
                             <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
                                 <Bell size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-slate-800 m-0">Assign Teacher & Notify</h3>
+                                <h3 className="text-lg font-bold text-slate-800 m-0">Assign Teacher & Notify</h3>
                                 <p className="text-slate-500 text-xs m-0 mt-1">Sends an instant mobile notification to the teacher.</p>
                             </div>
                         </div>

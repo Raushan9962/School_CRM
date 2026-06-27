@@ -1,31 +1,34 @@
 import React, { useState } from 'react';
 import StudentList from './StudentList';
 import StudentForm from './StudentForm';
+import { Users, Plus, ArrowLeft } from 'lucide-react';
 
 const StudentManagement = () => {
     const [view, setView] = useState('list'); // 'list' | 'create'
 
+    // Inline style objects mapping standard Tailwind
+    const containerStyle = { display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' };
+    const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+    const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
+    const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
+    const btnPrimary = { padding: '8px 16px', background: '#1e293b', color: 'white', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+    const btnSecondary = { padding: '8px 16px', background: 'white', color: '#475569', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+
     return (
-        <div className="animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
+        <div style={containerStyle} className="animate-fade-in">
+            <div style={headerStyle}>
                 <div>
-                    <h2 className="text-2xl font-extrabold text-indigo-950 m-0">Student Management</h2>
-                    <p className="text-slate-500 text-sm mt-1">Manage admissions, academics, transport, and more.</p>
+                    <h2 style={titleStyle}>Student Management</h2>
+                    <p style={subTitleStyle}>Manage student admissions, records, and assignments</p>
                 </div>
                 <div>
                     {view === 'list' ? (
-                        <button 
-                            onClick={() => setView('create')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2"
-                        >
-                            <span>➕</span> Add New Student
+                        <button onClick={() => setView('create')} style={btnPrimary}>
+                            <Plus size={16} /> Add New Student
                         </button>
                     ) : (
-                        <button 
-                            onClick={() => setView('list')}
-                            className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
-                        >
-                            Back to List
+                        <button onClick={() => setView('list')} style={btnSecondary}>
+                            <ArrowLeft size={16} /> Back to List
                         </button>
                     )}
                 </div>

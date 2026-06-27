@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Phone, Mail, FileText, ArrowRight } from 'lucide-react';
+import { Users, Plus, Phone, Mail, FileText, ArrowRight, Filter, ShieldCheck } from 'lucide-react';
 import apiFetch from '../../../services/api';
-import PremiumTable from '../../../components/ui/PremiumTable';
 
 const PrincipalDetails = () => {
     const [view, setView] = useState('list');
     const [principals, setPrincipals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [activeKpi, setActiveKpi] = useState('All');
 
     const fetchPrincipals = async () => {
         setLoading(true);
@@ -32,86 +32,131 @@ const PrincipalDetails = () => {
         }
     }, [view]);
 
-    const [activeKpi, setActiveKpi] = useState('All');
-
     let filteredPrincipals = principals.filter(p => 
         p.name?.toLowerCase().includes(search.toLowerCase()) || 
         p.email?.toLowerCase().includes(search.toLowerCase()) ||
         p.phone?.toLowerCase().includes(search.toLowerCase())
     );
 
-    if (activeKpi === 'Active') {
-        filteredPrincipals = filteredPrincipals;
-    }
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
+                <div>
+                    <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' }}>Principal Management</h2>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>Manage principal accounts and access</p>
+                </div>
+                <button 
+                    onClick={() => alert("Add principal functionality to be implemented")} 
+                    style={{ padding: '8px 16px', background: '#1e293b', color: 'white', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                    <Plus size={16} /> Add Principal
+                </button>
+            </div>
 
-    const kpiCards = [
-        { label: 'Total Principals', value: principals.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
-        { label: 'Active Profiles', value: principals.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
-    ];
-
-    const actions = (
-        <button 
-            onClick={() => alert("Add principal functionality to be implemented")}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
-        >
-            <Plus size={16} strokeWidth={3} /> Add Principal
-        </button>
-    );
-
-    const columns = [
-        { 
-            label: 'Principal Details', 
-            sortable: true,
-            render: (row) => (
-                <div className="flex items-center gap-3">
-                    <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} className="w-10 h-10 rounded-full border border-slate-200" />
-                    <div className="text-left">
-                        <p className="font-bold text-slate-800 m-0 leading-tight">{row.name}</p>
-                        <p className="text-[11px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 rounded mt-0.5 m-0 uppercase tracking-wider">{row.role}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div 
+                    onClick={() => setActiveKpi('All')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: activeKpi === 'All' ? '1px solid #3b82f6' : '1px solid #e2e8f0', boxShadow: activeKpi === 'All' ? '0 0 0 1px #3b82f6' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Users size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Total Principals</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>{principals.length}</h3>
                     </div>
                 </div>
-            )
-        },
-        { 
-            label: 'Contact Info', 
-            render: (row) => (
-                <div className="text-left">
-                    <p className="text-[12px] text-slate-600 flex items-center gap-1.5 m-0"><Mail size={12} className="text-slate-400" /> {row.email}</p>
-                    <p className="text-[12px] text-slate-600 flex items-center gap-1.5 m-0 mt-1"><Phone size={12} className="text-slate-400" /> {row.phone || 'N/A'}</p>
-                </div>
-            )
-        },
-        { 
-            label: 'Status', 
-            sortable: true,
-            render: (row) => (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase tracking-wider border border-emerald-100">
-                    Active
-                </span>
-            )
-        },
-        { 
-            label: 'Action', 
-            render: (row) => (
-                <div className="flex justify-center">
-                    <button className="flex items-center gap-1 text-[12px] font-bold text-blue-600 hover:text-blue-700 hover:underline">
-                        View Details <ArrowRight size={14} />
-                    </button>
-                </div>
-            )
-        }
-    ];
 
-    return (
-        <PremiumTable 
-            title="Principal Details"
-            actions={actions}
-            columns={columns} 
-            data={filteredPrincipals} 
-            kpiCards={kpiCards}
-            onSearch={setSearch}
-            loading={loading}
-        />
+                <div 
+                    onClick={() => setActiveKpi('Active')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: activeKpi === 'Active' ? '1px solid #10b981' : '1px solid #e2e8f0', boxShadow: activeKpi === 'Active' ? '0 0 0 1px #10b981' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ShieldCheck size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Active Profiles</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>{principals.length}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <h3 style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Users size={16} className="text-slate-500" /> Principal Directory
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '4px 8px' }}>
+                        <Filter size={14} color="#64748b" />
+                        <input 
+                            type="text" 
+                            placeholder="Search principal..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            style={{ border: 'none', outline: 'none', fontSize: '12px', width: '200px' }}
+                        />
+                    </div>
+                </div>
+                
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                            <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Principal Details</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Contact Info</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Status</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>Loading records...</td>
+                                </tr>
+                            ) : filteredPrincipals.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>No records found.</td>
+                                </tr>
+                            ) : (
+                                filteredPrincipals.map((row, idx) => (
+                                    <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover:bg-slate-50 transition-colors">
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #e2e8f0' }} />
+                                                <div>
+                                                    <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{row.name}</p>
+                                                    <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>Principal Account</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
+                                                    <Mail size={12} color="#94a3b8" /> {row.email}
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
+                                                    <Phone size={12} color="#94a3b8" /> {row.phone || 'N/A'}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #bbf7d0', textTransform: 'uppercase' }}>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                                            <button style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }} className="hover:underline">
+                                                View Profile <ArrowRight size={14} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     );
 };
 

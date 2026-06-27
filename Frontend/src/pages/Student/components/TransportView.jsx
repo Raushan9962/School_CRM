@@ -39,9 +39,9 @@ const TransportView = () => {
         <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
                 <div>
-                    <h2 className="m-0 text-lg text-gray-900 font-semibold">Transport & Route Details</h2>
+                    <h2 className="m-0 text-sm text-gray-900 font-semibold">Transport & Route Details</h2>
                 </div>
                 <div className="flex gap-3">
                     <button className="px-4 py-2 bg-sky-500 border-none rounded text-white text-sm font-medium cursor-pointer flex items-center gap-1.5 hover:bg-sky-600 transition-colors">
@@ -58,7 +58,7 @@ const TransportView = () => {
                 <div className="flex flex-wrap gap-0">
                     
                     {/* Left Side: Summary & Driver */}
-                    <div className="flex-1 basis-[300px] p-6 border-r border-slate-200 flex flex-col gap-6">
+                    <div className="flex-1 basis-[300px] p-4 border-r border-slate-200 flex flex-col gap-4">
                         
                         {/* Bus Info */}
                         <div>
@@ -70,7 +70,7 @@ const TransportView = () => {
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-500">Bus Number</div>
-                                        <div className="text-base text-gray-900 font-semibold">Bus {myBus.id} ({myBus.vehicle_number})</div>
+                                        <div className="text-sm text-gray-900 font-semibold">Bus {myBus.id} ({myBus.vehicle_number})</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ const TransportView = () => {
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-500">Route Name</div>
-                                        <div className="text-base text-gray-900 font-semibold">{myBus.route || 'Main Route'}</div>
+                                        <div className="text-sm text-gray-900 font-semibold">{myBus.route || 'Main Route'}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ const TransportView = () => {
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-500">Capacity</div>
-                                        <div className="text-base text-gray-900 font-semibold">{myBus.capacity} Seats</div>
+                                        <div className="text-sm text-gray-900 font-semibold">{myBus.capacity} Seats</div>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@ const TransportView = () => {
                         <div>
                             <h3 className="m-0 mb-4 text-sm text-gray-500 uppercase tracking-wider font-semibold">Driver Details</h3>
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col gap-3">
-                                <div className="text-base text-gray-900 font-semibold">Assigned Driver ID: {myBus.driver_id || 'Pending'}</div>
+                                <div className="text-sm text-gray-900 font-semibold">Assigned Driver ID: {myBus.driver_id || 'Pending'}</div>
                                 <div className="text-sm text-gray-600">Managed By School Admin</div>
                                 <div className="flex items-center justify-between mt-1">
                                     <span className="text-sm text-gray-900 font-medium">Contact Office</span>

@@ -1,123 +1,299 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { IndianRupee, Users, FileText, CheckCircle2, Clock, Calculator, Plus } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const SalaryManagement = () => {
-    const [activeTab, setActiveTab] = useState('list');
+    const [view, setView] = useState('list'); // 'list' or 'form'
+    const [payrolls, setPayrolls] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [staffList, setStaffList] = useState([]);
 
-    const salaries = [
-        { id: 'EMP-001', name: 'Dr. Anita Desai', role: 'Principal', basic: '₹ 80,000', deductions: '₹ 12,000', pf_esi: '₹ 4,000', bonus: '₹ 5,000', net: '₹ 69,000', status: 'Processed' },
-        { id: 'EMP-002', name: 'Ramesh Kumar', role: 'Teacher', basic: '₹ 45,000', deductions: '₹ 4,500', pf_esi: '₹ 2,500', bonus: '₹ 0', net: '₹ 38,000', status: 'Processed' },
-        { id: 'EMP-003', name: 'Suresh Singh', role: 'Transport', basic: '₹ 25,000', deductions: '₹ 1,500', pf_esi: '₹ 1,000', bonus: '₹ 2,000', net: '₹ 24,500', status: 'Pending' }
-    ];
+    const [formData, setFormData] = useState({
+        staffId: '',
+        month: new Date().toLocaleString('default', { month: 'long' }),
+        year: new Date().getFullYear(),
+        basicSalary: '',
+        allowances: '0',
+        deductions: '0',
+        paymentDate: new Date().toISOString().split('T')[0]
+    });
+
+    useEffect(() => {
+        if (view === 'list') {
+            fetchPayrolls();
+        } else if (view === 'form' && staffList.length === 0) {
+            fetchStaff();
+        }
+    }, [view]);
+
+    const fetchPayrolls = async () => {
+        setLoading(true);
+        try {
+            const res = await apiFetch('/accountant/payroll');
+            const data = await res.json();
+            if (data.success) {
+                setPayrolls(data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching payrolls:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStaff = async () => {
+        try {
+            const res = await apiFetch('/users/staff'); // Assuming endpoint exists
+            const data = await res.json();
+            if (data.success) {
+                setStaffList(data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching staff:", error);
+        }
+    };
+
+    const handleProcess = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            const res = await apiFetch('/accountant/payroll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId: formData.staffId,
+                    month: formData.month,
+                    year: formData.year,
+                    basicSalary: parseFloat(formData.basicSalary),
+                    allowances: parseFloat(formData.allowances || 0),
+                    deductions: parseFloat(formData.deductions || 0),
+                    paymentDate: formData.paymentDate
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Payroll processed successfully!');
+                setView('list');
+                setFormData({
+                    ...formData,
+                    staffId: '',
+                    basicSalary: '',
+                    allowances: '0',
+                    deductions: '0'
+                });
+            } else {
+                alert(data.message || 'Failed to process payroll');
+            }
+        } catch (error) {
+            console.error("Error processing payroll:", error);
+            alert("Error processing payroll");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const calculateNet = () => {
+        const basic = parseFloat(formData.basicSalary) || 0;
+        const allow = parseFloat(formData.allowances) || 0;
+        const deduc = parseFloat(formData.deductions) || 0;
+        return basic + allow - deduc;
+    };
+
+    const totalSalaryDisbursed = payrolls.reduce((acc, curr) => acc + parseFloat(curr.net_salary || 0), 0);
+
+    if (view === 'form') {
+        return (
+            <div className="animate-fade-in bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6 max-w-3xl">
+                <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800 m-0">Process Staff Salary</h2>
+                        <p className="text-xs text-slate-500 mt-1">Generate and record payroll for a staff member</p>
+                    </div>
+                    <button onClick={() => setView('list')} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200 transition-colors">Back</button>
+                </div>
+
+                <form onSubmit={handleProcess} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Select Staff *</label>
+                            <select 
+                                value={formData.staffId}
+                                onChange={e => setFormData({...formData, staffId: e.target.value})}
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                                required
+                            >
+                                <option value="">-- Choose Staff --</option>
+                                {staffList.map(s => (
+                                    <option key={s.id} value={s.id}>{s.name} ({s.role_name})</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="flex-1">
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Month</label>
+                                <select 
+                                    value={formData.month}
+                                    onChange={e => setFormData({...formData, month: e.target.value})}
+                                    className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                                >
+                                    {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
+                                        <option key={m} value={m}>{m}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="w-24">
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Year</label>
+                                <input 
+                                    type="number" 
+                                    value={formData.year}
+                                    onChange={e => setFormData({...formData, year: e.target.value})}
+                                    className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" 
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Basic Salary (₹) *</label>
+                            <input 
+                                type="number" 
+                                required
+                                value={formData.basicSalary}
+                                onChange={e => setFormData({...formData, basicSalary: e.target.value})}
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" 
+                                placeholder="0" 
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Allowances (₹)</label>
+                            <input 
+                                type="number" 
+                                value={formData.allowances}
+                                onChange={e => setFormData({...formData, allowances: e.target.value})}
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" 
+                                placeholder="0" 
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Deductions (₹)</label>
+                            <input 
+                                type="number" 
+                                value={formData.deductions}
+                                onChange={e => setFormData({...formData, deductions: e.target.value})}
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-red-500 outline-none" 
+                                placeholder="0" 
+                            />
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center mt-2">
+                        <span className="text-xs font-semibold text-slate-600">Net Payable Salary:</span>
+                        <span className="text-sm font-bold text-blue-600">₹{calculateNet().toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Payment Date *</label>
+                        <input 
+                            type="date" 
+                            required
+                            value={formData.paymentDate}
+                            onChange={e => setFormData({...formData, paymentDate: e.target.value})}
+                            className="w-full md:w-1/2 px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" 
+                        />
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 mt-4">
+                        <button type="button" onClick={() => setView('list')} className="px-4 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200">Cancel</button>
+                        <button type="submit" disabled={submitting} className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700 flex items-center gap-1 disabled:opacity-70">
+                            {submitting ? 'Processing...' : <><CheckCircle2 size={14} /> Process Salary</>}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="animate-fade-in space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Salary Management</h2>
-                <button style={{ padding: '10px 20px', background: '#0ea5e9', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(14,165,233,0.2)' }}>
-                    ⚡ Process Bulk Salary
+                <div>
+                    <h1 className="text-xl font-bold text-slate-800 m-0">Payroll & Salary</h1>
+                    <p className="text-slate-500 text-xs mt-1">Manage staff salaries, deductions and payslips</p>
+                </div>
+                <button 
+                    onClick={() => setView('form')}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded text-sm font-bold hover:bg-blue-700 shadow-sm"
+                >
+                    <Calculator size={16} /> Process Payroll
                 </button>
             </div>
 
-            <div className="flex gap-4 border-b border-slate-200 pb-4">
-                {['list', 'deductions', 'bonus'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        style={{
-                            padding: '8px 16px',
-                            background: activeTab === tab ? '#0ea5e9' : 'white',
-                            color: activeTab === tab ? 'white' : '#64748b',
-                            border: activeTab === tab ? 'none' : '1px solid #cbd5e1',
-                            borderRadius: '20px',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            textTransform: 'capitalize'
-                        }}
-                    >
-                        {tab === 'list' ? 'Employee Salary' : tab === 'deductions' ? 'Tax & Deductions' : 'Bonus Management'}
-                    </button>
-                ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-white border border-slate-200 rounded p-3">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Total Salary Disbursed</p>
+                    <p className="text-base font-bold text-slate-800 m-0">₹{totalSalaryDisbursed.toLocaleString('en-IN')}</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded p-3">
+                    <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Total Payroll Records</p>
+                    <p className="text-base font-bold text-slate-800 m-0">{payrolls.length}</p>
+                </div>
             </div>
 
-            {activeTab === 'list' && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
-                        <input type="month" defaultValue="2026-06" className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none" />
-                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
-                            <option value="">All Departments</option>
-                            <option value="teaching">Teaching Staff</option>
-                            <option value="admin">Administration</option>
-                            <option value="support">Support Staff</option>
-                        </select>
-                        <select className="px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm outline-none">
-                            <option value="">All Statuses</option>
-                            <option value="Processed">Processed</option>
-                            <option value="Pending">Pending</option>
-                        </select>
-                    </div>
+            <div className="bg-white rounded shadow-sm border border-slate-200">
+                <div className="p-3 border-b border-slate-100 flex items-center gap-1.5 bg-slate-50/50">
+                    <FileText size={16} className="text-blue-600" />
+                    <h3 className="font-bold text-slate-800 text-sm m-0">Payroll History</h3>
+                </div>
+                
+                {loading ? (
+                    <div className="p-8 text-center text-slate-500 text-sm">Loading payroll records...</div>
+                ) : payrolls.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-sm">No payroll records found.</div>
+                ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-left">
-                            <thead className="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Employee</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Basic Pay</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Deductions & PF</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Bonus</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Net Salary</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-600">Actions</th>
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-4 py-2 font-bold">Staff</th>
+                                    <th className="px-4 py-2 font-bold">Period</th>
+                                    <th className="px-4 py-2 font-bold">Basic</th>
+                                    <th className="px-4 py-2 font-bold">Allw/Ded</th>
+                                    <th className="px-4 py-2 font-bold">Net Salary</th>
+                                    <th className="px-4 py-2 font-bold">Status</th>
+                                    <th className="px-4 py-2 font-bold text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {salaries.map((s, idx) => (
-                                    <tr key={idx} className="border-b border-slate-200">
-                                        <td className="px-6 py-4">
-                                            <p className="m-0 mb-1 text-sm font-semibold text-slate-800">{s.name}</p>
-                                            <span className="text-xs text-slate-500">{s.id} • {s.role}</span>
+                            <tbody className="text-xs">
+                                {payrolls.map((payroll) => (
+                                    <tr key={payroll.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                        <td className="px-4 py-2.5">
+                                            <div className="font-bold text-slate-800">{payroll.staff_name}</div>
+                                            <div className="text-[10px] text-slate-500">{payroll.role}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-slate-700">{s.basic}</td>
-                                        <td className="px-6 py-4">
-                                            <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#ef4444' }}>Tax: -{s.deductions}</p>
-                                            <span style={{ fontSize: '13px', color: '#ef4444' }}>PF/ESI: -{s.pf_esi}</span>
+                                        <td className="px-4 py-2.5 text-slate-700">{payroll.month} {payroll.year}</td>
+                                        <td className="px-4 py-2.5 font-medium text-slate-600">₹{parseFloat(payroll.basic_salary).toLocaleString('en-IN')}</td>
+                                        <td className="px-4 py-2.5">
+                                            <div className="text-emerald-600">+₹{parseFloat(payroll.allowances).toLocaleString('en-IN')}</div>
+                                            <div className="text-red-600">-₹{parseFloat(payroll.deductions).toLocaleString('en-IN')}</div>
                                         </td>
-                                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#10b981' }}>{s.bonus !== '₹ 0' ? `+${s.bonus}` : '-'}</td>
-                                        <td style={{ padding: '16px 24px', fontSize: '15px', color: '#1e293b', fontWeight: '600' }}>{s.net}</td>
-                                        <td className="px-6 py-4">
-                                            <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: s.status === 'Processed' ? '#dcfce7' : '#fef3c7', color: s.status === 'Processed' ? '#166534' : '#d97706' }}>
-                                                {s.status}
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">₹{parseFloat(payroll.net_salary).toLocaleString('en-IN')}</td>
+                                        <td className="px-4 py-2.5">
+                                            <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-bold uppercase rounded">
+                                                {payroll.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 flex gap-2">
-                                            {s.status === 'Pending' ? (
-                                                <button style={{ padding: '6px 12px', background: '#eff6ff', color: '#0ea5e9', border: '1px solid #bae6fd', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Process</button>
-                                            ) : (
-                                                <button style={{ padding: '6px 12px', background: 'white', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>Payslip</button>
-                                            )}
+                                        <td className="px-4 py-2.5 text-right">
+                                            <button className="text-blue-600 font-bold hover:underline">Payslip</button>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
-
-            {activeTab === 'deductions' && (
-                <div className="bg-white p-10 rounded-2xl text-center shadow-sm">
-                    <span className="text-[48px]">📉</span>
-                    <h3 className="text-slate-900 my-4 mb-2">Tax & Deduction Management</h3>
-                    <p className="text-slate-500">Configure standard tax brackets, PF, ESI, and other automated deductions.</p>
-                </div>
-            )}
-
-            {activeTab === 'bonus' && (
-                <div className="bg-white p-10 rounded-2xl text-center shadow-sm">
-                    <span className="text-[48px]">🎁</span>
-                    <h3 className="text-slate-900 my-4 mb-2">Bonus Management</h3>
-                    <p className="text-slate-500">Approve and assign festival bonuses, performance rewards, or advance payouts.</p>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };

@@ -69,7 +69,7 @@ const DisciplineManagement = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading discipline logs...</div>;
+    if (loading) return <div className="p-5 text-center text-slate-500">Loading discipline logs...</div>;
 
     const inputClass = "w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm";
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
@@ -86,10 +86,10 @@ const DisciplineManagement = () => {
     };
 
     return (
-        <div className="animate-fade-in p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="animate-fade-in p-4">
+            <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h2 className="text-2xl font-extrabold text-slate-800 m-0">Discipline Management</h2>
+                    <h2 className="text-xl font-extrabold text-slate-800 m-0">Discipline Management</h2>
                     <p className="text-slate-500 text-sm mt-1">Record and track student disciplinary incidents.</p>
                 </div>
                 <button 
@@ -100,7 +100,7 @@ const DisciplineManagement = () => {
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-4 border-b border-slate-100 flex gap-4">
                     <div className="relative flex-1 max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -120,7 +120,7 @@ const DisciplineManagement = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {logs.length === 0 ? (
-                            <tr><td colSpan="6" className="p-8 text-center text-slate-500">No disciplinary incidents logged.</td></tr>
+                            <tr><td colSpan="6" className="p-5 text-center text-slate-500">No disciplinary incidents logged.</td></tr>
                         ) : (
                             logs.map(log => (
                                 <tr key={log.id} className="hover:bg-slate-50 transition-colors">
@@ -154,8 +154,8 @@ const DisciplineManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Log Disciplinary Incident</h3>
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Log Disciplinary Incident</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className={labelClass}>Student</label>

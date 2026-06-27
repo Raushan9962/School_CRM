@@ -34,9 +34,9 @@ const EventsManagement = () => {
   }, []);
 
   return (
-    <div className="dashboard-section animate-fade-in" className="p-6">
-      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Events Management</h2>
-      <div className="flex gap-3 mb-6 flex-wrap">
+    <div className="dashboard-section animate-fade-in" className="p-4">
+      <h2 className="text-xl font-extrabold text-indigo-950 mb-4">Events Management</h2>
+      <div className="flex gap-3 mb-4 flex-wrap">
         <ActionBtn text="Create Events" icon="🎉" />
         <ActionBtn text="Publish Calendars" icon="📅" />
       </div>

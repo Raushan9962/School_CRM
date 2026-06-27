@@ -149,12 +149,12 @@ const TeacherManagement = () => {
 
             {showModal && (
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-slate-800 m-0">Add New Teacher</h3>
+                    <div className="bg-white rounded-lg w-full max-w-md shadow-2xl overflow-hidden">
+                        <div className="px-4 py-2 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                            <h3 className="text-sm font-bold text-slate-800 m-0">Add New Teacher</h3>
                             <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">×</button>
                         </div>
-                        <form className="p-6 flex flex-col gap-4">
+                        <form className="p-4 flex flex-col gap-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">First Name</label>

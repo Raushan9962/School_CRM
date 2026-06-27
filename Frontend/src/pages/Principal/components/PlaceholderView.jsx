@@ -149,8 +149,8 @@ const PlaceholderView = ({ title }) => {
             />
 
             {(category === 'finance' || category === 'academic' || category === 'attendance') && (
-                <div className="mt-6 bg-white rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-slate-200 p-6">
-                    <h3 className="font-bold text-slate-700 mb-6">{title} Trends</h3>
+                <div className="mt-4 bg-white rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-slate-200 p-4">
+                    <h3 className="font-bold text-slate-700 mb-4">{title} Trends</h3>
                     <div className="h-[200px] w-full">
                         <Bar 
                             options={{

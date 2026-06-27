@@ -8,6 +8,7 @@ const TaskDelegation = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [staffList, setStaffList] = useState([]);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -34,6 +35,7 @@ const TaskDelegation = () => {
 
     useEffect(() => {
         fetchTasks();
+        apiFetch('/principal/staff-list').then(r => r.json()).then(d => { if (d.success) setStaffList(d.data); });
     }, []);
 
     const handleStatusUpdate = async (id, newStatus) => {
@@ -93,7 +95,7 @@ const TaskDelegation = () => {
         },
         { 
             label: 'Assigned To', 
-            render: (row) => <span className="font-medium text-slate-700">{row.assignedTo}</span>
+            render: (row) => <span className="font-medium text-slate-700">{row.assignee_name || row.assignedTo}</span>
         },
         { 
             label: 'Priority', 
@@ -156,8 +158,8 @@ const TaskDelegation = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Assign New Task</h3>
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Assign New Task</h3>
                         <form onSubmit={handleCreateTask} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Task Title</label>
@@ -165,7 +167,10 @@ const TaskDelegation = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Assign To</label>
-                                <input required type="text" name="assignedTo" value={formData.assignedTo} onChange={handleInputChange} placeholder="e.g., Dr. Anil Mehra" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                                <select required name="assignedTo" value={formData.assignedTo} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="">-- Select Staff --</option>
+                                    {staffList && staffList.map(s => <option key={s.id} value={s.id}>{s.name} ({s.role_name})</option>)}
+                                </select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

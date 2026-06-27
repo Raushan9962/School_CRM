@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Phone, Mail, ArrowRight } from 'lucide-react';
+import { Users, Plus, Filter, ArrowRight, ArrowLeft } from 'lucide-react';
 import apiFetch from '../../../services/api';
-import PremiumTable from '../../../components/ui/PremiumTable';
 import StaffForm from './StaffForm';
 
 const GenericRoleManagement = ({ roleName, title, description }) => {
@@ -9,6 +8,8 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
     const [staff, setStaff] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [activeKpi, setActiveKpi] = useState('All');
+    const [selectedStaff, setSelectedStaff] = useState(null);
 
     const fetchStaff = async () => {
         setLoading(true);
@@ -16,7 +17,6 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
             const res = await apiFetch('/users/school-users');
             const data = await res.json();
             if (data.success) {
-                // Filter by exact role, or roles that match
                 let filtered;
                 if (roleName === 'Transport Staff') {
                     filtered = data.data.filter(u => u.role === 'Transport Manager' || u.role === 'Driver' || u.role === 'Transport Staff');
@@ -38,109 +38,190 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
         }
     }, [view, roleName]);
 
+    // Inline style objects mapping standard Tailwind
+    const containerStyle = { display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' };
+    const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+    const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
+    const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
+    const btnPrimary = { padding: '8px 16px', background: '#1e293b', color: 'white', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+    const btnSecondary = { padding: '8px 16px', background: 'white', color: '#475569', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+
     if (view === 'create') {
         return (
-            <div className="animate-fade-in">
-                <div className="flex justify-between items-center mb-6">
+            <div style={containerStyle} className="animate-fade-in">
+                <div style={headerStyle}>
                     <div>
-                        <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">{title}</h2>
-                        <p className="text-slate-500 text-sm mt-1">{description}</p>
+                        <h2 style={titleStyle}>{title}</h2>
+                        <p style={subTitleStyle}>{description}</p>
                     </div>
-                    <div>
-                        <button 
-                            onClick={() => setView('list')}
-                            className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
-                        >
-                            Back to List
-                        </button>
-                    </div>
+                    <button onClick={() => setView('list')} style={btnSecondary}>
+                        <ArrowLeft size={16} /> Back to List
+                    </button>
                 </div>
-                {/* Notice we force the role if the form allows it, but StaffForm has its own role dropdown.
-                    For simplicity, we let StaffForm handle it as before, or the user can select. */}
                 <StaffForm onSave={() => setView('list')} onCancel={() => setView('list')} initialRole={roleName} />
             </div>
         );
     }
 
-    const [activeKpi, setActiveKpi] = useState('All');
-
-    let filteredList = staff.filter(s => 
-        s.name?.toLowerCase().includes(search.toLowerCase()) || 
-        s.email?.toLowerCase().includes(search.toLowerCase())
-    );
-
-    if (activeKpi === 'Active') {
-        filteredList = filteredList; // Mock filtering
-    }
-
-    const kpiCards = [
-        { label: `Total ${roleName}s`, value: staff.length, active: activeKpi === 'All', onClick: () => setActiveKpi('All') },
-        { label: `Active ${roleName}s`, value: staff.length, active: activeKpi === 'Active', onClick: () => setActiveKpi('Active') }
-    ];
-
-    const actions = (
-        <button 
-            onClick={() => setView('create')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
-        >
-            <Plus size={16} strokeWidth={3} /> Add New {roleName}
-        </button>
-    );
-
-    const columns = [
-        { 
-            label: 'Profile Details', 
-            sortable: true,
-            render: (row) => (
-                <div className="flex items-center gap-3">
-                    <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} className="w-10 h-10 rounded-full border border-slate-200" />
-                    <div className="text-left">
-                        <p className="font-bold text-slate-800 m-0 leading-tight">{row.name}</p>
-                        <p className="text-[11px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 rounded mt-0.5 m-0 uppercase tracking-wider">{row.role}</p>
+    if (view === 'profile' && selectedStaff) {
+        return (
+            <div style={containerStyle} className="animate-fade-in">
+                <div style={headerStyle}>
+                    <div>
+                        <h2 style={titleStyle}>{selectedStaff.name}'s Profile</h2>
+                        <p style={subTitleStyle}>{selectedStaff.role} Details</p>
                     </div>
-                </div>
-            )
-        },
-        { 
-            label: 'Contact Info', 
-            render: (row) => (
-                <div className="text-left">
-                    <p className="text-[12px] text-slate-600 flex items-center gap-1.5 m-0"><Mail size={12} className="text-slate-400" /> {row.email}</p>
-                    <p className="text-[12px] text-slate-600 flex items-center gap-1.5 m-0 mt-1"><Phone size={12} className="text-slate-400" /> {row.phone || 'N/A'}</p>
-                </div>
-            )
-        },
-        { 
-            label: 'Status', 
-            sortable: true,
-            render: (row) => (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase tracking-wider border border-emerald-100">
-                    Active
-                </span>
-            )
-        },
-        { 
-            label: 'Action', 
-            render: (row) => (
-                <div className="flex justify-center">
-                    <button className="flex items-center gap-1 text-[12px] font-bold text-blue-600 hover:text-blue-700 hover:underline">
-                        View Profile <ArrowRight size={14} />
+                    <button onClick={() => { setView('list'); setSelectedStaff(null); }} style={btnSecondary}>
+                        <ArrowLeft size={16} /> Back to List
                     </button>
                 </div>
-            )
-        }
-    ];
+                
+                <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden', maxWidth: '800px' }}>
+                    <div style={{ background: '#f8fafc', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid #e2e8f0' }}>
+                        <img src={selectedStaff.image || `https://api.dicebear.com/5.x/initials/svg?seed=${selectedStaff.name}`} alt={selectedStaff.name} style={{ width: '80px', height: '80px', borderRadius: '50%', border: '4px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
+                        <div>
+                            <h3 style={{ margin: '0 0 4px 0', fontSize: '20px', color: '#1e293b', fontWeight: 'bold' }}>{selectedStaff.name}</h3>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>{selectedStaff.role}</p>
+                            <span style={{ display: 'inline-block', marginTop: '8px', padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #bbf7d0', textTransform: 'uppercase' }}>Active</span>
+                        </div>
+                    </div>
+                    
+                    <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                        <div>
+                            <h4 style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>Contact Information</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div>
+                                    <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Email Address</p>
+                                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold' }}>{selectedStaff.email || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Phone Number</p>
+                                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold' }}>{selectedStaff.phone || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>Employment Details</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div>
+                                    <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Employee ID</p>
+                                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold' }}>{selectedStaff.employee_id || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Joined Date</p>
+                                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#1e293b', fontWeight: 'bold' }}>{selectedStaff.created_at ? new Date(selectedStaff.created_at).toLocaleDateString() : 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    let filteredStaff = staff.filter(u => 
+        u.name?.toLowerCase().includes(search.toLowerCase()) || 
+        u.email?.toLowerCase().includes(search.toLowerCase()) ||
+        u.phone?.toLowerCase().includes(search.toLowerCase())
+    );
 
     return (
-        <PremiumTable 
-            title={title}
-            actions={actions}
-            columns={columns} 
-            data={filteredList} 
-            kpiCards={kpiCards}
-            onSearch={setSearch}
-            loading={loading}
-        />
+        <div style={containerStyle} className="animate-fade-in">
+            <div style={headerStyle}>
+                <div>
+                    <h2 style={titleStyle}>{title}</h2>
+                    <p style={subTitleStyle}>{description}</p>
+                </div>
+                <button onClick={() => setView('create')} style={btnPrimary}>
+                    <Plus size={16} /> Add {roleName}
+                </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div 
+                    onClick={() => setActiveKpi('All')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: activeKpi === 'All' ? '1px solid #3b82f6' : '1px solid #e2e8f0', boxShadow: activeKpi === 'All' ? '0 0 0 1px #3b82f6' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Users size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Total {roleName}s</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>{staff.length}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <h3 style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Users size={16} className="text-slate-500" /> {roleName} Directory
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '4px 8px' }}>
+                        <Filter size={14} color="#64748b" />
+                        <input 
+                            type="text" 
+                            placeholder="Search staff..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            style={{ border: 'none', outline: 'none', fontSize: '12px', width: '200px' }}
+                        />
+                    </div>
+                </div>
+                
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                            <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Staff Details</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Contact Info</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Status</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'right' }}>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>Loading records...</td>
+                                </tr>
+                            ) : filteredStaff.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>No records found.</td>
+                                </tr>
+                            ) : (
+                                filteredStaff.map((row, idx) => (
+                                    <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover:bg-slate-50 transition-colors">
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #e2e8f0' }} />
+                                                <div>
+                                                    <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{row.name}</p>
+                                                    <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b', textTransform: 'uppercase' }}>{row.role}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{row.phone || 'N/A'}</p>
+                                            <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{row.email || 'N/A'}</p>
+                                        </td>
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #bbf7d0', textTransform: 'uppercase' }}>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                                            <button onClick={() => { setSelectedStaff(row); setView('profile'); }} style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }} className="hover:underline">
+                                                View Profile <ArrowRight size={14} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     );
 };
 

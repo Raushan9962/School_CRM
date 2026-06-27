@@ -60,7 +60,7 @@ const AssignmentsView = () => {
         <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
                     <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
                         Subject <ChevronDown size={16} />
@@ -109,7 +109,7 @@ const AssignmentsView = () => {
                     >
                         <div className="flex justify-between items-start w-full">
                             <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-2xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
                         </div>
                         <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
                     </button>
@@ -177,7 +177,7 @@ const AssignmentsView = () => {
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-6 py-4 border-t border-slate-200 text-gray-600 text-sm gap-6">
+            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Rows per page: 
                     <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">

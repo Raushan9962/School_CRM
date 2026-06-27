@@ -136,12 +136,12 @@ const DashboardOverview = ({ setActiveTab }) => {
     ];
 
     if (loading) {
-        return <div className="p-8 text-center text-slate-500">Loading Dashboard Stats...</div>;
+        return <div className="p-5 text-center text-slate-500">Loading Dashboard Stats...</div>;
     }
 
     return (
         <div className="animate-fade-in max-w-[1600px] mx-auto pb-10">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
                 <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">Overview</h2>
                 <div className="flex gap-2">
                     <button 
@@ -157,17 +157,17 @@ const DashboardOverview = ({ setActiveTab }) => {
             
             {showQRModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col items-center p-8 relative">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col items-center p-5 relative">
                         <button 
                             onClick={() => setShowQRModal(false)} 
                             className="absolute top-4 right-4 p-1 hover:bg-slate-200 rounded-full transition-colors cursor-pointer border-none bg-transparent"
                         >
                             <X size={20} className="text-slate-500" />
                         </button>
-                        <h3 className="font-bold text-xl text-slate-800 mb-2 mt-4 text-center">Daily Attendance QR</h3>
+                        <h3 className="font-bold text-lg text-slate-800 mb-2 mt-4 text-center">Daily Attendance QR</h3>
                         <p className="text-slate-500 text-sm mb-8 text-center">Display this QR code for students and staff to scan using their mobile apps.</p>
                         
-                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                             {qrPayload && <QRCode value={qrPayload} size={250} level="H" />}
                         </div>
                         
@@ -190,7 +190,7 @@ const DashboardOverview = ({ setActiveTab }) => {
                             </div>
                         </div>
                         <div className="flex items-end justify-between">
-                            <h3 className="text-2xl font-bold text-slate-800 tracking-tight">{card.value}</h3>
+                            <h3 className="text-xl font-bold text-slate-800 tracking-tight">{card.value}</h3>
                             <div className="flex items-center text-emerald-500 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
                                 <ArrowUpRight size={12} />
                                 <span>2.5%</span>
@@ -200,7 +200,7 @@ const DashboardOverview = ({ setActiveTab }) => {
                 ))}
             </div>
 
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Critical Alerts Panel */}
                 <div className="bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5 flex flex-col">
                     <div className="flex justify-between items-center mb-4">

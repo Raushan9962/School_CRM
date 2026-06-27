@@ -47,10 +47,10 @@ const StaffForm = ({ onSave, onCancel, initialRole }) => {
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-6 border-b pb-2">Add New Staff Member</h3>
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+            <h3 className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">Add New Staff Member</h3>
             <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     
                     <div className="md:col-span-3">
                         <label className={labelClass}>Select Staff Role *</label>
@@ -86,7 +86,7 @@ const StaffForm = ({ onSave, onCancel, initialRole }) => {
                         </div>
                     )}
                     {formData.roleName === 'Transport Manager' && (
-                        <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200 mt-2">
+                        <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 mt-2">
                             <div><label className={labelClass}>Vehicle Assigned</label><input type="text" name="vehicleAssigned" value={formData.vehicleAssigned} onChange={handleChange} className={inputClass} /></div>
                             <div><label className={labelClass}>Route Assigned</label><input type="text" name="routeAssigned" value={formData.routeAssigned} onChange={handleChange} className={inputClass} /></div>
                             <div><label className={labelClass}>License Number</label><input type="text" name="licenseNumber" value={formData.licenseNumber} onChange={handleChange} className={inputClass} /></div>

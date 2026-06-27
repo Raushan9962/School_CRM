@@ -38,21 +38,21 @@ const LeaveApproval = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading leave requests...</div>;
+    if (loading) return <div className="p-5 text-center text-slate-500">Loading leave requests...</div>;
 
     const pendingLeaves = leaves.filter(l => l.status === 'Pending');
     const pastLeaves = leaves.filter(l => l.status !== 'Pending');
 
     return (
-        <div className="animate-fade-in p-6">
-            <div className="mb-6">
-                <h2 className="text-2xl font-extrabold text-slate-800 m-0">Leave Approval Workflow</h2>
+        <div className="animate-fade-in p-4">
+            <div className="mb-4">
+                <h2 className="text-xl font-extrabold text-slate-800 m-0">Leave Approval Workflow</h2>
                 <p className="text-slate-500 text-sm mt-1">Review and manage leave applications from teachers and staff.</p>
             </div>
 
             {pendingLeaves.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
                         <Clock size={18} className="text-amber-500" /> Pending Approvals ({pendingLeaves.length})
                     </h3>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -61,7 +61,7 @@ const LeaveApproval = () => {
                                 <div className="absolute top-0 left-0 w-1 h-full bg-amber-400"></div>
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
-                                        <h4 className="font-bold text-slate-800 m-0 text-lg">{leave.name}</h4>
+                                        <h4 className="font-bold text-slate-800 m-0 text-sm">{leave.name}</h4>
                                         <p className="text-sm font-medium text-slate-500 m-0 mt-0.5">{leave.role} {leave.employee_id ? `(${leave.employee_id})` : ''}</p>
                                     </div>
                                     <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full">{leave.type} Leave</span>
@@ -104,7 +104,7 @@ const LeaveApproval = () => {
             )}
 
             <div>
-                <h3 className="text-lg font-bold text-slate-700 mb-4">Past Records</h3>
+                <h3 className="text-sm font-bold text-slate-700 mb-4">Past Records</h3>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -117,7 +117,7 @@ const LeaveApproval = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {pastLeaves.length === 0 ? (
-                                <tr><td colSpan="4" className="p-8 text-center text-slate-500">No past leave records.</td></tr>
+                                <tr><td colSpan="4" className="p-5 text-center text-slate-500">No past leave records.</td></tr>
                             ) : (
                                 pastLeaves.map(leave => (
                                     <tr key={leave.id} className="hover:bg-slate-50 transition-colors">

@@ -9,9 +9,9 @@ const Notifications = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Transport Notifications</h2>
+                <h2 className="m-0 text-xl text-slate-900">Transport Notifications</h2>
             </div>
 
             <div className="flex gap-4 border-b border-slate-200 pb-4">

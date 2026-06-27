@@ -76,16 +76,16 @@ const SubjectManagement = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading subjects...</div>;
+    if (loading) return <div className="p-5 text-center text-slate-500">Loading subjects...</div>;
 
     const inputClass = "w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm";
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
-        <div className="animate-fade-in p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="animate-fade-in p-4">
+            <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h2 className="text-2xl font-extrabold text-slate-800 m-0">Subject Management</h2>
+                    <h2 className="text-xl font-extrabold text-slate-800 m-0">Subject Management</h2>
                     <p className="text-slate-500 text-sm mt-1">Create subjects and map them to classes and teachers.</p>
                 </div>
                 <button 
@@ -96,19 +96,19 @@ const SubjectManagement = () => {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subjects.length === 0 ? (
-                    <div className="col-span-full p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-500">No subjects created yet.</div>
+                    <div className="col-span-full p-5 text-center bg-white rounded-lg border border-slate-200 text-slate-500">No subjects created yet.</div>
                 ) : (
                     subjects.map(sub => (
-                        <div key={sub.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow flex flex-col">
+                        <div key={sub.id} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow flex flex-col">
                             <div className="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
                                         <BookOpen size={20} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-slate-800 m-0 text-lg">{sub.name}</h3>
+                                        <h3 className="font-bold text-slate-800 m-0 text-sm">{sub.name}</h3>
                                         <p className="text-xs font-semibold text-slate-500 m-0 mt-1 uppercase tracking-wider">{sub.code || 'NO CODE'}</p>
                                     </div>
                                 </div>
@@ -131,8 +131,8 @@ const SubjectManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Create New Subject</h3>
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Create New Subject</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className={labelClass}>Subject Name</label>

@@ -13,9 +13,9 @@ const TransportReports = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Reports & Analytics</h2>
+                <h2 className="m-0 text-xl text-slate-900">Reports & Analytics</h2>
             </div>
 
             <div style={{ display: 'flex', gap: '16px', background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>

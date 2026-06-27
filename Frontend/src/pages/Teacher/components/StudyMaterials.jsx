@@ -10,9 +10,9 @@ const StudyMaterials = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Study Materials</h2>
+                <h2 className="m-0 text-xl text-slate-900">Study Materials</h2>
                 <button onClick={() => setIsUploadModalOpen(true)} className="px-5 py-2.5 bg-blue-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center gap-2 shadow-md shadow-blue-500/20 hover:bg-blue-600 transition">
                     📤 Upload Material
                 </button>
@@ -60,8 +60,8 @@ const StudyMaterials = () => {
             {isUploadModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div style={{ background: 'white', width: '500px', borderRadius: '16px', padding: '32px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="m-0 text-xl text-slate-900">Upload Study Material</h3>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="m-0 text-lg text-slate-900">Upload Study Material</h3>
                             <button onClick={() => setIsUploadModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
                         </div>
                         

@@ -149,7 +149,7 @@ const StudentManagement = ({ activeAction }) => {
   return (
     <div className="animate-fade-in relative" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
       <div className="flex justify-between items-center px-2">
-        <h2 className="text-lg font-bold text-slate-800 m-0">Student List</h2>
+        <h2 className="text-sm font-bold text-slate-800 m-0">Student List</h2>
         <div className="flex gap-3 flex-wrap">
           <ActionBtn text="Add New Student" icon="➕" onClick={handleCreateNew} color="bg-blue-600" />
         </div>
@@ -193,8 +193,8 @@ const StudentManagement = ({ activeAction }) => {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl animate-fade-in">
-            <h3 className="text-xl font-bold text-slate-800 mb-6">{editingId ? 'Edit Student' : 'Add New Student'}</h3>
+          <div className="bg-white rounded-lg p-5 w-full max-w-2xl shadow-2xl animate-fade-in">
+            <h3 className="text-lg font-bold text-slate-800 mb-4">{editingId ? 'Edit Student' : 'Add New Student'}</h3>
             <form onSubmit={handleSaveStudent} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-slate-500 mb-1">Full Name</label><input required type="text" name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
               <div><label className="block text-xs font-semibold text-slate-500 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full p-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -215,9 +215,9 @@ const StudentManagement = ({ activeAction }) => {
       {/* Promote Modal */}
       {showPromoteModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fade-in text-center">
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Promote Student</h3>
-            <p className="text-slate-500 text-sm mb-6">Promoting {activeStudent?.name}</p>
+          <div className="bg-white rounded-lg p-5 w-full max-w-md shadow-2xl animate-fade-in text-center">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Promote Student</h3>
+            <p className="text-slate-500 text-sm mb-4">Promoting {activeStudent?.name}</p>
             <form onSubmit={handlePromoteSubmit} className="space-y-4 text-left">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">New Class ID</label>
@@ -239,10 +239,10 @@ const StudentManagement = ({ activeAction }) => {
       {/* Transfer Modal */}
       {showTransferModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fade-in text-center">
+          <div className="bg-white rounded-lg p-5 w-full max-w-md shadow-2xl animate-fade-in text-center">
             <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">🚪</div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Transfer Student</h3>
-            <p className="text-slate-500 text-sm mb-6">Initiating transfer for {activeStudent?.name}</p>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Transfer Student</h3>
+            <p className="text-slate-500 text-sm mb-4">Initiating transfer for {activeStudent?.name}</p>
             <form onSubmit={handleTransferSubmit} className="space-y-4 text-left">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Transfer Date</label>
@@ -266,21 +266,21 @@ const StudentManagement = ({ activeAction }) => {
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4">
 
           <div className="flex justify-between w-full max-w-md mb-4 text-white">
-            <h3 className="text-xl font-bold">Student ID Card</h3>
+            <h3 className="text-lg font-bold">Student ID Card</h3>
             <button onClick={() => setShowIdCardModal(false)} className="text-slate-300 hover:text-white font-bold">✕ Close</button>
           </div>
 
-          <div className="bg-white rounded-xl overflow-hidden shadow-2xl w-full max-w-md border border-slate-200 mb-6 animate-fade-in relative">
+          <div className="bg-white rounded-xl overflow-hidden shadow-2xl w-full max-w-md border border-slate-200 mb-4 animate-fade-in relative">
             <div className="bg-indigo-600 p-4 text-center text-white">
-              <h2 className="font-black text-xl tracking-wider">MODERN PUBLIC SCHOOL</h2>
+              <h2 className="font-black text-lg tracking-wider">MODERN PUBLIC SCHOOL</h2>
               <p className="text-xs text-indigo-200">Excellence in Education</p>
             </div>
-            <div className="p-6 flex flex-col items-center">
+            <div className="p-4 flex flex-col items-center">
               <div className="w-32 h-32 bg-slate-100 rounded-lg border-4 border-white shadow-md flex items-center justify-center text-6xl mb-4 -mt-12">👤</div>
 
               {isEditingIdCard ? (
                 <div className="w-full space-y-3 mb-4">
-                  <input className="w-full text-center text-2xl font-bold text-slate-800 border-b border-indigo-200 outline-none" value={idCardData.name} onChange={(e) => setIdCardData({ ...idCardData, name: e.target.value })} />
+                  <input className="w-full text-center text-xl font-bold text-slate-800 border-b border-indigo-200 outline-none" value={idCardData.name} onChange={(e) => setIdCardData({ ...idCardData, name: e.target.value })} />
                   <div className="flex gap-2">
                     <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.className} onChange={(e) => setIdCardData({ ...idCardData, className: e.target.value })} />
                     <input className="flex-1 text-center font-bold text-indigo-600 border-b border-indigo-100 outline-none" value={idCardData.section} onChange={(e) => setIdCardData({ ...idCardData, section: e.target.value })} />
@@ -288,8 +288,8 @@ const StudentManagement = ({ activeAction }) => {
                   <input className="w-full text-center text-slate-500 border-b border-slate-200 outline-none text-sm" value={idCardData.admissionNo} onChange={(e) => setIdCardData({ ...idCardData, admissionNo: e.target.value })} />
                 </div>
               ) : (
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-slate-800">{idCardData.name}</h3>
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold text-slate-800">{idCardData.name}</h3>
                   <p className="text-indigo-600 font-bold tracking-wide mt-1">{idCardData.className} - Section {idCardData.section}</p>
                   <p className="text-slate-500 text-sm mt-2">Adm No: <span className="font-bold text-slate-700">{idCardData.admissionNo}</span></p>
                   <p className="text-slate-500 text-sm">Roll No: <span className="font-bold text-slate-700">{idCardData.rollNumber}</span></p>

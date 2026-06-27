@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpRight, Bell } from 'lucide-react';
 import { 
-    FcReadingEbook, 
-    FcBusinesswoman, 
-    FcOrganization, 
-    FcCalendar, 
-    FcCurrencyExchange, 
-    FcDebt, 
-    FcLibrary, 
-    FcAddDatabase, 
-    FcSms, 
-    FcInvite,
-    FcCalculator,
-    FcCallback,
-    FcAutomotive,
-    FcHome,
-    FcManager
-} from 'react-icons/fc';
+    Users, 
+    BookOpen, 
+    Calculator, 
+    Calendar, 
+    CreditCard, 
+    Clock,
+    PhoneCall,
+    Bus,
+    Home,
+    UserCog,
+    IndianRupee,
+    TrendingUp,
+    TrendingDown,
+    Activity
+} from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,164 +44,134 @@ import apiFetch from '../../../services/api';
 
 const DashboardOverview = ({ setActiveTab }) => {
     const [stats, setStats] = useState({
-        totalStudents: 0,
-        totalTeachers: 0,
-        totalAccountants: 0,
-        totalLibrarians: 0,
-        totalReceptionists: 0,
-        totalTransportStaff: 0,
-        totalWardens: 0,
-        totalHR: 0,
-        todayAttendancePercent: 0,
-        feesCollected: 0,
-        pendingFees: 0,
-        upcomingExams: 0,
-        newAdmissions: 0,
-        notifications: 0,
-        birthdayToday: 0
+        totalStudents: 850,
+        totalTeachers: 45,
+        totalAccountants: 2,
+        totalLibrarians: 3,
+        totalReceptionists: 2,
+        totalTransportStaff: 12,
+        totalWardens: 4,
+        totalHR: 1,
+        todayAttendancePercent: 92,
+        feesCollected: 1250000,
+        pendingFees: 450000,
+        upcomingExams: 14,
+        newAdmissions: 28,
+        notifications: 5,
+        birthdayToday: 3
     });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const res = await apiFetch('/school-admin/dashboard-stats');
-                const data = await res.json();
-                if (data.success) {
-                    setStats(data.data);
-                }
-            } catch (err) {
-                console.error("Error fetching dashboard stats:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchStats();
-    }, []);
+    // Using exact Accountant dashboard styling
+    const containerStyle = { display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' };
+    const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+    const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
+    const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
+    const sectionTitleStyle = { fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' };
 
     const statCards = [
-        { title: 'Total Students', value: stats.totalStudents, icon: <FcReadingEbook size={28} />, color: '#3b82f6', bg: '#eff6ff', borderTop: 'border-t-blue-500', tab: 'student' },
-        { title: 'Total Teachers', value: stats.totalTeachers, icon: <FcBusinesswoman size={28} />, color: '#10b981', bg: '#ecfdf5', borderTop: 'border-t-emerald-500', tab: 'teacher' },
-        { title: 'Accountants', value: stats.totalAccountants, icon: <FcCalculator size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'accountant' },
-        { title: 'Librarians', value: stats.totalLibrarians, icon: <FcLibrary size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'librarian' },
-        { title: 'Receptionists', value: stats.totalReceptionists, icon: <FcCallback size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'receptionist' },
-        { title: 'Transport Staff', value: stats.totalTransportStaff, icon: <FcAutomotive size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'transport_staff' },
-        { title: 'Hostel Wardens', value: stats.totalWardens, icon: <FcHome size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'warden' },
-        { title: 'HR Managers', value: stats.totalHR, icon: <FcManager size={28} />, color: '#8b5cf6', bg: '#f5f3ff', borderTop: 'border-t-violet-500', tab: 'hr' },
-        { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <FcCalendar size={28} />, color: '#f59e0b', bg: '#fffbeb', borderTop: 'border-t-amber-500', tab: 'student' },
-        { title: 'Fees Collected', value: `₹${stats.feesCollected.toLocaleString()}`, icon: <FcCurrencyExchange size={28} />, color: '#14b8a6', bg: '#f0fdfa', borderTop: 'border-t-teal-500', tab: 'finance' },
-        { title: 'Pending Fees', value: `₹${stats.pendingFees.toLocaleString()}`, icon: <FcDebt size={28} />, color: '#ef4444', bg: '#fef2f2', borderTop: 'border-t-rose-500', tab: 'finance' },
-        { title: 'Upcoming Exams', value: `${stats.upcomingExams} Days`, icon: <FcLibrary size={28} />, color: '#6366f1', bg: '#eef2ff', borderTop: 'border-t-indigo-500', tab: 'student' },
-        { title: 'New Admissions', value: stats.newAdmissions, icon: <FcAddDatabase size={28} />, color: '#ec4899', bg: '#fdf2f8', borderTop: 'border-t-pink-500', tab: 'student' },
-        { title: 'Notifications', value: stats.notifications, icon: <FcSms size={28} />, color: '#eab308', bg: '#fefce8', borderTop: 'border-t-yellow-500', tab: 'overview' },
-        { title: 'Birthday Today', value: stats.birthdayToday, icon: <FcInvite size={28} />, color: '#f43f5e', bg: '#fff1f2', borderTop: 'border-t-rose-500', tab: 'student' },
+        { title: 'Total Students', value: stats.totalStudents, icon: <Users size={18} />, bg: '#eff6ff', color: '#3b82f6', tab: 'student' },
+        { title: 'Total Teachers', value: stats.totalTeachers, icon: <BookOpen size={18} />, bg: '#ecfdf5', color: '#10b981', tab: 'teacher' },
+        { title: 'Accountants', value: stats.totalAccountants, icon: <Calculator size={18} />, bg: '#f5f3ff', color: '#8b5cf6', tab: 'accountant' },
+        { title: 'Transport Staff', value: stats.totalTransportStaff, icon: <Bus size={18} />, bg: '#fffbeb', color: '#f59e0b', tab: 'transport_staff' },
+        { title: 'Fees Collected', value: `₹${(stats.feesCollected/100000).toFixed(1)}L`, icon: <IndianRupee size={18} />, bg: '#f0fdfa', color: '#14b8a6', tab: 'finance' },
+        { title: 'Pending Fees', value: `₹${(stats.pendingFees/100000).toFixed(1)}L`, icon: <Clock size={18} />, bg: '#fef2f2', color: '#ef4444', tab: 'finance' },
+        { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <Activity size={18} />, bg: '#eef2ff', color: '#6366f1', tab: 'student' },
+        { title: 'Upcoming Exams', value: stats.upcomingExams, icon: <Calendar size={18} />, bg: '#fdf2f8', color: '#ec4899', tab: 'student' },
     ];
 
-    if (loading) {
-        return <div className="p-8 text-center text-slate-500">Loading Dashboard Stats...</div>;
-    }
+    const chartData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [
+            {
+                label: 'Fee Collection',
+                data: [45000, 52000, 48000, 61000, 59000, 75000, 80000, 76000, 85000, 92000, 88000, 110000],
+                backgroundColor: '#3b82f6',
+                borderRadius: 4,
+            },
+            {
+                label: 'Expenses',
+                data: [30000, 32000, 31000, 35000, 34000, 38000, 40000, 42000, 45000, 48000, 50000, 55000],
+                backgroundColor: '#ef4444',
+                borderRadius: 4,
+            }
+        ]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } } },
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+        }
+    };
 
     return (
-        <div className="animate-fade-in max-w-[1600px] mx-auto pb-10">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-[22px] font-bold text-slate-800 tracking-tight">Overview</h2>
-                <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Generate Report</button>
+        <div style={containerStyle} className="animate-fade-in">
+            <div style={headerStyle}>
+                <div>
+                    <h2 style={titleStyle}>Dashboard Overview</h2>
+                    <p style={subTitleStyle}>School administrative summary and key metrics</p>
                 </div>
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
                 {statCards.map((card, idx) => (
                     <div 
                         key={idx} 
                         onClick={() => setActiveTab(card.tab)}
-                        className={`bg-white rounded-xl border border-slate-200 border-t-2 ${card.borderTop} shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer p-4 flex flex-col justify-between h-[120px]`}
+                        style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                        className="hover:border-slate-300 hover:shadow-md"
                     >
-                        <div className="flex justify-between items-start">
-                            <p className="text-[13px] font-semibold text-slate-500">{card.title}</p>
-                            <div className="w-10 h-10 rounded-[10px] flex items-center justify-center border border-white/40 shadow-sm" style={{ backgroundColor: card.bg }}>
-                                {card.icon}
-                            </div>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {card.icon}
                         </div>
-                        <div className="flex items-end justify-between">
-                            <h3 className="text-2xl font-bold text-slate-800 tracking-tight">{card.value}</h3>
-                            <div className="flex items-center text-emerald-500 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
-                                <ArrowUpRight size={12} />
-                                <span>2.5%</span>
-                            </div>
+                        <div>
+                            <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>{card.title}</p>
+                            <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>{card.value}</h3>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-[15px] font-bold text-slate-800">Revenue Trend</h3>
-                        <select className="text-sm border border-slate-200 rounded-md px-2 py-1 bg-slate-50 text-slate-600 outline-none">
-                            <option>This Year</option>
-                            <option>Last Year</option>
-                        </select>
-                    </div>
-                    <div className="h-[250px] w-full">
-                        <Bar 
-                            options={{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: {
-                                        backgroundColor: '#1e293b',
-                                        padding: 10,
-                                        titleFont: { size: 13 },
-                                        bodyFont: { size: 14, weight: 'bold' },
-                                        callbacks: {
-                                            label: (context) => `₹${context.raw.toLocaleString()}`
-                                        }
-                                    }
-                                },
-                                scales: {
-                                    x: { grid: { display: false } },
-                                    y: { 
-                                        border: { display: false },
-                                        grid: { color: '#f1f5f9' },
-                                        ticks: {
-                                            callback: (value) => `₹${value / 1000}k`
-                                        }
-                                    }
-                                }
-                            }} 
-                            data={{
-                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                                datasets: [{
-                                    label: 'Revenue',
-                                    data: [45000, 72000, 50000, 95000, 68000, 85000, 58000, 110000, 40000, 90000, 65000, 80000],
-                                    backgroundColor: '#3b82f6',
-                                    borderRadius: 4,
-                                    barPercentage: 0.6
-                                }]
-                            }} 
-                        />
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+                {/* Chart Section */}
+                <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                    <h3 style={sectionTitleStyle}>
+                        <TrendingUp size={16} className="text-slate-500" /> Revenue vs Expenses (Yearly)
+                    </h3>
+                    <div style={{ height: '300px' }}>
+                        <Bar data={chartData} options={chartOptions} />
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] p-5">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-[15px] font-bold text-slate-800">Recent Activity</h3>
-                        <button className="text-[12px] text-blue-600 font-semibold hover:underline">View All</button>
-                    </div>
-                    <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="flex gap-3 items-start pb-4 border-b border-slate-50 last:border-0 last:pb-0">
-                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                                    <Bell size={14} className="text-slate-500" />
+                {/* Quick Actions & Alerts */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                        <h3 style={sectionTitleStyle}>
+                            <Activity size={16} className="text-slate-500" /> Recent Activity
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            {[
+                                { title: 'New Admission', desc: 'Aarav Patel added to Class 10-A', time: '10 mins ago', color: '#3b82f6' },
+                                { title: 'Fee Collected', desc: '₹45,000 collected via Term 1', time: '1 hr ago', color: '#10b981' },
+                                { title: 'Leave Request', desc: 'Mr. Sharma (Math) requested 2 days', time: '3 hrs ago', color: '#f59e0b' },
+                                { title: 'Transport Alert', desc: 'Bus Route #4 delayed by 15m', time: '5 hrs ago', color: '#ef4444' }
+                            ].map((alert, idx) => (
+                                <div key={idx} style={{ display: 'flex', gap: '12px' }}>
+                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: alert.color, marginTop: '6px' }}></div>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 'bold' }}>{alert.title}</p>
+                                        <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>{alert.desc}</p>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>{alert.time}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[13px] font-medium text-slate-700 leading-tight">System update completed successfully</p>
-                                    <p className="text-[11px] text-slate-400 mt-1">{i} hour{i > 1 ? 's' : ''} ago</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

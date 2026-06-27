@@ -104,17 +104,17 @@ const StudentDashboard = () => {
             {/* Sidebar */}
             <aside className={`overflow-hidden bg-white transition-[width] duration-300 flex flex-col border-r border-slate-200 z-10 ${isSidebarOpen ? 'w-[260px]' : 'w-0'}`}>
                 {/* Profile Header */}
-                <div className="p-6 pb-2 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+                <div className="p-4 pb-2 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
                         {currentUser?.name ? currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : 'ST'}
                     </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-slate-800 m-0 text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{currentUser?.name || 'Student'}</p>
+                        <p className="text-slate-800 m-0 text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{currentUser?.name || 'Student'}</p>
                     </div>
                 </div>
                 
                 {/* Brand Selector */}
-                <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors mb-2">
+                <div className="px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors mb-2">
                     <span className="text-slate-600 font-semibold tracking-wide text-sm uppercase">VIDYASETU</span>
                     <span className="text-slate-400 text-[10px]">▶</span>
                 </div>
@@ -144,13 +144,13 @@ const StudentDashboard = () => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
                 {/* Header */}
-                <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-slate-200 z-[5]">
+                <header className="bg-white px-4 py-2 flex justify-between items-center border-b border-slate-200 z-[5]">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="bg-transparent border-none text-xl cursor-pointer text-slate-500 p-1 flex items-center hover:text-slate-800 transition-colors">
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="bg-transparent border-none text-lg cursor-pointer text-slate-500 p-1 flex items-center hover:text-slate-800 transition-colors">
                             <Menu size={24} />
                         </button>
                         <div>
-                            <h1 className="m-0 text-xl font-semibold text-gray-900">{getActiveTitle()}</h1>
+                            <h1 className="m-0 text-lg font-semibold text-gray-900">{getActiveTitle()}</h1>
                         </div>
                     </div>
                     <div className="flex gap-3">

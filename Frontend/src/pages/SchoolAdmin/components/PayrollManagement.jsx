@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IndianRupee, Download, CheckCircle, Clock, FileText } from 'lucide-react';
+import { IndianRupee, Download, CheckCircle, Clock, FileText, CheckCircle2, Check, Filter } from 'lucide-react';
 import apiFetch from '../../../services/api';
-import PremiumTable from '../../../components/ui/PremiumTable';
 
 const PayrollManagement = ({ roleFilter }) => {
     const [staff, setStaff] = useState([]);
@@ -51,7 +50,7 @@ const PayrollManagement = ({ roleFilter }) => {
             }
         };
         fetchPayroll();
-    }, []);
+    }, [roleFilter]);
 
     const filteredStaff = staff.filter(s => 
         (tab === 'all' || s.status.toLowerCase() === tab) &&
@@ -62,95 +61,146 @@ const PayrollManagement = ({ roleFilter }) => {
     const totalPayroll = staff.reduce((acc, s) => acc + (s.basicSalary + s.allowances - s.deductions), 0);
     const processedPayroll = staff.filter(s => s.status === 'Processed').reduce((acc, s) => acc + (s.basicSalary + s.allowances - s.deductions), 0);
 
-    const kpiCards = [
-        { label: 'Total Payroll (Monthly)', value: `₹${totalPayroll.toLocaleString()}`, active: tab === 'all', onClick: () => setTab('all') },
-        { label: 'Processed', value: `₹${processedPayroll.toLocaleString()}`, active: tab === 'processed', onClick: () => setTab('processed') },
-        { label: 'Pending Processing', value: `₹${(totalPayroll - processedPayroll).toLocaleString()}`, active: tab === 'pending', onClick: () => setTab('pending') }
-    ];
-
-    const actions = (
-        <div className="flex gap-2">
-            <button className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
-                <Download size={16} /> Export CSV
-            </button>
-            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
-                <IndianRupee size={16} /> Process All
-            </button>
-        </div>
-    );
-
-    const columns = [
-        { 
-            label: 'Employee', 
-            sortable: true,
-            render: (row) => (
-                <div className="flex items-center gap-3">
-                    <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} className="w-10 h-10 rounded-full border border-slate-200" />
-                    <div className="text-left">
-                        <p className="font-bold text-slate-800 m-0 leading-tight">{row.name}</p>
-                        <p className="text-[11px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 rounded mt-0.5 m-0 uppercase tracking-wider">{row.role}</p>
-                    </div>
-                </div>
-            )
-        },
-        { 
-            label: 'Net Salary', 
-            sortable: true,
-            render: (row) => {
-                const net = row.basicSalary + row.allowances - row.deductions;
-                return (
-                    <div className="text-left">
-                        <p className="font-bold text-slate-800 m-0 leading-tight">₹{net.toLocaleString()}</p>
-                        <p className="text-[11px] text-slate-500 m-0">Basic: ₹{row.basicSalary.toLocaleString()}</p>
-                    </div>
-                );
-            }
-        },
-        { 
-            label: 'Status', 
-            sortable: true,
-            render: (row) => {
-                if (row.status === 'Processed') {
-                    return (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[12px] font-bold border border-emerald-100">
-                            <CheckCircle size={14} className="text-emerald-500" /> Processed
-                        </span>
-                    );
-                }
-                return (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-[12px] font-bold border border-amber-100">
-                        <Clock size={14} className="text-amber-500" /> Pending
-                    </span>
-                );
-            }
-        },
-        { 
-            label: 'Action', 
-            render: (row) => (
-                <div className="flex justify-center gap-2">
-                    <button className="flex items-center justify-center p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="View Payslip">
-                        <FileText size={16} />
-                    </button>
-                    {row.status === 'Pending' && (
-                        <button className="flex items-center justify-center p-1.5 text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="Process Salary">
-                            <IndianRupee size={16} />
-                        </button>
-                    )}
-                </div>
-            )
-        }
-    ];
-
     return (
-        <PremiumTable 
-            title="Payroll Management"
-            actions={actions}
-            columns={columns} 
-            data={filteredStaff} 
-            kpiCards={kpiCards}
-            onSearch={setSearch}
-            loading={loading}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a', fontWeight: 'bold' }}>Salary & Payroll</h3>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button style={{ background: 'white', border: '1px solid #cbd5e1', color: '#475569', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                        <Download size={14} /> Export CSV
+                    </button>
+                    <button style={{ background: '#1e293b', border: 'none', color: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                        <IndianRupee size={14} /> Process All
+                    </button>
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div 
+                    onClick={() => setTab('all')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: tab === 'all' ? '1px solid #3b82f6' : '1px solid #e2e8f0', boxShadow: tab === 'all' ? '0 0 0 1px #3b82f6' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <IndianRupee size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Total Payroll</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>₹{totalPayroll.toLocaleString()}</h3>
+                    </div>
+                </div>
+
+                <div 
+                    onClick={() => setTab('processed')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: tab === 'processed' ? '1px solid #10b981' : '1px solid #e2e8f0', boxShadow: tab === 'processed' ? '0 0 0 1px #10b981' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <CheckCircle2 size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Processed</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>₹{processedPayroll.toLocaleString()}</h3>
+                    </div>
+                </div>
+
+                <div 
+                    onClick={() => setTab('pending')}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: tab === 'pending' ? '1px solid #f59e0b' : '1px solid #e2e8f0', boxShadow: tab === 'pending' ? '0 0 0 1px #f59e0b' : '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#fffbeb', color: '#b45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Clock size={18} />
+                    </div>
+                    <div>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Pending</p>
+                        <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>₹{(totalPayroll - processedPayroll).toLocaleString()}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <h3 style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FileText size={16} className="text-slate-500" /> Payroll Records
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '4px 8px' }}>
+                        <Filter size={14} color="#64748b" />
+                        <input 
+                            type="text" 
+                            placeholder="Search employee..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            style={{ border: 'none', outline: 'none', fontSize: '12px', width: '200px' }}
+                        />
+                    </div>
+                </div>
+                
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                            <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Employee</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Net Salary</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Status</th>
+                                <th style={{ padding: '10px 16px', fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>Loading payroll data...</td>
+                                </tr>
+                            ) : filteredStaff.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '30px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>No records found.</td>
+                                </tr>
+                            ) : (
+                                filteredStaff.map((row, idx) => {
+                                    const net = row.basicSalary + row.allowances - row.deductions;
+                                    return (
+                                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover:bg-slate-50 transition-colors">
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <img src={row.image || `https://api.dicebear.com/5.x/initials/svg?seed=${row.name}`} alt={row.name} style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #e2e8f0' }} />
+                                                    <div>
+                                                        <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{row.name}</p>
+                                                        <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>{row.role}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '14px', color: '#1e293b' }}>₹{net.toLocaleString()}</p>
+                                                <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>Base: ₹{row.basicSalary.toLocaleString()} | Allow: ₹{row.allowances.toLocaleString()} | Ded: ₹{row.deductions.toLocaleString()}</p>
+                                            </td>
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <span style={{ 
+                                                    display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase',
+                                                    background: row.status === 'Processed' ? '#dcfce7' : '#fef3c7',
+                                                    color: row.status === 'Processed' ? '#166534' : '#92400e',
+                                                    border: `1px solid ${row.status === 'Processed' ? '#bbf7d0' : '#fde68a'}`
+                                                }}>
+                                                    {row.status === 'Processed' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                                                    {row.status}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                                                {row.status === 'Pending' ? (
+                                                    <button style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', padding: '6px 12px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                        <Check size={14} /> Process
+                                                    </button>
+                                                ) : (
+                                                    <button style={{ background: 'white', border: '1px solid #cbd5e1', color: '#475569', padding: '6px 12px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }} className="hover:bg-slate-50">
+                                                        <FileText size={14} /> Slip
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     );
 };
 

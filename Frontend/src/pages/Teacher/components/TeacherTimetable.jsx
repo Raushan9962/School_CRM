@@ -1,90 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiFetch from '../../../services/api';
+import { Calendar } from 'lucide-react';
+
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const TeacherTimetable = () => {
-    const [view, setView] = useState('weekly');
+    const [timetable, setTimetable] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const schedule = [
-        { day: 'Monday', slots: [
-            { time: '08:30 - 09:30', class: '10 - A', subject: 'Science', room: 'Lab 1', type: 'Regular' },
-            { time: '09:30 - 10:30', class: '9 - B', subject: 'Physics', room: 'Room 201', type: 'Regular' },
-            { time: '10:30 - 11:00', type: 'Break' },
-            { time: '11:00 - 12:00', class: '10 - B', subject: 'Science', room: 'Lab 1', type: 'Regular' }
-        ]},
-        { day: 'Tuesday', slots: [
-            { time: '08:30 - 09:30', class: '9 - A', subject: 'Physics', room: 'Room 202', type: 'Regular' },
-            { time: '09:30 - 10:30', class: '8 - C', subject: 'Science', room: 'Room 105', type: 'Substitute', originalTeacher: 'Mr. Verma' },
-            { time: '10:30 - 11:00', type: 'Break' }
-        ]}
-    ];
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const todayDay = DAYS[new Date().getDay() - 1] || '';
+
+    useEffect(() => {
+        apiFetch('/teacher-portal/my-timetable', { headers })
+            .then(r => r.json())
+            .then(d => { if (d.success) setTimetable(d.data); })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
+
+    const byDay = DAYS.reduce((acc, day) => {
+        acc[day] = timetable.filter(t => t.day_of_week?.toLowerCase() === day.toLowerCase());
+        return acc;
+    }, {});
+
+    const subjectColors = {};
+    const palette = ['#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899','#14b8a6'];
+    let colorIdx = 0;
+    timetable.forEach(t => {
+        if (!subjectColors[t.subject_name]) {
+            subjectColors[t.subject_name] = palette[colorIdx % palette.length];
+            colorIdx++;
+        }
+    });
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">My Timetable</h2>
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        📥 Download PDF
-                    </button>
-                    <button style={{ padding: '8px 16px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
-                        🔄 Request Shift Change
-                    </button>
+                <h2 className="m-0 text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <Calendar size={22} className="text-indigo-600" /> My Timetable
+                </h2>
+                <div className="text-xs text-slate-500 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-200 font-bold whitespace-nowrap">
+                    {timetable.length} period(s) per week
                 </div>
             </div>
 
-            <div className="flex gap-4 border-b border-slate-200 pb-4">
-                {['weekly', 'daily'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setView(tab)}
-                        style={{
-                            padding: '8px 16px',
-                            background: view === tab ? '#10b981' : 'white',
-                            color: view === tab ? 'white' : '#64748b',
-                            border: view === tab ? 'none' : '1px solid #cbd5e1',
-                            borderRadius: '20px',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            textTransform: 'capitalize'
-                        }}
-                    >
-                        {tab} View
-                    </button>
-                ))}
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <div className="flex flex-col gap-6">
-                    {schedule.map((dayObj, idx) => (
-                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b', borderBottom: '2px solid #e2e8f0', paddingBottom: '8px' }}>{dayObj.day}</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                                {dayObj.slots.map((slot, sIdx) => (
-                                    <div key={sIdx} style={{ padding: '16px', borderRadius: '12px', border: '1px solid', borderColor: slot.type === 'Break' ? '#cbd5e1' : (slot.type === 'Substitute' ? '#fde68a' : '#bfdbfe'), background: slot.type === 'Break' ? '#f8fafc' : (slot.type === 'Substitute' ? '#fffbeb' : '#eff6ff') }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: slot.type === 'Break' ? '#64748b' : (slot.type === 'Substitute' ? '#d97706' : '#2563eb') }}>{slot.time}</span>
-                                            {slot.type !== 'Break' && (
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', background: slot.type === 'Substitute' ? '#fef3c7' : '#dbeafe', color: slot.type === 'Substitute' ? '#b45309' : '#1d4ed8' }}>{slot.type}</span>
-                                            )}
-                                        </div>
-                                        {slot.type === 'Break' ? (
-                                            <h4 style={{ margin: 0, fontSize: '16px', color: '#64748b', textAlign: 'center' }}>Break</h4>
-                                        ) : (
-                                            <>
-                                                <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b' }}>{slot.class} • {slot.subject}</h4>
-                                                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>📍 {slot.room}</p>
-                                                {slot.originalTeacher && (
-                                                    <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#d97706', fontStyle: 'italic' }}>Subbing for {slot.originalTeacher}</p>
-                                                )}
-                                            </>
-                                        )}
+            {loading ? (
+                <div className="text-center p-20 text-slate-400 font-medium">Loading timetable...</div>
+            ) : timetable.length === 0 ? (
+                <div className="bg-white rounded-lg p-16 text-center border-2 border-dashed border-slate-200 flex flex-col items-center">
+                    <Calendar size={48} strokeWidth={1.5} className="text-slate-300 mb-4" />
+                    <h3 className="text-slate-500 font-bold m-0 mb-2 text-sm">No timetable assigned</h3>
+                    <p className="text-slate-400 m-0 text-sm">Contact your administrator to set up your timetable.</p>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-4">
+                    {DAYS.map(day => {
+                        const periods = byDay[day];
+                        const isToday = day === todayDay;
+                        return (
+                            <div key={day} className={`bg-white rounded-lg overflow-hidden transition-shadow ${isToday ? 'border-2 border-indigo-500 shadow-[0_4px_16px_rgba(99,102,241,0.12)]' : 'border border-slate-100 shadow-sm hover:shadow-md'}`}>
+                                <div className={`px-5 py-3 flex items-center justify-between ${isToday ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' : 'bg-slate-50'}`}>
+                                    <span className={`font-bold text-[15px] ${isToday ? 'text-white' : 'text-slate-700'}`}>
+                                        {day} {isToday && '(Today)'}
+                                    </span>
+                                    <span className={`text-xs font-bold ${isToday ? 'text-white/80' : 'text-slate-400'}`}>
+                                        {periods.length} period(s)
+                                    </span>
+                                </div>
+                                {periods.length === 0 ? (
+                                    <div className="px-5 py-4 text-slate-400 text-sm italic font-medium">No classes scheduled</div>
+                                ) : (
+                                    <div className="flex flex-wrap gap-3 p-4 sm:p-5">
+                                        {periods.map((p, i) => {
+                                            const color = subjectColors[p.subject_name] || '#6366f1';
+                                            return (
+                                                <div key={i} className="px-4 py-3 rounded-xl min-w-[140px]" style={{ background: color + '15', border: `1px solid ${color}30` }}>
+                                                    <p className="m-0 mb-1 text-[11px] font-extrabold uppercase tracking-wider" style={{ color }}>Period {p.period_number}</p>
+                                                    <p className="m-0 mb-0.5 text-[14px] font-bold text-slate-800">{p.subject_name}</p>
+                                                    <p className="m-0 mb-0.5 text-[12px] font-medium text-slate-500">Class {p.class_name} {p.section}</p>
+                                                    <p className="m-0 text-[11px] font-bold text-slate-400">{p.start_time} – {p.end_time}</p>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                ))}
+                                )}
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -63,8 +63,8 @@ const StudentLogin = () => {
       <Link to="/" className="text-orange-500 font-bold text-3xl sm:text-4xl tracking-widest drop-shadow-md mb-8">
         VidyaSetu
       </Link>
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-6">Portal Login</h2>
+      <div className="bg-white p-5 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+        <h2 className="text-xl font-bold text-center text-blue-900 mb-4">Portal Login</h2>
         
         {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm text-center">{error}</div>}
 

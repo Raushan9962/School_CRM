@@ -153,8 +153,8 @@ const GrievanceSystem = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fade-in">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Log New Grievance</h3>
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 animate-fade-in">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Log New Grievance</h3>
                         <form onSubmit={handleCreateGrievance} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Subject / Issue</label>

@@ -10,7 +10,7 @@ const GPSTracking = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
             <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">Live GPS Tracking</h2>
+                <h2 className="m-0 text-xl text-slate-900">Live GPS Tracking</h2>
                 <div className="flex gap-3">
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#475569', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }}></span> On Time

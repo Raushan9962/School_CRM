@@ -77,8 +77,8 @@ const StudentForm = ({ onSave, onCancel }) => {
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <div className="p-6 border-b border-slate-200 bg-slate-50 flex gap-4 overflow-x-auto rounded-t-2xl">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div className="p-4 border-b border-slate-200 bg-slate-50 flex gap-4 overflow-x-auto rounded-t-2xl">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
@@ -95,11 +95,11 @@ const StudentForm = ({ onSave, onCancel }) => {
                 ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6" noValidate>
+            <form onSubmit={handleSubmit} className="p-4" noValidate>
                 
                 {/* Personal Tab */}
                 <div className={activeTab === 'personal' ? 'block' : 'hidden'}>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label className={labelClass}>Full Name *</label><input required type="text" name="name" value={formData.name} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Date of Birth</label><input type="date" name="dob" value={formData.dob} onChange={handleChange} className={inputClass} /></div>
                         <div>
@@ -117,7 +117,7 @@ const StudentForm = ({ onSave, onCancel }) => {
 
                 {/* Contact Tab */}
                 <div className={activeTab === 'contact' ? 'block' : 'hidden'}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2"><label className={labelClass}>Residential Address</label><textarea name="address" value={formData.address} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>City</label><input type="text" name="city" value={formData.city} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>State</label><input type="text" name="state" value={formData.state} onChange={handleChange} className={inputClass} /></div>
@@ -130,7 +130,7 @@ const StudentForm = ({ onSave, onCancel }) => {
 
                 {/* Parent Tab */}
                 <div className={activeTab === 'parent' ? 'block' : 'hidden'}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label className={labelClass}>Father's Name</label><input type="text" name="fatherName" value={formData.fatherName} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Mother's Name</label><input type="text" name="motherName" value={formData.motherName} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Guardian Name (If applicable)</label><input type="text" name="guardianName" value={formData.guardianName} onChange={handleChange} className={inputClass} /></div>
@@ -143,7 +143,7 @@ const StudentForm = ({ onSave, onCancel }) => {
 
                 {/* Academic Tab */}
                 <div className={activeTab === 'academic' ? 'block' : 'hidden'}>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label className={labelClass}>Class ID *</label><input required type="number" name="classId" value={formData.classId} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Section</label><input type="text" name="section" value={formData.section} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Roll Number</label><input type="text" name="rollNumber" value={formData.rollNumber} onChange={handleChange} className={inputClass} /></div>
@@ -156,7 +156,7 @@ const StudentForm = ({ onSave, onCancel }) => {
 
                 {/* Medical Tab */}
                 <div className={activeTab === 'medical' ? 'block' : 'hidden'}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label className={labelClass}>Allergies</label><textarea name="medicalAllergies" value={formData.medicalAllergies} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>Disabilities / Health Issues</label><textarea name="medicalDisabilities" value={formData.medicalDisabilities} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>Family Doctor Name</label><input type="text" name="medicalDoctorName" value={formData.medicalDoctorName} onChange={handleChange} className={inputClass} /></div>
@@ -168,7 +168,7 @@ const StudentForm = ({ onSave, onCancel }) => {
                 <div className={activeTab === 'transport' ? 'block' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div>
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Transport Allocation</h3>
+                            <h3 className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">Transport Allocation</h3>
                             <label className="flex items-center gap-2 mb-4 cursor-pointer">
                                 <input type="checkbox" name="transportRequired" checked={formData.transportRequired} onChange={handleChange} className="w-5 h-5 text-blue-600 rounded border-slate-300" />
                                 <span className="font-medium text-slate-700">School Transport Required</span>
@@ -182,7 +182,7 @@ const StudentForm = ({ onSave, onCancel }) => {
                             )}
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Hostel Allocation</h3>
+                            <h3 className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">Hostel Allocation</h3>
                             <label className="flex items-center gap-2 mb-4 cursor-pointer">
                                 <input type="checkbox" name="hostelRequired" checked={formData.hostelRequired} onChange={handleChange} className="w-5 h-5 text-blue-600 rounded border-slate-300" />
                                 <span className="font-medium text-slate-700">Hostel Resident</span>

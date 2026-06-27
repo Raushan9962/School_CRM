@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X } from 'lucide-react';
+import { Camera, X, Lock, Edit, CreditCard, BookOpen, FileText } from 'lucide-react';
 import apiFetch from '../../../services/api';
 
 const TeacherProfile = () => {
@@ -61,8 +61,9 @@ const TeacherProfile = () => {
         }
     };
 
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const teacher = {
-        name: "Anita Sharma",
+        name: user.name || "Anita Sharma",
         employeeId: "EMP-2023-045",
         department: "Science",
         designation: "Senior Science Teacher",
@@ -72,7 +73,7 @@ const TeacherProfile = () => {
         gender: "Female",
         bloodGroup: "O+",
         contact: {
-            email: "anita.sharma@vidyasetu.edu",
+            email: user.email || "anita.sharma@vidyasetu.edu",
             phone: "+91 98765 43210",
             address: "123, Rose Villa, Green Park Avenue, New Delhi - 110016"
         },
@@ -85,59 +86,54 @@ const TeacherProfile = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-center">
-                <h2 className="m-0 text-2xl text-slate-900">My Profile</h2>
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#475569', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        🔒 Change Password
+        <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 className="m-0 text-xl font-bold text-slate-900 tracking-tight">My Profile</h2>
+                <div className="flex gap-3 w-full sm:w-auto">
+                    <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm">
+                        <Lock size={16} /> Change Password
                     </button>
-                    <button style={{ padding: '8px 16px', background: '#10b981', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(16,185,129,0.2)' }}>
-                        📝 Update Profile Request
+                    <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm">
+                        <Edit size={16} /> Update Profile
                     </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div style={{ height: '120px', background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)' }}></div>
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                {/* Banner */}
+                <div className="h-32 bg-gradient-to-r from-emerald-500 to-emerald-700 w-full"></div>
                 
-                <div style={{ padding: '0 32px 32px', position: 'relative' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-40px', marginBottom: '24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px' }}>
-                            <div className="relative">
-                                <img src={userImage} alt="Profile" style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid white', background: 'white', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', objectFit: 'cover' }} />
-                                <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
-                                <button onClick={() => fileInputRef.current.click()} style={{ position: 'absolute', bottom: 4, right: 4, width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: 'white', border: '2px solid white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Camera size={16} />
+                <div className="px-6 sm:px-8 pb-8 relative">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-end -mt-12 sm:-mt-16 mb-4 gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+                            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-md mx-auto sm:mx-0">
+                                <img src={userImage} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                <button onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white flex items-center justify-center transition-colors shadow-sm cursor-pointer">
+                                    <Camera size={14} />
                                 </button>
                             </div>
-                            <div style={{ paddingBottom: '8px' }}>
-                                <h1 style={{ margin: '0 0 4px 0', fontSize: '24px', color: '#0f172a' }}>{teacher.name}</h1>
-                                <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
-                                    <span>🆔 {teacher.employeeId}</span>
-                                    <span>📚 {teacher.department} Department</span>
+                            <div className="text-center sm:text-left pb-1">
+                                <h1 className="m-0 mb-1.5 text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{teacher.name}</h1>
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-slate-500 text-sm font-semibold">
+                                    <span className="flex items-center gap-1.5"><CreditCard size={16} /> {teacher.employeeId}</span>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span className="flex items-center gap-1.5"><BookOpen size={16} /> {teacher.department} Department</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ borderBottom: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                        <div style={{ display: 'flex', gap: '32px' }}>
+                    {/* Tabs */}
+                    <div className="border-b border-slate-200 mb-4 flex overflow-x-auto hide-scrollbar">
+                        <div className="flex gap-4 sm:gap-8">
                             {['personal', 'documents'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    style={{
-                                        padding: '12px 0',
-                                        background: 'none',
-                                        border: 'none',
-                                        borderBottom: activeTab === tab ? '2px solid #10b981' : '2px solid transparent',
-                                        color: activeTab === tab ? '#10b981' : '#64748b',
-                                        fontWeight: activeTab === tab ? '600' : '500',
-                                        fontSize: '15px',
-                                        cursor: 'pointer',
-                                        textTransform: 'capitalize'
-                                    }}
+                                    className={`py-3 text-[15px] font-semibold whitespace-nowrap border-b-2 transition-colors cursor-pointer ${
+                                        activeTab === tab ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                                    }`}
                                 >
                                     {tab === 'personal' ? 'Professional & Personal Details' : 'Documents'}
                                 </button>
@@ -145,62 +141,63 @@ const TeacherProfile = () => {
                         </div>
                     </div>
 
+                    {/* Tab Content */}
                     {activeTab === 'personal' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                        <div className="flex flex-col gap-8">
                             <div>
-                                <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Professional Information</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Designation</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.designation}</p>
+                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Professional Information</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Designation</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.designation}</p>
                                     </div>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Qualification</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.qualification}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Qualification</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.qualification}</p>
                                     </div>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Experience</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.experience}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Experience</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.experience}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ height: '1px', background: '#e2e8f0' }}></div>
+                            <hr className="border-slate-100 m-0" />
 
                             <div>
-                                <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Personal Information</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Date of Birth</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.dob}</p>
+                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Personal Information</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Date of Birth</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.dob}</p>
                                     </div>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Gender</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.gender}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Gender</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.gender}</p>
                                     </div>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Blood Group</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.bloodGroup}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Blood Group</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.bloodGroup}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ height: '1px', background: '#e2e8f0' }}></div>
+                            <hr className="border-slate-100 m-0" />
 
                             <div>
-                                <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#1e293b' }}>Contact Details</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Email</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.contact.email}</p>
+                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Contact Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Email</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.contact.email}</p>
                                     </div>
-                                    <div>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Phone Number</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>{teacher.contact.phone}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Phone Number</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.contact.phone}</p>
                                     </div>
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                        <p className="m-0 mb-1 text-[13px] text-slate-500">Residential Address</p>
-                                        <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500', lineHeight: '1.5' }}>{teacher.contact.address}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 md:col-span-2">
+                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Residential Address</p>
+                                        <p className="m-0 text-[15px] font-bold text-slate-800 leading-relaxed">{teacher.contact.address}</p>
                                     </div>
                                 </div>
                             </div>
@@ -209,26 +206,28 @@ const TeacherProfile = () => {
 
                     {activeTab === 'documents' && (
                         <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                <h3 className="m-0 text-lg text-slate-800">Uploaded Documents</h3>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Uploaded Documents</h3>
+                            <div className="flex flex-col gap-3">
                                 {teacher.documents.map((doc, idx) => (
-                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
-                                                📄
+                                    <div key={idx} className="flex flex-col sm:flex-row justify-between sm:items-center p-4 border border-slate-200 rounded-xl bg-slate-50 gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                                                <FileText size={20} />
                                             </div>
                                             <div>
-                                                <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#1e293b' }}>{doc.name}</h4>
-                                                <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Uploaded on: {doc.date}</p>
+                                                <h4 className="m-0 mb-1 text-[15px] font-bold text-slate-800">{doc.name}</h4>
+                                                <p className="m-0 text-[13px] font-medium text-slate-500">Uploaded on: {doc.date}</p>
                                             </div>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                            <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: doc.status === 'Verified' ? '#dcfce7' : '#fef3c7', color: doc.status === 'Verified' ? '#166534' : '#d97706' }}>
+                                        <div className="flex items-center justify-between sm:justify-end gap-4 mt-2 sm:mt-0">
+                                            <span className={`px-3 py-1 rounded-full text-[12px] font-bold ${
+                                                doc.status === 'Verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                            }`}>
                                                 {doc.status}
                                             </span>
-                                            <button style={{ padding: '6px 12px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontSize: '13px', cursor: 'pointer' }}>View</button>
+                                            <button className="px-4 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold transition-colors cursor-pointer">
+                                                View
+                                            </button>
                                         </div>
                                     </div>
                                 ))}

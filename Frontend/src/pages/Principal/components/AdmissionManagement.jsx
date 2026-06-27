@@ -82,9 +82,9 @@ const AdmissionManagement = () => {
   };
 
   return (
-    <div className="dashboard-section animate-fade-in" className="p-6">
-      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Admission Management</h2>
-      <div className="flex gap-3 mb-6 flex-wrap">
+    <div className="dashboard-section animate-fade-in" className="p-4">
+      <h2 className="text-xl font-extrabold text-indigo-950 mb-4">Admission Management</h2>
+      <div className="flex gap-3 mb-4 flex-wrap">
         <ActionBtn text="Approve Admissions" icon="✅" onClick={() => setShowModal(true)} />
         <ActionBtn text="Reject Applications" icon="❌" onClick={() => setShowRejectModal(true)} />
       </div>

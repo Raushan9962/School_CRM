@@ -72,9 +72,9 @@ const FeeManagement = () => {
   const formatCurrency = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
 
   return (
-    <div className="dashboard-section animate-fade-in" className="p-6">
-      <h2 className="text-2xl font-extrabold text-indigo-950 mb-6">Fee Management</h2>
-      <div className="flex gap-3 mb-6 flex-wrap">
+    <div className="dashboard-section animate-fade-in" className="p-4">
+      <h2 className="text-xl font-extrabold text-indigo-950 mb-4">Fee Management</h2>
+      <div className="flex gap-3 mb-4 flex-wrap">
         <ActionBtn text="Record Fee Payment" icon="💰" onClick={() => setShowModal(true)} />
         <ActionBtn text="Approve Concessions" icon="✅" />
         <ActionBtn text="Check Dues" icon="⚠️" />
