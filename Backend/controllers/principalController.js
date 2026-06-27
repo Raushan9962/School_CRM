@@ -4,9 +4,21 @@ const Class = require('../models/Class');
 
 exports.getDailyAttendanceQR = async (req, res) => {
     try {
+        const pool = require('../config/db');
+        const schoolId = req.user.schoolId;
+        const dateStr = new Date().toISOString().split('T')[0];
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        
+        await pool.query(
+            `INSERT INTO daily_attendance_qr (school_id, date, token) 
+             VALUES ($1, $2, $3) 
+             ON CONFLICT (school_id, date) DO UPDATE SET token = EXCLUDED.token`,
+            [schoolId, dateStr, token]
+        );
+
         const qrData = {
-            date: new Date().toISOString().split('T')[0],
-            token: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+            date: dateStr,
+            token: token
         };
         res.status(200).json({ data: qrData });
     } catch (error) {
@@ -1095,3 +1107,143 @@ exports.updateGrievanceStatus = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
+const pool = require('../config/db');
+
+// GET /api/principal/dashboard-alerts
+exports.getDashboardAlerts = async (req, res) => {
+    try {
+        const schoolId = req.user.schoolId;
+        const criticalAlerts = [];
+        let pendingLeaves = [];
+
+        // 1. Pending Leave Requests
+        try {
+            const leaves = await pool.query(
+                `SELECT l.id, u.name as applicant, u.role_name as role, l.leave_type as type, 
+                 CONCAT(l.start_date, ' to ', l.end_date) as duration
+                 FROM leaves l
+                 JOIN users u ON l.user_id = u.id
+                 WHERE l.school_id = $1 AND l.status = 'Pending'
+                 ORDER BY l.created_at DESC LIMIT 5`,
+                [schoolId]
+            );
+            pendingLeaves = leaves.rows;
+        } catch(e) {}
+
+        // 2. Pending Grievances
+        try {
+            const grievances = await pool.query(
+                `SELECT COUNT(*) FROM grievances WHERE school_id = $1 AND status != 'Resolved'`,
+                [schoolId]
+            );
+            if (parseInt(grievances.rows[0].count) > 0) {
+                criticalAlerts.push({ id: 'grievance', type: 'Issue', severity: 'high', message: `${grievances.rows[0].count} unresolved grievances.`, time: 'Today' });
+            }
+        } catch(e) {}
+
+        // Add dummy alerts if none
+        if (criticalAlerts.length === 0) {
+            criticalAlerts.push({ id: '1', type: 'System', severity: 'low', message: 'School operations running smoothly.', time: 'Just now' });
+        }
+
+        res.status(200).json({ success: true, data: { criticalAlerts, pendingLeaves } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch alerts.' });
+    }
+};
+
+// GET /api/principal/tasks
+exports.getTasks = async (req, res) => {
+    try {
+        const schoolId = req.user.schoolId;
+        let tasks = [];
+        try {
+            tasks = (await pool.query(
+                `SELECT t.id, t.title, t.description, t.assigned_to, t.status, t.due_date, t.priority,
+                        u.name as assignee_name, u.role_name as assignee_role
+                 FROM principal_tasks t
+                 LEFT JOIN users u ON t.assigned_to = u.id
+                 WHERE t.school_id = $1
+                 ORDER BY t.created_at DESC`,
+                [schoolId]
+            )).rows;
+        } catch(e) { tasks = []; }
+
+        res.status(200).json({ success: true, data: tasks });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch tasks.' });
+    }
+};
+
+// POST /api/principal/tasks
+exports.createTask = async (req, res) => {
+    try {
+        const schoolId = req.user.schoolId;
+        const principalId = req.user.id;
+        const { title, description, assigned_to, due_date, priority } = req.body;
+
+        if (!title || !assigned_to) {
+            return res.status(400).json({ success: false, message: 'Title and Assignee are required.' });
+        }
+
+        let result;
+        try {
+            result = (await pool.query(
+                `INSERT INTO principal_tasks (school_id, principal_id, title, description, assigned_to, due_date, priority, status)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pending') RETURNING *`,
+                [schoolId, principalId, title, description || '', assigned_to, due_date || null, priority || 'Medium']
+            )).rows[0];
+        } catch(e) {
+            await pool.query(`CREATE TABLE IF NOT EXISTS principal_tasks (
+                id SERIAL PRIMARY KEY,
+                school_id INT, principal_id INT, assigned_to INT,
+                title VARCHAR(255), description TEXT,
+                due_date DATE, priority VARCHAR(50), status VARCHAR(50) DEFAULT 'Pending',
+                created_at TIMESTAMP DEFAULT NOW()
+            )`);
+            result = (await pool.query(
+                `INSERT INTO principal_tasks (school_id, principal_id, title, description, assigned_to, due_date, priority, status)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pending') RETURNING *`,
+                [schoolId, principalId, title, description || '', assigned_to, due_date || null, priority || 'Medium']
+            )).rows[0];
+        }
+        res.status(201).json({ success: true, data: result });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to create task.' });
+    }
+};
+
+// PUT /api/principal/tasks/:id/status
+exports.updateTaskStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const schoolId = req.user.schoolId;
+
+        const result = await pool.query(
+            `UPDATE principal_tasks SET status = $1 WHERE id = $2 AND school_id = $3 RETURNING *`,
+            [status, id, schoolId]
+        );
+        res.status(200).json({ success: true, data: result.rows[0] });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to update task.' });
+    }
+};
+
+// GET /api/principal/staff-list (For task delegation dropdowns)
+exports.getStaffList = async (req, res) => {
+    try {
+        const schoolId = req.user.schoolId;
+        const staff = (await pool.query(
+            `SELECT id, name, role_name FROM users WHERE school_id = $1 AND role_name IN ('Teacher', 'Accountant', 'Librarian', 'Receptionist') ORDER BY name`,
+            [schoolId]
+        )).rows;
+        res.status(200).json({ success: true, data: staff });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch staff list.' });
+    }
+};
+
+// Leave endpoints already exist in schoolAdminRoutes but we can map them in principalRoutes

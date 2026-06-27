@@ -90,10 +90,20 @@ exports.isAdmin = async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
-        if (!req.user || !roles.includes(req.user.role)) {
+        if (!req.user || !req.user.role) {
             return res.status(403).json({
                 success: false,
                 message: "You do not have permission to perform this action"
+            });
+        }
+        
+        const normalizedUserRole = req.user.role.toLowerCase().replace(/\s+/g, '');
+        const normalizedAllowedRoles = roles.map(r => r.toLowerCase().replace(/\s+/g, ''));
+        
+        if (!normalizedAllowedRoles.includes(normalizedUserRole)) {
+            return res.status(403).json({
+                success: false,
+                message: `You do not have permission. Your role: ${req.user.role}, Allowed: ${roles.join(', ')}`
             });
         }
         next();

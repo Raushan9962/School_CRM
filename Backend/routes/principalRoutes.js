@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const principalController = require('../controllers/principalController');
 const { auth } = require('../middleware/auth'); // Optional if using auth
-
 // GET dashboard statistics
 router.get('/dashboard-stats', auth, principalController.getDashboardStats);
 router.get('/dashboard-alerts', auth, principalController.getDashboardAlerts);
+router.get('/staff-list', auth, principalController.getStaffList);
 
 // Tasks & Delegation
 router.get('/tasks', auth, principalController.getTasks);

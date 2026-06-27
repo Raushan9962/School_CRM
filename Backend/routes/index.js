@@ -28,7 +28,7 @@ const superAdminRoutes = require('./superAdminRoutes');
 const principalRoutes = require('./principalRoutes');
 const leaveRoutes = require('./leaveRoutes');
 const complaintRoutes = require('./complaintRoutes');
-
+const accountantRoutes = require('./accountantRoutes');
 // API routes mapping
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -59,5 +59,7 @@ router.use('/leaves', leaveRoutes);
 router.use('/complaints', complaintRoutes);
 router.use('/profile-updates', require('./profileUpdateRoutes'));
 router.use('/school-admin', require('./schoolAdminRoutes'));
+router.use('/teacher-portal', require('./teacherPortalRoutes'));
+router.use('/accountant', accountantRoutes);
 
 module.exports = router;
