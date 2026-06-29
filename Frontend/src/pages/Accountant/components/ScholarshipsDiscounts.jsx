@@ -1,14 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, CheckCircle2, XCircle, Award } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const ScholarshipsDiscounts = () => {
     const [view, setView] = useState('list'); // 'list' or 'form'
+    const [grants, setGrants] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const grants = [
-        { id: 'GR-1001', student: 'Aarav Patel', class: '10-A', type: 'Merit Scholarship', amount: '₹ 10,000', validTill: 'Mar 2027', status: 'Approved' },
-        { id: 'GR-1002', student: 'Kavya Verma', class: '8-C', type: 'Sibling Discount', amount: '20% off Tuition', validTill: 'Lifetime', status: 'Approved' },
-        { id: 'GR-1003', student: 'Rohan Gupta', class: '10-A', type: 'Sports Concession', amount: '₹ 5,000', validTill: 'Dec 2026', status: 'Pending Approval' }
-    ];
+    useEffect(() => {
+        fetchGrants();
+        fetchStudents();
+    }, []);
+
+    const fetchGrants = async () => {
+        try {
+            const res = await apiFetch('/accountant/scholarships');
+            const data = await res.json();
+            if (data.success) {
+                setGrants(data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching grants:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStudents = async () => {
+        try {
+            const res = await apiFetch('/accountant/students');
+            const data = await res.json();
+            if (data.success) {
+                setStudents(data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching students:", err);
+        }
+    };
+
+    const handleAssignSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const grantData = {
+            studentId: formData.get('student_id'),
+            grantType: formData.get('grant_type'),
+            valueType: formData.get('value_type'),
+            value: formData.get('value'),
+            validTill: formData.get('valid_till'),
+            remarks: formData.get('remarks')
+        };
+        try {
+            const res = await apiFetch('/accountant/scholarships', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(grantData)
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchGrants();
+                setView('list');
+            } else {
+                alert(data.message || 'Failed to assign grant');
+            }
+        } catch (err) {
+            console.error("Error assigning grant:", err);
+            alert("Error assigning grant");
+        }
+    };
+
+    const handleStatusUpdate = async (id, status) => {
+        try {
+            const res = await apiFetch(`/accountant/scholarships/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchGrants();
+            } else {
+                alert(data.message || 'Failed to update status');
+            }
+        } catch (err) {
+            console.error("Error updating status:", err);
+            alert("Error updating status");
+        }
+    };
 
     if (view === 'form') {
         return (
@@ -21,21 +99,21 @@ const ScholarshipsDiscounts = () => {
                     <button onClick={() => setView('list')} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200 transition-colors">Back</button>
                 </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); setView('list'); }} className="space-y-4">
+                <form onSubmit={handleAssignSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Search Student *</label>
-                            <input type="text" required placeholder="Name or ID (e.g. ST-001)" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Student ID *</label>
+                            <input name="student_id" type="number" required placeholder="Enter Student ID (e.g. 1)" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Grant Type *</label>
-                            <select required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
+                            <select name="grant_type" required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
                                 <option value="">Select Type</option>
-                                <option value="merit">Merit Scholarship</option>
-                                <option value="sibling">Sibling Discount</option>
-                                <option value="sports">Sports Concession</option>
-                                <option value="staff">Staff Child Discount</option>
-                                <option value="custom">Custom Concession</option>
+                                <option value="Merit Scholarship">Merit Scholarship</option>
+                                <option value="Sibling Discount">Sibling Discount</option>
+                                <option value="Sports Concession">Sports Concession</option>
+                                <option value="Staff Child Discount">Staff Child Discount</option>
+                                <option value="Custom Concession">Custom Concession</option>
                             </select>
                         </div>
                     </div>
@@ -44,29 +122,29 @@ const ScholarshipsDiscounts = () => {
                         <div className="flex gap-2">
                             <div className="flex-1">
                                 <label className="block text-xs font-bold text-slate-700 mb-1">Value Type</label>
-                                <select className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
+                                <select name="value_type" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
                                     <option value="fixed">Fixed Amount (₹)</option>
                                     <option value="percent">Percentage (%)</option>
                                 </select>
                             </div>
                             <div className="flex-1">
                                 <label className="block text-xs font-bold text-slate-700 mb-1">Value *</label>
-                                <input type="number" required placeholder="0" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
+                                <input name="value" type="number" required placeholder="0" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
                             </div>
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Valid Till *</label>
-                            <select required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
-                                <option value="current_session">Current Academic Session</option>
-                                <option value="specific_month">Specific Month</option>
-                                <option value="lifetime">Lifetime / Until Graduation</option>
+                            <select name="valid_till" required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
+                                <option value="Current Academic Session">Current Academic Session</option>
+                                <option value="Specific Month">Specific Month</option>
+                                <option value="Lifetime">Lifetime / Until Graduation</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">Reason / Remarks</label>
-                        <input type="text" placeholder="Optional notes for approval" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
+                        <input name="remarks" type="text" placeholder="Optional notes for approval" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" />
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 mt-4">
@@ -98,11 +176,11 @@ const ScholarshipsDiscounts = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="bg-white border border-slate-200 rounded p-3">
                     <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Total Active Grants</p>
-                    <p className="text-base font-bold text-slate-800 m-0">124</p>
+                    <p className="text-xl font-bold text-slate-800 m-0">{grants.filter(g => g.status === 'Approved').length}</p>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-3">
                     <p className="text-[10px] uppercase text-slate-500 font-bold mb-1">Pending Approvals</p>
-                    <p className="text-base font-bold text-amber-600 m-0">5</p>
+                    <p className="text-xl font-bold text-amber-600 m-0">{grants.filter(g => g.status === 'Pending Approval').length}</p>
                 </div>
             </div>
 
@@ -135,32 +213,46 @@ const ScholarshipsDiscounts = () => {
                             </tr>
                         </thead>
                         <tbody className="text-xs">
-                            {grants.map((g, idx) => (
-                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-4 py-2.5">
-                                        <div className="font-bold text-slate-800">{g.student}</div>
-                                        <div className="text-[10px] text-slate-500">{g.id}</div>
+                            {grants.map((grant) => (
+                                <tr key={grant.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-4 py-3">
+                                        <p className="font-bold text-slate-700 m-0">{grant.student_name}</p>
+                                        <p className="text-[10px] text-slate-500 m-0 font-mono mt-0.5">ID: {grant.student_roll || grant.student_id}</p>
                                     </td>
-                                    <td className="px-4 py-2.5 text-slate-600">{g.class}</td>
-                                    <td className="px-4 py-2.5 font-medium text-slate-700">{g.type}</td>
-                                    <td className="px-4 py-2.5 font-bold text-emerald-600">{g.amount}</td>
-                                    <td className="px-4 py-2.5 text-slate-600">{g.validTill}</td>
-                                    <td className="px-4 py-2.5">
-                                        <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded ${
-                                            g.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                                    <td className="px-4 py-3 text-slate-600 font-medium">--</td>
+                                    <td className="px-4 py-3 font-medium text-slate-700">{grant.grant_type}</td>
+                                    <td className="px-4 py-3 font-bold text-emerald-600">
+                                        {grant.value_type === 'percent' ? `${grant.value}% off` : `₹ ${parseFloat(grant.value).toLocaleString('en-IN')}`}
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-500">{grant.valid_till}</td>
+                                    <td className="px-4 py-3">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                            grant.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
+                                            grant.status === 'Revoked' ? 'bg-red-100 text-red-700' :
+                                            'bg-amber-100 text-amber-700'
                                         }`}>
-                                            {g.status}
+                                            {grant.status}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-2.5 text-right flex justify-end gap-2">
-                                        {g.status === 'Pending Approval' ? (
-                                            <button className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-bold rounded hover:bg-emerald-100 border border-emerald-100">Approve</button>
+                                    <td className="px-4 py-3 text-right">
+                                        {grant.status === 'Approved' ? (
+                                            <button onClick={() => handleStatusUpdate(grant.id, 'Revoked')} className="px-2.5 py-1 text-red-600 bg-red-50 hover:bg-red-100 rounded text-xs font-bold transition-colors">Revoke</button>
+                                        ) : grant.status === 'Pending Approval' ? (
+                                            <div className="flex gap-1 justify-end">
+                                                <button onClick={() => handleStatusUpdate(grant.id, 'Approved')} className="px-2.5 py-1 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">Approve</button>
+                                                <button onClick={() => handleStatusUpdate(grant.id, 'Revoked')} className="px-2.5 py-1 text-red-600 bg-red-50 hover:bg-red-100 rounded text-xs font-bold transition-colors">Reject</button>
+                                            </div>
                                         ) : (
-                                            <button className="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded hover:bg-red-100 border border-red-100">Revoke</button>
+                                            <span className="text-slate-400 font-medium">--</span>
                                         )}
                                     </td>
                                 </tr>
                             ))}
+                            {grants.length === 0 && !loading && (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-6 text-slate-500 text-sm">No grants found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

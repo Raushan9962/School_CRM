@@ -204,7 +204,7 @@ const SchoolRegister = () => {
                   onChange={(e) => setUserRole(e.target.value)}
                   className={inputCls}
                 >
-                  {['Teacher', 'Student', 'Parent', 'Principal', 'Accountant', 'Librarian', 'Transport Manager', 'Receptionist'].map(r => (
+                  {['Teacher', 'Student', 'Parent', 'Accountant', 'Librarian', 'Receptionist', 'Transport Manager', 'Hostel Warden', 'HR Manager'].map(r => (
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>

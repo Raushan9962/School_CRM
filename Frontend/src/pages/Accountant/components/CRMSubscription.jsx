@@ -41,7 +41,7 @@ const CRMSubscription = () => {
 
     const handleFileUpload = (e) => {
         if (e.target.files && e.target.files[0]) {
-            setUploadedFile(e.target.files[0].name);
+            setUploadedFile(e.target.files[0]);
         }
     };
 
@@ -49,16 +49,21 @@ const CRMSubscription = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const submissionData = {
-                ...formData,
-                planId: 1, 
-                invoiceUrl: uploadedFile ? `https://storage.vidyasetu.com/proofs/${uploadedFile}` : ''
-            };
+            const submitData = new FormData();
+            submitData.append('planId', planDetails?.plan_id || 1);
+            submitData.append('amount', formData.amount);
+            submitData.append('paymentDate', formData.paymentDate);
+            submitData.append('paymentMode', formData.paymentMode);
+            submitData.append('transactionId', formData.transactionId);
+            submitData.append('billingCycle', planDetails?.billing_cycle || 'Monthly');
+            if (uploadedFile) {
+                submitData.append('receipt', uploadedFile);
+            }
 
             const res = await apiFetch('/accountant/crm-subscription', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(submissionData)
+                // Fetch automatically sets Content-Type to multipart/form-data with the correct boundary when body is FormData
+                body: submitData
             });
             const data = await res.json();
             if (data.success) {
@@ -183,7 +188,7 @@ const CRMSubscription = () => {
                             </label>
                         ) : (
                             <div className="flex items-center justify-between p-2 border border-emerald-200 bg-emerald-50 rounded">
-                                <span className="text-xs font-medium text-emerald-700 truncate">{uploadedFile}</span>
+                                <span className="text-xs font-medium text-emerald-700 truncate">{uploadedFile.name}</span>
                                 <button type="button" onClick={() => setUploadedFile(null)} className="text-red-500 hover:text-red-700">
                                     <Trash2 size={14} />
                                 </button>

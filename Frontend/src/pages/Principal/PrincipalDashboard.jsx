@@ -212,7 +212,9 @@ const PrincipalDashboard = () => {
         }
 
         if (activeTab === 'leave') {
-            return (
+            if (!currentUser) return null;
+
+    return (
                 <ModuleContainer 
                     tabs={[{ id: 'leave_all', label: 'All Leave Requests' }]} 
                     contentMap={{ 'leave_all': <LeaveApproval /> }} 
@@ -238,6 +240,8 @@ const PrincipalDashboard = () => {
 
         return <DashboardOverview setActiveTab={setActiveTab} />;
     };
+
+    if (!currentUser) return null;
 
     return (
         <DashboardLayout

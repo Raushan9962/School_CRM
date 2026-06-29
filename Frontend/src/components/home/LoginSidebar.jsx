@@ -6,6 +6,7 @@ const LoginSidebar = () => {
   const loginOptions = [
     { name: "VidyaSetu Login", icon: <User size={20} className="text-orange-500" />, path: "/login/admin", color: "text-blue-900" },
     { name: "Student Login", icon: <GraduationCap size={20} className="text-blue-500" />, path: "/login/student", color: "text-orange-600" },
+    { name: "Student Admission (New)", icon: <PlusCircle size={20} className="text-green-600" />, path: "/admission", color: "text-green-700" },
     { name: "Vidya Samiksha Kendra - VSK", icon: <Building2 size={20} className="text-green-600" />, path: "#", color: "text-blue-900" },
     { name: "UDISE", icon: <PlusCircle size={20} className="text-orange-500" />, path: "#", color: "text-blue-900" },
     { name: "CM SHRI Schools Admission Test - 2026", icon: <FileText size={20} className="text-blue-600" />, path: "#", color: "text-orange-700" }

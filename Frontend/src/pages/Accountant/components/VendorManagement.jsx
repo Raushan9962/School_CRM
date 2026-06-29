@@ -1,20 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Building, Plus, Search, CheckCircle2, AlertCircle, Phone, Mail, IndianRupee, X, FileText, Trash2, DollarSign } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const VendorManagement = () => {
     const [activeTab, setActiveTab] = useState('list');
     const [searchQuery, setSearchQuery] = useState('');
+    const [vendors, setVendors] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState(null);
     const [uploadedFile, setUploadedFile] = useState(null);
 
-    const vendors = [
-        { id: 'VND-001', name: 'Saraswati Stationers', type: 'Stationery Supplier', contact: '+91 9876543210', email: 'contact@saraswati.com', pendingDue: 15000, status: 'Active' },
-        { id: 'VND-002', name: 'Rapid City Travels', type: 'Bus Contractor', contact: '+91 9123456789', email: 'info@rapidcity.com', pendingDue: 0, status: 'Active' },
-        { id: 'VND-003', name: 'Global Uniforms', type: 'Uniform Supplier', contact: '+91 9988776655', email: 'sales@globaluniforms.com', pendingDue: 45000, status: 'Active' }
-    ];
+    useEffect(() => {
+        fetchVendors();
+    }, []);
+
+    const fetchVendors = async () => {
+        try {
+            const res = await apiFetch('/accountant/vendors');
+            const data = await res.json();
+            if (data.success) {
+                setVendors(data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching vendors:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const vendorTypes = ['Stationery Supplier', 'Bus Contractor', 'Uniform Supplier', 'Maintenance Vendor', 'Event Management', 'IT Equipment'];
 
@@ -33,15 +48,61 @@ const VendorManagement = () => {
         setIsPaymentModalOpen(true);
     };
 
-    const handleSubmitVendor = (e) => {
+    const handleSubmitVendor = async (e) => {
         e.preventDefault();
-        setIsVendorModalOpen(false);
+        const formData = new FormData(e.target);
+        const newVendor = {
+            name: formData.get('name'),
+            type: formData.get('type'),
+            contact: formData.get('contact'),
+            email: formData.get('email'),
+            pending_due: formData.get('pending_due')
+        };
+        try {
+            const res = await apiFetch('/accountant/vendors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newVendor)
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchVendors();
+                setIsVendorModalOpen(false);
+            } else {
+                alert((data.message || 'Failed to add vendor') + (data.error ? ' : ' + data.error : ''));
+            }
+        } catch (err) {
+            console.error("Error adding vendor:", err);
+            alert("Error adding vendor");
+        }
     };
 
-    const handleSubmitPayment = (e) => {
+    const handleSubmitPayment = async (e) => {
         e.preventDefault();
-        setIsPaymentModalOpen(false);
-        setUploadedFile(null);
+        const formData = new FormData(e.target);
+        const paymentData = {
+            amount: formData.get('amount'),
+            paymentDate: formData.get('payment_date'),
+            paymentMethod: formData.get('payment_method')
+        };
+        try {
+            const res = await apiFetch(`/accountant/vendors/${selectedVendor.id}/pay`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData)
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchVendors();
+                setIsPaymentModalOpen(false);
+                setUploadedFile(null);
+            } else {
+                alert(data.message || 'Failed to record payment');
+            }
+        } catch (err) {
+            console.error("Error recording payment:", err);
+            alert("Error recording payment");
+        }
     };
 
     const handleFileUpload = (e) => {
@@ -51,7 +112,7 @@ const VendorManagement = () => {
     };
 
     const filteredVendors = vendors.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    const totalPending = vendors.reduce((acc, curr) => acc + curr.pendingDue, 0);
+    const totalPending = vendors.reduce((acc, curr) => acc + parseFloat(curr.pending_due || 0), 0);
 
     // Vendor Modal (Inline Form style)
     if (isVendorModalOpen) {
@@ -74,11 +135,11 @@ const VendorManagement = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Business Name *</label>
-                            <input type="text" defaultValue={selectedVendor?.name || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Vendor Name" />
+                            <input name="name" type="text" defaultValue={selectedVendor?.name || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Vendor Name" />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Vendor Category *</label>
-                            <select defaultValue={selectedVendor?.type || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                            <select name="type" defaultValue={selectedVendor?.type || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
                                 <option value="" disabled>Select Category</option>
                                 {vendorTypes.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
@@ -88,11 +149,18 @@ const VendorManagement = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Contact Number *</label>
-                            <input type="tel" defaultValue={selectedVendor?.contact || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="+91 9876543210" />
+                            <input name="contact" type="tel" defaultValue={selectedVendor?.contact || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="+91 9876543210" />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                            <input type="email" defaultValue={selectedVendor?.email || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="vendor@example.com" />
+                            <input name="email" type="email" defaultValue={selectedVendor?.email || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="vendor@example.com" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Opening Pending Due (₹)</label>
+                            <input name="pending_due" type="number" defaultValue={selectedVendor?.pending_due || 0} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="0" />
                         </div>
                     </div>
 
@@ -120,17 +188,24 @@ const VendorManagement = () => {
                 <form onSubmit={handleSubmitPayment} className="space-y-4">
                     <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center">
                         <span className="text-xs font-semibold text-slate-600">Pending Amount:</span>
-                        <span className="text-sm font-bold text-red-600">₹{selectedVendor?.pendingDue.toLocaleString('en-IN') || '0'}</span>
+                        <span className="text-sm font-bold text-red-600">₹{parseFloat(selectedVendor?.pending_due || 0).toLocaleString('en-IN')}</span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Amount Paid (₹) *</label>
-                            <input type="number" defaultValue={selectedVendor?.pendingDue || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="e.g. 5000" />
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Payment Amount (₹) *</label>
+                            <input name="amount" type="number" required max={selectedVendor?.pending_due} defaultValue={selectedVendor?.pending_due} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-emerald-500 outline-none" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Payment Mode *</label>
-                            <select required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Payment Date *</label>
+                            <input name="payment_date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-emerald-500 outline-none" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method *</label>
+                            <select name="payment_method" required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-emerald-500 outline-none bg-white">
                                 <option value="Bank Transfer">Bank Transfer</option>
                                 <option value="UPI">UPI</option>
                                 <option value="Cheque">Cheque</option>
@@ -204,11 +279,11 @@ const VendorManagement = () => {
                         <tbody className="text-xs">
                             {filteredVendors.map((vendor) => (
                                 <tr key={vendor.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-4 py-2.5 font-bold text-slate-700">{vendor.name}</td>
-                                    <td className="px-4 py-2.5 text-slate-600">{vendor.type}</td>
-                                    <td className="px-4 py-2.5 text-slate-500">{vendor.contact}</td>
-                                    <td className="px-4 py-2.5 font-bold text-red-600">₹{vendor.pendingDue.toLocaleString('en-IN')}</td>
-                                    <td className="px-4 py-2.5 text-right flex justify-end gap-2">
+                                    <td className="px-4 py-3 font-medium text-slate-700">{vendor.name}</td>
+                                    <td className="px-4 py-3 text-slate-600">{vendor.type}</td>
+                                    <td className="px-4 py-3 text-slate-600">{vendor.contact}</td>
+                                    <td className="px-4 py-3 font-bold text-red-600">₹{parseFloat(vendor.pending_due || 0).toLocaleString('en-IN')}</td>
+                                    <td className="px-4 py-3 text-right flex justify-end gap-2">
                                         <button onClick={() => handleEditVendor(vendor)} className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200 transition-colors">Edit</button>
                                         <button onClick={() => handlePayVendor(vendor)} className="px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded hover:bg-blue-100 transition-colors border border-blue-100">Pay</button>
                                     </td>

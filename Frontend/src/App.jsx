@@ -12,12 +12,16 @@ import TransportDashboard from './pages/Transport/TransportDashboard';
 import LibrarianDashboard from './pages/Librarian/LibrarianDashboard';
 import ReceptionistDashboard from './pages/Receptionist/ReceptionistDashboard';
 import LabAssistantDashboard from './pages/LabAssistant/LabAssistantDashboard';
+import AdmissionForm from './pages/Public/AdmissionForm';
+import InvoicePayment from './pages/Public/InvoicePayment';
 import './App.css';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/admission" element={<AdmissionForm />} />
+      <Route path="/invoice/:id" element={<InvoicePayment />} />
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/SuperAdmin" element={<SuperAdmin />} />
       <Route path="/register-school" element={<SchoolRegister />} />

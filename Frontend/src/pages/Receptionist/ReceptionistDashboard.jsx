@@ -70,6 +70,8 @@ const ReceptionistDashboard = () => {
         return item ? item.label : 'Front Desk Overview';
     };
 
+    if (!currentUser) return null;
+
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', fontFamily: "'Inter', sans-serif" }}>
             {/* Sidebar */}

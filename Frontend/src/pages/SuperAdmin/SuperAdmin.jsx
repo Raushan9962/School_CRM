@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { LayoutDashboard, Building2, CreditCard, Settings, PlusCircle } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ModuleContainer from '../../components/layout/ModuleContainer';
 import PlaceholderView from '../Principal/components/PlaceholderView';
@@ -9,21 +10,52 @@ import RevenueBilling from './components/RevenueBilling';
 import ExpiringSoon from './components/ExpiringSoon';
 import Transactions from './components/Transactions';
 import PlatformSettings from './components/PlatformSettings';
+import apiFetch from '../../services/api';
 
 const SuperAdmin = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+    const [currentUser, setCurrentUser] = useState(null);
+    const [schoolsCount, setSchoolsCount] = useState(0);
+    const [expiringCount, setExpiringCount] = useState(0);
+
     useEffect(() => {
         const checkAuth = () => {
+            const userStr = localStorage.getItem('user');
             const token = localStorage.getItem('token');
-            if (!token) {
+            if (!token || !userStr) {
+                navigate('/login/student');
+                return;
+            }
+            try {
+                const userObj = JSON.parse(userStr);
+                setCurrentUser(userObj);
+            } catch (e) {
                 navigate('/login/student');
             }
         };
         checkAuth();
+        fetchCounts();
     }, [navigate]);
+
+    const fetchCounts = async () => {
+        try {
+            const dashRes = await apiFetch('/super-admin/dashboard');
+            const dashData = await dashRes.json();
+            if (dashData.success) {
+                setSchoolsCount(dashData.stats.totalSchools);
+            }
+            const expRes = await apiFetch('/super-admin/expiring-soon');
+            const expData = await expRes.json();
+            if (expData.success) {
+                setExpiringCount(expData.count || 0);
+            }
+        } catch (err) {
+            console.error('Failed to fetch counts:', err);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -31,10 +63,10 @@ const SuperAdmin = () => {
     };
 
     const navItems = [
-        { id: 'overview', label: 'Dashboard Overview', icon: '📊' },
-        { id: 'schools', label: 'Schools Management', icon: '🏫' },
-        { id: 'finance', label: 'Finance & Billing', icon: '💰' },
-        { id: 'system', label: 'System & Settings', icon: '⚙️' }
+        { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'schools', label: 'Schools Management', icon: <Building2 size={20} strokeWidth={1.5} /> },
+        { id: 'finance', label: 'Finance & Billing', icon: <CreditCard size={20} strokeWidth={1.5} /> },
+        { id: 'system', label: 'System & Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
@@ -42,8 +74,8 @@ const SuperAdmin = () => {
 
         if (activeTab === 'schools') {
             const tabs = [
-                { id: 'sa_sch_list', label: 'Registered Schools', count: '48' },
-                { id: 'sa_sch_expiring', label: 'Expiring Soon', count: '3' }
+                { id: 'sa_sch_list', label: 'Registered Schools', count: schoolsCount },
+                { id: 'sa_sch_expiring', label: 'Expiring Soon', count: expiringCount }
             ];
             const contentMap = {
                 'sa_sch_list': <RegisteredSchools />,
@@ -95,17 +127,21 @@ const SuperAdmin = () => {
             }}
             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-                <span>➕</span> Register School
+                <PlusCircle size={18} /> Register School
             </Link>
         </div>
     );
 
+    if (!currentUser) return null;
+
     return (
         <DashboardLayout
+            userInfo={{ name: currentUser.name || 'System Admin', schoolName: 'VidyaSetu CRM', role: currentUser.role || 'Platform Owner', avatar: currentUser.image }}
             navItems={navItems}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            userInfo={{ name: 'System Admin', schoolName: 'VidyaSetu CRM', role: 'Platform Owner' }}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
             handleLogout={handleLogout}
             sidebarBottomContent={registerSchoolContent}
         >

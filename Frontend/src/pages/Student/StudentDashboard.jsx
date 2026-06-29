@@ -99,6 +99,8 @@ const StudentDashboard = () => {
         return item ? item.label : 'Dashboard Overview';
     };
 
+    if (!currentUser) return null;
+
     return (
         <div className="flex min-h-screen bg-slate-50 font-sans">
             {/* Sidebar */}

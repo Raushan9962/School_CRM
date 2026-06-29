@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, GraduationCap, UserCheck, School, Users, IndianRupee, Library, Bus, CalendarCheck, Calculator, BookOpen, PhoneCall, Home, UserCog } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, UserCheck, School, Users, IndianRupee, Library, Bus, CalendarCheck, Calculator, BookOpen, PhoneCall, Home, UserCog, FileText } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ModuleContainer from '../../components/layout/ModuleContainer';
 import PlaceholderView from '../Principal/components/PlaceholderView';
@@ -17,6 +17,8 @@ import TransportManagement from './components/TransportManagement';
 import ProfileUpdatesManagement from './components/ProfileUpdatesManagement';
 import PayrollManagement from './components/PayrollManagement';
 import GenericRoleManagement from './components/GenericRoleManagement';
+import AdmissionRequests from './components/AdmissionRequests';
+import FeeSettings from './components/FeeSettings';
 import { Briefcase, Building2, UserPlus } from "lucide-react";
 
 const SchoolAdminDashboard = () => {
@@ -56,6 +58,8 @@ const SchoolAdminDashboard = () => {
 
     const navItems = [
         { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'admissions', label: 'Admission Requests', icon: <FileText size={20} strokeWidth={1.5} /> },
+        { id: 'fees', label: 'Fee Settings', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
         { id: 'student', label: 'Student Management', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
         { id: 'teacher', label: 'Teacher Mgmt', icon: <UserCheck size={20} strokeWidth={1.5} /> },
         { id: 'accountant', label: 'Accountant Mgmt', icon: <Calculator size={20} strokeWidth={1.5} /> },
@@ -64,7 +68,6 @@ const SchoolAdminDashboard = () => {
         { id: 'transport_staff', label: 'Transport Staff', icon: <Bus size={20} strokeWidth={1.5} /> },
         { id: 'warden', label: 'Hostel Warden', icon: <Home size={20} strokeWidth={1.5} /> },
         { id: 'hr', label: 'HR Management', icon: <UserCog size={20} strokeWidth={1.5} /> },
-        { id: 'principal', label: 'Principal Details', icon: <School size={20} strokeWidth={1.5} /> },
         { id: 'parent', label: 'Parent Management', icon: <Users size={20} strokeWidth={1.5} /> },
         { id: 'finance', label: 'Finance & Accounts', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
         { id: 'library', label: 'Library Management', icon: <Library size={20} strokeWidth={1.5} /> },
@@ -73,6 +76,8 @@ const SchoolAdminDashboard = () => {
 
     const renderContent = () => {
         if (activeTab === 'overview') return <DashboardOverview setActiveTab={setActiveTab} />;
+        if (activeTab === 'admissions') return <AdmissionRequests />;
+        if (activeTab === 'fees') return <FeeSettings />;
 
         if (activeTab === 'student') {
             const tabs = [
@@ -287,6 +292,8 @@ const SchoolAdminDashboard = () => {
         const item = navItems.find(n => n.id === activeTab);
         return item ? item.label : 'Dashboard Overview';
     };
+
+    if (!currentUser) return null;
 
     return (
         <DashboardLayout

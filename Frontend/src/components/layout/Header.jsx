@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
-    <div className="bg-white px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between shadow-sm">
-      <Link to="/" className="flex items-center gap-4 text-orange-500 font-bold text-3xl sm:text-4xl tracking-widest drop-shadow-md">
+    <div className="bg-white px-4 sm:px-8 py-2 flex flex-col sm:flex-row items-center justify-between shadow-sm">
+      <Link to="/" className="flex items-center gap-4 text-orange-500 font-bold text-2xl sm:text-3xl tracking-widest drop-shadow-md">
         VidyaSetu
       </Link>
       
-      <div className="text-center mt-4 sm:mt-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-orange-700 uppercase tracking-wide">VidyaSetu CRM</h1>
-        <p className="text-gray-700 text-sm font-semibold">Comprehensive School Management System</p>
+      <div className="text-center mt-2 sm:mt-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-orange-700 uppercase tracking-wide">VidyaSetu CRM</h1>
+        <p className="text-gray-700 text-xs sm:text-sm font-semibold">Comprehensive School Management System</p>
       </div>
 
       <div className="flex items-center gap-4 mt-4 sm:mt-0">

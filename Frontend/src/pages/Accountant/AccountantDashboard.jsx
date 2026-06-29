@@ -108,7 +108,7 @@ const AccountantDashboard = () => {
             setActiveTab={setActiveTab}
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
-            onLogout={handleLogout}
+            handleLogout={handleLogout}
         >
             {renderContent()}
         </DashboardLayout>
