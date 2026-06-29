@@ -22,8 +22,22 @@ router.delete('/transactions/:id',    auth, superAdminController.deleteTransacti
 router.get('/schools',                auth, superAdminController.getSchools);
 router.patch('/schools/:id/subscription', auth, superAdminController.updateSchoolSubscription);
 
+// Revenue report
+router.get('/revenue/report',         auth, superAdminController.getRevenueReport);
+
 // All users (grouped by role)
 router.get('/users',                  auth, superAdminController.getAllUsers);
+
+// Settings
+router.get('/settings',               auth, superAdminController.getPlatformSettings);
+router.put('/settings',               auth, superAdminController.updatePlatformSettings);
+
+// Plans
+router.get('/plans',                  auth, superAdminController.getPlans);
+router.put('/plans/:id',              auth, superAdminController.updatePlan);
+
+// Reminders
+router.post('/reminders/send',        auth, superAdminController.sendReminders);
 
 module.exports = router;
 

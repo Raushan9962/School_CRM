@@ -61,5 +61,6 @@ router.use('/profile-updates', require('./profileUpdateRoutes'));
 router.use('/school-admin', require('./schoolAdminRoutes'));
 router.use('/teacher-portal', require('./teacherPortalRoutes'));
 router.use('/accountant', accountantRoutes);
+router.use('/admission', require('./admission'));
 
 module.exports = router;
