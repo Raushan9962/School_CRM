@@ -60,7 +60,24 @@ const DashboardOverview = ({ setActiveTab }) => {
         notifications: 5,
         birthdayToday: 3
     });
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await apiFetch('/school-admin/dashboard-stats');
+                const result = await response.json();
+                if (result.success && result.data) {
+                    setStats((prev) => ({ ...prev, ...result.data }));
+                }
+            } catch (error) {
+                console.error("Error fetching dashboard stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
 
     // Using exact Accountant dashboard styling
     const containerStyle = { display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' };
@@ -74,8 +91,8 @@ const DashboardOverview = ({ setActiveTab }) => {
         { title: 'Total Teachers', value: stats.totalTeachers, icon: <BookOpen size={18} />, bg: '#ecfdf5', color: '#10b981', tab: 'teacher' },
         { title: 'Accountants', value: stats.totalAccountants, icon: <Calculator size={18} />, bg: '#f5f3ff', color: '#8b5cf6', tab: 'accountant' },
         { title: 'Transport Staff', value: stats.totalTransportStaff, icon: <Bus size={18} />, bg: '#fffbeb', color: '#f59e0b', tab: 'transport_staff' },
-        { title: 'Fees Collected', value: `₹${(stats.feesCollected/100000).toFixed(1)}L`, icon: <IndianRupee size={18} />, bg: '#f0fdfa', color: '#14b8a6', tab: 'finance' },
-        { title: 'Pending Fees', value: `₹${(stats.pendingFees/100000).toFixed(1)}L`, icon: <Clock size={18} />, bg: '#fef2f2', color: '#ef4444', tab: 'finance' },
+        { title: 'Fees Collected', value: `₹${stats.feesCollected.toLocaleString('en-IN')}`, icon: <IndianRupee size={18} />, bg: '#f0fdfa', color: '#14b8a6', tab: 'finance' },
+        { title: 'Pending Fees', value: `₹${stats.pendingFees.toLocaleString('en-IN')}`, icon: <Clock size={18} />, bg: '#fef2f2', color: '#ef4444', tab: 'finance' },
         { title: 'Today Attendance', value: `${stats.todayAttendancePercent}%`, icon: <Activity size={18} />, bg: '#eef2ff', color: '#6366f1', tab: 'student' },
         { title: 'Upcoming Exams', value: stats.upcomingExams, icon: <Calendar size={18} />, bg: '#fdf2f8', color: '#ec4899', tab: 'student' },
     ];

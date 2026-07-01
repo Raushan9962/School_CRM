@@ -85,23 +85,21 @@ exports.getDashboardStats = async (req, res) => {
 
         // 5. Fees Collected (This month)
         const feesRes = await pool.query(`
-            SELECT SUM(f.amount) 
-            FROM fees f
-            JOIN students s ON f.student_id = s.id
-            WHERE s.school_id = $1 AND f.status = 'Paid' 
-            AND EXTRACT(MONTH FROM f.paid_date) = EXTRACT(MONTH FROM CURRENT_DATE)
-            AND EXTRACT(YEAR FROM f.paid_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            SELECT COALESCE(SUM(amount_paid), 0) as total 
+            FROM fee_receipts 
+            WHERE school_id = $1 AND status = 'Paid' 
+            AND EXTRACT(MONTH FROM payment_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM payment_date) = EXTRACT(YEAR FROM CURRENT_DATE)
         `, [schoolId]);
-        const feesCollected = parseInt(feesRes.rows[0].sum) || 0;
+        const feesCollected = parseInt(feesRes.rows[0].total) || 0;
 
         // 6. Pending Fees
         const pendingFeesRes = await pool.query(`
-            SELECT SUM(f.amount) 
-            FROM fees f
-            JOIN students s ON f.student_id = s.id
-            WHERE s.school_id = $1 AND f.status != 'Paid'
+            SELECT COALESCE(SUM(balance), 0) as total 
+            FROM fee_receipts 
+            WHERE school_id = $1
         `, [schoolId]);
-        const pendingFees = parseInt(pendingFeesRes.rows[0].sum) || 0;
+        const pendingFees = parseInt(pendingFeesRes.rows[0].total) || 0;
 
         // Mock data for Phase 1 where tables don't exist yet
         const upcomingExams = 0; 
