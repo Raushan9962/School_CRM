@@ -52,11 +52,16 @@ const VendorManagement = () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const newVendor = {
-            name: formData.get('name'),
-            type: formData.get('type'),
-            contact: formData.get('contact'),
-            email: formData.get('email'),
-            pending_due: formData.get('pending_due')
+            name: e.target.name.value,
+            type: e.target.type.value,
+            contact: e.target.contact.value,
+            email: e.target.email.value,
+            pending_due: e.target.pending_due.value,
+            bank_name: e.target.bank_name.value,
+            account_name: e.target.account_name.value,
+            account_number: e.target.account_number.value,
+            ifsc_code: e.target.ifsc_code.value,
+            upi_id: e.target.upi_id.value,
         };
         try {
             const res = await apiFetch('/accountant/vendors', {
@@ -148,20 +153,46 @@ const VendorManagement = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Contact Number *</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Contact No. *</label>
                             <input name="contact" type="tel" defaultValue={selectedVendor?.contact || ''} required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="+91 9876543210" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Email ID</label>
                             <input name="email" type="email" defaultValue={selectedVendor?.email || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="vendor@example.com" />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Opening Pending Due (₹)</label>
-                            <input name="pending_due" type="number" defaultValue={selectedVendor?.pending_due || 0} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="0" />
+                    <div className="border-t border-slate-200 pt-4 mt-2">
+                        <h3 className="text-sm font-bold text-slate-700 mb-3">Bank Details</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Bank Name</label>
+                                <input name="bank_name" type="text" defaultValue={selectedVendor?.bank_name || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="e.g. HDFC Bank" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Account Name</label>
+                                <input name="account_name" type="text" defaultValue={selectedVendor?.account_name || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Name on account" />
+                            </div>
                         </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Account Number</label>
+                                <input name="account_number" type="text" defaultValue={selectedVendor?.account_number || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Account No." />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">IFSC Code</label>
+                                <input name="ifsc_code" type="text" defaultValue={selectedVendor?.ifsc_code || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="IFSC Code" />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">UPI ID</label>
+                            <input name="upi_id" type="text" defaultValue={selectedVendor?.upi_id || ''} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="vendor@upi" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Opening Pending Due (₹)</label>
+                        <input name="pending_due" type="number" defaultValue={selectedVendor?.pending_due || 0} className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="0" />
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 mt-4">
@@ -186,9 +217,32 @@ const VendorManagement = () => {
                 </div>
 
                 <form onSubmit={handleSubmitPayment} className="space-y-4">
-                    <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center">
-                        <span className="text-xs font-semibold text-slate-600">Pending Amount:</span>
+                    <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center mb-4">
+                        <span className="text-xs font-semibold text-slate-600">Pending Due:</span>
                         <span className="text-sm font-bold text-red-600">₹{parseFloat(selectedVendor?.pending_due || 0).toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
+                        <h3 className="text-sm font-bold text-blue-800 mb-2">Vendor Bank Details</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div className="bg-white p-3 rounded border border-blue-100 shadow-sm">
+                                <span className="block font-bold text-slate-700 mb-1 border-b pb-1">Bank Transfer</span>
+                                <div className="grid grid-cols-2 gap-1 mt-2 text-slate-600">
+                                    <span className="font-semibold">Bank:</span> <span>{selectedVendor?.bank_name || 'N/A'}</span>
+                                    <span className="font-semibold">Name:</span> <span>{selectedVendor?.account_name || 'N/A'}</span>
+                                    <span className="font-semibold">A/c No:</span> <span className="font-mono font-bold">{selectedVendor?.account_number || 'N/A'}</span>
+                                    <span className="font-semibold">IFSC:</span> <span className="font-mono">{selectedVendor?.ifsc_code || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div className="bg-white p-3 rounded border border-blue-100 shadow-sm">
+                                <span className="block font-bold text-slate-700 mb-1 border-b pb-1">UPI Details</span>
+                                <div className="mt-2 text-slate-600">
+                                    <span className="font-semibold block mb-1">UPI ID:</span> 
+                                    <span className="font-mono font-bold text-sm bg-slate-50 px-2 py-1 rounded border">{selectedVendor?.upi_id || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

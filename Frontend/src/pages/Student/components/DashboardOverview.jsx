@@ -85,7 +85,8 @@ const DashboardOverview = ({ onNavigate }) => {
                     rollNo: `STU-${profileData?.id || 'N/A'}`,
                     attendance: statsData?.attendancePercentage || 0,
                     pendingFees: statsData?.pendingFees || 0,
-                    latestResult: statsData?.latestResult || null
+                    latestResult: statsData?.latestResult || null,
+                    hasPendingAdmissionFee: statsData?.hasPendingAdmissionFee || false
                 });
             }
         } catch (error) {
@@ -202,6 +203,27 @@ const DashboardOverview = ({ onNavigate }) => {
                     </button>
                 </div>
             </div>
+
+            {user.hasPendingAdmissionFee && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r shadow-sm">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <span className="text-red-500 font-bold text-xl">!</span>
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-bold text-red-800 m-0">Action Required: Pending Admission Fee</h3>
+                            <div className="mt-1 text-sm text-red-700">
+                                <p className="m-0">Your admission has been conditionally approved. Please pay your admission fee within 15 days of approval, otherwise your account and admission may be cancelled.</p>
+                            </div>
+                            <div className="mt-3">
+                                <button onClick={() => onNavigate && onNavigate('fees')} className="bg-red-100 text-red-800 font-bold px-3 py-1.5 rounded text-xs hover:bg-red-200 border-none cursor-pointer">
+                                    Pay Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Prominent Next Class Notification */}
             <div className="bg-sky-50 border border-sky-200 p-4 rounded-xl flex items-center justify-between">

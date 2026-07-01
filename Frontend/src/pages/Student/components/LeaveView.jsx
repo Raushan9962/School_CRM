@@ -92,40 +92,40 @@ const LeaveView = () => {
     const filteredRecords = records.filter(r => activeTab === 'all' || r.status.toLowerCase() === activeTab);
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Leave Type <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Leave Type <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Date Range
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Date Range
                     </button>
                 </div>
 
-                <div className="flex gap-3">
-                    <button onClick={() => setShowModal(true)} className="px-4 py-2 bg-sky-500 border-none rounded text-white text-sm font-medium cursor-pointer flex items-center gap-1.5 hover:bg-sky-600 transition-colors">
-                        <PlusCircle size={16} /> Apply Leave
+                <div className="flex gap-3 items-center">
+                    <button onClick={() => setShowModal(true)} className="px-4 py-1.5 bg-blue-600 text-white border-none rounded text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        <PlusCircle size={14} /> Apply Leave
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[2px] rounded-t-lg transition-colors border ${activeTab === tab.id ? 'bg-sky-50 border-sky-500 border-b-transparent border-t-4' : 'bg-white border-slate-200 border-b-transparent border-t border-t-transparent hover:bg-slate-50'}`}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -133,37 +133,40 @@ const LeaveView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading leave records...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading leave records...</div>
                 ) : filteredRecords.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">No leave applications found.</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">No leave applications found.</div>
                 ) : (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                <th className="px-3 py-4">App ID</th>
-                                <th className="px-3 py-4">Leave Type</th>
-                                <th className="px-3 py-4">Duration</th>
-                                <th className="px-3 py-4">Days</th>
-                                <th className="px-3 py-4">Reason</th>
-                                <th className="px-3 py-4 text-right">Status</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">App ID</th>
+                                <th className="px-4 py-2 font-bold">Leave Type</th>
+                                <th className="px-4 py-2 font-bold">Duration</th>
+                                <th className="px-4 py-2 font-bold">Days</th>
+                                <th className="px-4 py-2 font-bold">Reason</th>
+                                <th className="px-4 py-2 font-bold text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {filteredRecords.map((row, idx) => (
                                 <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 font-bold text-blue-600">
                                         LAV-{row.id.toString().padStart(4, '0')}
                                     </td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.type}</td>
-                                    <td className="px-3 py-4 text-gray-600">
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.type}</td>
+                                    <td className="px-4 py-2.5 text-slate-600 font-medium">
                                         {new Date(row.from_date).toLocaleDateString()} to {new Date(row.to_date).toLocaleDateString()}
                                     </td>
-                                    <td className="px-3 py-4 text-gray-900 font-semibold">{row.days}</td>
-                                    <td className="px-3 py-4 text-gray-500">{row.reason}</td>
-                                    <td className="px-3 py-4 text-right">
-                                        <span className={`px-2 py-1 rounded text-xs font-semibold ${row.status === 'Approved' ? 'bg-green-100 text-green-800' : (row.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')}`}>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.days}</td>
+                                    <td className="px-4 py-2.5 text-slate-600">{row.reason}</td>
+                                    <td className="px-4 py-2.5 text-center">
+                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                                            row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 
+                                            (row.status === 'Rejected' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')
+                                        }`}>
                                             {row.status}
                                         </span>
                                     </td>
@@ -174,41 +177,41 @@ const LeaveView = () => {
                 )}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchLeaves} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchLeaves} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
                 <div className="flex items-center gap-2">
                     Rows per page: 
-                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
-                        <option>100</option>
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
+                        <option>10</option>
+                        <option>25</option>
                         <option>50</option>
-                        <option>20</option>
                     </select>
                 </div>
                 <div>1-{filteredRecords.length} of {filteredRecords.length}</div>
-                <div className="flex gap-2">
-                    <button className="bg-transparent border-none text-gray-400 flex items-center cursor-not-allowed" disabled><ChevronLeft size={20} /></button>
-                    <button className="bg-transparent border-none text-gray-600 cursor-pointer flex items-center hover:text-gray-900 transition-colors"><ChevronRight size={20} /></button>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                 </div>
             </div>
 
             {/* Apply Leave Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-[400px] p-4 relative shadow-xl">
-                        <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 bg-transparent border-none cursor-pointer text-gray-500 hover:text-gray-700 transition-colors">
-                            <X size={20} />
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+                    <div className="bg-white rounded-lg w-full max-w-md p-6 relative shadow-xl">
+                        <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                            <X size={18} />
                         </button>
-                        <h2 className="m-0 mb-5 text-sm text-gray-900 font-semibold">Apply for Leave</h2>
+                        <h2 className="text-lg font-bold text-slate-800 mb-6">Apply for Leave</h2>
                         
                         <form onSubmit={handleApplyLeave} className="flex flex-col gap-4">
                             <div>
-                                <label className="block text-sm text-gray-600 mb-2 font-medium">Leave Type</label>
-                                <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)} className="w-full p-2.5 rounded border border-slate-200 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white">
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Leave Type</label>
+                                <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow">
                                     <option>Sick Leave</option>
                                     <option>Casual Leave</option>
                                     <option>Medical Leave</option>
@@ -216,23 +219,23 @@ const LeaveView = () => {
                                 </select>
                             </div>
                             
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 <div className="flex-1">
-                                    <label className="block text-sm text-gray-600 mb-2 font-medium">From Date</label>
-                                    <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} required className="w-full p-2.5 rounded border border-slate-200 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">From Date</label>
+                                    <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} required className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" />
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-sm text-gray-600 mb-2 font-medium">To Date</label>
-                                    <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} required className="w-full p-2.5 rounded border border-slate-200 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">To Date</label>
+                                    <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} required className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm text-gray-600 mb-2 font-medium">Reason</label>
-                                <textarea value={reason} onChange={(e) => setReason(e.target.value)} required rows="3" placeholder="Explain your reason briefly..." className="w-full p-2.5 rounded border border-slate-200 outline-none resize-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"></textarea>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Reason</label>
+                                <textarea value={reason} onChange={(e) => setReason(e.target.value)} required rows="3" placeholder="Explain your reason briefly..." className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none resize-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow"></textarea>
                             </div>
 
-                            <button type="submit" className="w-full p-3 bg-sky-500 text-white border-none rounded font-semibold cursor-pointer mt-2 hover:bg-sky-600 transition-colors">
+                            <button type="submit" className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold transition-colors cursor-pointer shadow-sm">
                                 Submit Application
                             </button>
                         </form>

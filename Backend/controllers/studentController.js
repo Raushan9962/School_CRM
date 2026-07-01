@@ -81,10 +81,19 @@ exports.getStudentDashboardStats = async (req, res) => {
 
         // 3. Pending Fees
         const feesRes = await pool.query(`
-            SELECT SUM(amount) as pending_amount 
-            FROM fees 
-            WHERE student_id = $1 AND status = 'Pending'
-        `, [studentId]);
+            SELECT SUM(total_pending) as pending_amount
+            FROM (
+                SELECT SUM(amount) as total_pending 
+                FROM fees 
+                WHERE student_id = $1 AND status = 'Pending'
+                
+                UNION ALL
+                
+                SELECT SUM(due_amount) as total_pending
+                FROM student_fee_invoices
+                WHERE student_id = $2 AND status = 'Pending'
+            ) combined_fees
+        `, [studentId, userId]);
         const pendingFees = feesRes.rows[0].pending_amount || 0;
 
         // 4. Latest Result
@@ -96,10 +105,20 @@ exports.getStudentDashboardStats = async (req, res) => {
         `, [studentId]);
         const latestResult = resultRes.rows.length > 0 ? resultRes.rows[0] : null;
 
+        // 5. Check for pending admission fee
+        const admissionFeeRes = await pool.query(`
+            SELECT sfi.id 
+            FROM student_fee_invoices sfi
+            JOIN fee_structures fs ON sfi.fee_structure_id = fs.id
+            WHERE sfi.student_id = $1 AND sfi.status = 'Pending' AND fs.fee_type = 'Admission Fee'
+        `, [studentId]);
+        const hasPendingAdmissionFee = admissionFeeRes.rows.length > 0;
+
         res.status(200).json({
             attendancePercentage,
             pendingFees,
-            latestResult
+            latestResult,
+            hasPendingAdmissionFee
         });
     } catch (error) {
         console.error(error);

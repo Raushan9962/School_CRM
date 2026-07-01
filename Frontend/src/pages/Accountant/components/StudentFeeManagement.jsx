@@ -12,6 +12,16 @@ const StudentFeeManagement = () => {
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
     const [message, setMessage] = useState('');
+    const [editingStructureId, setEditingStructureId] = useState(null);
+    const [editFormData, setEditFormData] = useState({ name: '', totalAmount: '' });
+    const [selectedClassForBulk, setSelectedClassForBulk] = useState('');
+    const [selectedFeeStructuresForBulk, setSelectedFeeStructuresForBulk] = useState([]);
+    const [isFeeDropdownOpen, setIsFeeDropdownOpen] = useState(false);
+    
+    // Payment Modal State
+    const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+    const [selectedStudentForPay, setSelectedStudentForPay] = useState(null);
+    const [paymentFormData, setPaymentFormData] = useState({ payment_method: 'Cash', transaction_ref: '' });
     
     const receiptRef = useRef(null);
 
@@ -126,12 +136,60 @@ const StudentFeeManagement = () => {
         }
     };
 
+    const handleOpenPayModal = (student) => {
+        setSelectedStudentForPay(student);
+        setPaymentFormData({ payment_method: 'Cash', transaction_ref: '' });
+        setIsPayModalOpen(true);
+    };
+
+    const handleProcessPayment = async (e) => {
+        e.preventDefault();
+        
+        // Find all unpaid or partial fees for this student
+        const feesToPay = studentsFees.filter(f => 
+            f.student_name === selectedStudentForPay.student_name && 
+            f.admission_number === selectedStudentForPay.admission_number &&
+            f.status !== 'Paid'
+        );
+
+        if (feesToPay.length === 0) {
+            alert("No pending fees to pay.");
+            setIsPayModalOpen(false);
+            return;
+        }
+
+        try {
+            // Process payment for all unpaid fees
+            await Promise.all(feesToPay.map(fee => 
+                apiFetch(`/accountant/student-fees/${fee.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        status: 'Paid', 
+                        payment_method: paymentFormData.payment_method,
+                        transaction_ref: paymentFormData.transaction_ref
+                    })
+                })
+            ));
+            
+            showMessage('Payment processed successfully.');
+            fetchStudentFees();
+            setIsPayModalOpen(false);
+        } catch (err) {
+            console.error(err);
+            alert("Error processing payment");
+        }
+    };
+
     const handleGenerateInvoice = async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
+        if (selectedFeeStructuresForBulk.length === 0) {
+            alert('Please select at least one fee structure.');
+            return;
+        }
         const data = {
-            className: formData.get('class_name'),
-            feeStructureId: formData.get('fee_structure_id')
+            className: selectedClassForBulk,
+            feeStructureIds: selectedFeeStructuresForBulk
         };
         try {
             const res = await apiFetch('/accountant/student-fees/bulk-generate', {
@@ -154,7 +212,12 @@ const StudentFeeManagement = () => {
     };
 
     const handleOpenReceipt = (student) => {
-        setSelectedStudent(student);
+        if (student.status === 'TEMPLATE') {
+            setSelectedStudent({ info: student, fees: [student] });
+        } else {
+            const studentFeesList = studentsFees.filter(s => s.student_name === student.student_name && s.admission_number === student.admission_number);
+            setSelectedStudent({ info: student, fees: studentFeesList });
+        }
         setIsReceiptModalOpen(true);
     };
 
@@ -165,7 +228,7 @@ const StudentFeeManagement = () => {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Invoice - ${selectedStudent.student_name}</title>
+                    <title>Invoice - ${selectedStudent.info ? selectedStudent.info.student_name : 'Student'}</title>
                     <script src="https://cdn.tailwindcss.com"></script>
                     <style>
                         body { font-family: monospace; padding: 40px; background: white; }
@@ -282,10 +345,60 @@ const StudentFeeManagement = () => {
                         <tbody className="text-xs">
                             {feeStructures.map(fs => (
                                 <tr key={fs.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-4 py-2.5 font-bold text-slate-700">{fs.name}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-700">
+                                        {editingStructureId === fs.id ? (
+                                            <input type="text" className="border rounded p-1 w-full text-sm font-normal" value={editFormData.name} onChange={e => setEditFormData({...editFormData, name: e.target.value})} />
+                                        ) : (
+                                            fs.name
+                                        )}
+                                    </td>
                                     <td className="px-4 py-2.5 text-slate-600">{fs.class_name}</td>
-                                    <td className="px-4 py-2.5 font-bold text-slate-800">₹{parseFloat(fs.total_amount).toLocaleString('en-IN')}</td>
-                                    <td className="px-4 py-2.5 text-right"><button className="text-blue-600 font-bold hover:underline">Edit</button></td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">
+                                        {editingStructureId === fs.id ? (
+                                            <input type="number" className="border rounded p-1 w-full text-sm font-normal" value={editFormData.totalAmount} onChange={e => setEditFormData({...editFormData, totalAmount: e.target.value})} />
+                                        ) : (
+                                            `₹${parseFloat(fs.total_amount).toLocaleString('en-IN')}`
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-2.5 text-right">
+                                        {editingStructureId === fs.id ? (
+                                            <div className="flex justify-end gap-2">
+                                                <button onClick={() => {
+                                                    fetch(`http://localhost:5000/api/accountant/fee-structures/${fs.id}`, {
+                                                        method: 'PUT',
+                                                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                                                        body: JSON.stringify(editFormData)
+                                                    }).then(r => r.json()).then(d => {
+                                                        if(d.success) { showMessage('Updated successfully.'); setEditingStructureId(null); fetchFeeStructures(); }
+                                                        else showMessage(d.message || 'Update failed', 'error');
+                                                    });
+                                                }} className="text-xs bg-green-600 text-white px-2 py-1 rounded">Save</button>
+                                                <button onClick={() => setEditingStructureId(null)} className="text-xs bg-slate-300 text-slate-700 px-2 py-1 rounded">Cancel</button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-end gap-3">
+                                                <button onClick={() => {
+                                                    setEditingStructureId(fs.id);
+                                                    setEditFormData({ name: fs.name, totalAmount: fs.total_amount });
+                                                }} className="text-blue-600 font-bold hover:underline">Edit</button>
+                                                <button onClick={() => {
+                                                    const templateObj = {
+                                                        id: `FS-${fs.id}`,
+                                                        student_name: 'Template Invoice',
+                                                        class_name: fs.class_name,
+                                                        admission_number: 'N/A',
+                                                        created_at: new Date().toISOString(),
+                                                        status: 'TEMPLATE',
+                                                        fee_type: fs.name,
+                                                        due_amount: fs.total_amount,
+                                                        paid_amount: 0
+                                                    };
+                                                    setSelectedStudent({ info: templateObj, fees: [templateObj] });
+                                                    setIsReceiptModalOpen(true);
+                                                }} className="text-emerald-600 font-bold hover:underline flex items-center gap-1">Invoice</button>
+                                            </div>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                             {feeStructures.length === 0 && (
@@ -302,12 +415,47 @@ const StudentFeeManagement = () => {
 
     // Generate Invoice Form
     if (activeTab === 'invoice') {
+        let displayStructures = [];
+        if (selectedClassForBulk) {
+            const classStructures = feeStructures.filter(f => f.class_name === selectedClassForBulk);
+            displayStructures = classStructures.map(f => ({ ...f, ids: [f.id] }));
+        } else {
+            const grouped = {};
+            feeStructures.forEach(f => {
+                if (!grouped[f.name]) {
+                    grouped[f.name] = { ...f, ids: [] };
+                }
+                grouped[f.name].ids.push(f.id);
+            });
+            displayStructures = Object.values(grouped);
+        }
+
+        const handleSelectAllFees = () => {
+            const allVisibleIds = displayStructures.flatMap(f => f.ids);
+            const isAllSelected = allVisibleIds.every(id => selectedFeeStructuresForBulk.includes(id));
+            if (isAllSelected && allVisibleIds.length > 0) {
+                setSelectedFeeStructuresForBulk([]);
+            } else {
+                setSelectedFeeStructuresForBulk(allVisibleIds);
+            }
+        };
+
+        const toggleFeeSelection = (ids) => {
+            const isSelected = ids.every(id => selectedFeeStructuresForBulk.includes(id));
+            if (isSelected) {
+                setSelectedFeeStructuresForBulk(selectedFeeStructuresForBulk.filter(feeId => !ids.includes(feeId)));
+            } else {
+                const newIds = ids.filter(id => !selectedFeeStructuresForBulk.includes(id));
+                setSelectedFeeStructuresForBulk([...selectedFeeStructuresForBulk, ...newIds]);
+            }
+        };
+
         return (
             <div className="animate-fade-in bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6 max-w-3xl">
                 <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
                     <div>
                         <h2 className="text-lg font-bold text-slate-800 m-0">Generate Bulk Invoices</h2>
-                        <p className="text-xs text-slate-500 mt-1">Generate invoices for an entire class or specific fee type</p>
+                        <p className="text-xs text-slate-500 mt-1">Generate invoices for an entire class or specific fee types</p>
                     </div>
                     <button onClick={() => setActiveTab('list')} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200 transition-colors">Back</button>
                 </div>
@@ -315,21 +463,67 @@ const StudentFeeManagement = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">Select Class</label>
-                            <select name="class_name" className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white">
+                            <select 
+                                name="class_name" 
+                                value={selectedClassForBulk}
+                                onChange={(e) => {
+                                    setSelectedClassForBulk(e.target.value);
+                                    setSelectedFeeStructuresForBulk([]); // Reset on class change
+                                }}
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                            >
                                 <option value="">All Classes</option>
                                 {classes.map(c => (
                                     <option key={c.id} value={c.name}>{c.name}</option>
                                 ))}
                             </select>
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Select Fee Structure *</label>
-                            <select name="fee_structure_id" required className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                                <option value="">Select Structure</option>
-                                {feeStructures.map(f => (
-                                    <option key={f.id} value={f.id}>{f.name} - ₹{f.total_amount}</option>
-                                ))}
-                            </select>
+                        <div className="relative">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Select Fee Structures *</label>
+                            <div 
+                                className="w-full px-3 py-2 text-sm rounded border border-slate-300 bg-white cursor-pointer flex justify-between items-center"
+                                onClick={() => setIsFeeDropdownOpen(!isFeeDropdownOpen)}
+                            >
+                                <span className="truncate">
+                                    {selectedFeeStructuresForBulk.length === 0 
+                                        ? 'Select Structures' 
+                                        : `${displayStructures.filter(f => f.ids.every(id => selectedFeeStructuresForBulk.includes(id))).length} Selected`}
+                                </span>
+                                <span>▼</span>
+                            </div>
+                            
+                            {isFeeDropdownOpen && (
+                                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                                    <div className="p-2 border-b border-slate-100">
+                                        <button 
+                                            type="button" 
+                                            onClick={handleSelectAllFees}
+                                            className="text-xs font-bold text-blue-600 hover:underline w-full text-left"
+                                        >
+                                            {displayStructures.length > 0 && displayStructures.flatMap(f => f.ids).every(id => selectedFeeStructuresForBulk.includes(id)) ? 'Deselect All' : 'Select All'}
+                                        </button>
+                                    </div>
+                                    {displayStructures.length === 0 ? (
+                                        <div className="p-3 text-xs text-slate-500 text-center">No fee structures available.</div>
+                                    ) : (
+                                        displayStructures.map((f, index) => (
+                                            <div 
+                                                key={index} 
+                                                className="px-3 py-2 flex items-center gap-2 hover:bg-slate-50 cursor-pointer"
+                                                onClick={() => toggleFeeSelection(f.ids)}
+                                            >
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={f.ids.every(id => selectedFeeStructuresForBulk.includes(id))} 
+                                                    readOnly 
+                                                    className="w-3.5 h-3.5"
+                                                />
+                                                <span className="text-sm text-slate-700">{f.name} - ₹{f.total_amount}</span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 mt-4">
@@ -343,6 +537,13 @@ const StudentFeeManagement = () => {
 
     // Receipt Modal
     if (isReceiptModalOpen && selectedStudent) {
+        const info = selectedStudent.info || selectedStudent;
+        const fees = selectedStudent.fees || [selectedStudent];
+        const totalDue = fees.reduce((sum, f) => sum + parseFloat(f.due_amount || 0), 0);
+        const totalPaid = fees.reduce((sum, f) => sum + parseFloat(f.paid_amount || 0), 0);
+        const totalRemaining = totalDue - totalPaid;
+        const invoiceStatus = totalRemaining <= 0 ? 'PAID' : (totalPaid > 0 ? 'PARTIAL' : 'PENDING');
+
         return (
             <div className="animate-fade-in bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6 max-w-2xl mx-auto">
                 <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
@@ -352,50 +553,106 @@ const StudentFeeManagement = () => {
                     <button onClick={() => setIsReceiptModalOpen(false)} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded hover:bg-slate-200 transition-colors">Close</button>
                 </div>
                 
-                <div ref={receiptRef} className="bg-white p-8 border border-slate-200">
-                    <div className="text-center mb-6">
-                        <h1 className="text-xl font-bold uppercase tracking-widest mb-1">VidyaSetu School</h1>
-                        <h2 className="text-lg font-bold mt-4 border-b pb-2">FEE INVOICE</h2>
-                    </div>
-                    
-                    <div className="flex justify-between mb-6 text-sm">
-                        <div>
-                            <p><span className="font-bold">Student Name:</span> {selectedStudent.student_name}</p>
-                            <p><span className="font-bold">Admission No:</span> {selectedStudent.admission_number || 'N/A'}</p>
-                            <p><span className="font-bold">Class:</span> {selectedStudent.class_name || 'N/A'}</p>
+                <style>{`@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');`}</style>
+                <div className="overflow-auto pb-4">
+                    <div ref={receiptRef} className="bg-white font-mono text-[11px] text-black mx-auto"
+                        style={{ width: '384px', border: '2px solid black', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                        
+                        {/* Top header — full width */}
+                        <div style={{ gridColumn: '1 / -1', borderBottom: '2px solid black', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <div>
+                                <div style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase' }}>{JSON.parse(localStorage.getItem('user') || '{}').schoolName || 'VidyaSetu'}</div>
+                                <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginTop: '2px', color: '#555' }}>FEE INVOICE / RECEIPT</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '28px', fontFamily: '"Libre Barcode 39", monospace', lineHeight: 1 }}>*INV-{info.id || '0000'}*</div>
+                                <div style={{ fontSize: '9px', fontWeight: 700, marginTop: '2px' }}>ID: {info.id || 'N/A'}</div>
+                            </div>
                         </div>
-                        <div className="text-right">
-                            <p><span className="font-bold">Date:</span> {new Date(selectedStudent.created_at).toLocaleDateString()}</p>
-                            <p><span className="font-bold">Status:</span> {selectedStudent.status}</p>
+
+                        {/* Billed To */}
+                        <div style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '12px 14px' }}>
+                            <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px', color: '#888' }}>Billed To</div>
+                            <div style={{ fontWeight: 700, fontSize: '13px' }}>{info.student_name || 'Class: ' + (info.class_name || 'N/A')}</div>
+                            <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>{info.student_name ? `ID: ${info.admission_number || 'N/A'} · Student` : 'Fee Structure Invoice'}</div>
                         </div>
-                    </div>
-                    
-                    <table className="w-full text-left mb-6 text-sm">
-                        <thead className="border-y border-black font-bold">
-                            <tr>
-                                <th className="py-2">Description</th>
-                                <th className="py-2 text-right">Amount (INR)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="py-2 border-b border-gray-200">{selectedStudent.fee_type} (Total Due)</td>
-                                <td className="py-2 text-right border-b border-gray-200">{parseFloat(selectedStudent.due_amount).toLocaleString('en-IN')}</td>
-                            </tr>
-                            <tr>
-                                <td className="py-2 border-b border-gray-200 font-bold">Amount Paid</td>
-                                <td className="py-2 text-right border-b border-gray-200 font-bold">{parseFloat(selectedStudent.paid_amount).toLocaleString('en-IN')}</td>
-                            </tr>
-                            <tr>
-                                <td className="py-2 font-bold text-red-600">Remaining Balance</td>
-                                <td className="py-2 text-right font-bold text-red-600">{(parseFloat(selectedStudent.due_amount) - parseFloat(selectedStudent.paid_amount)).toLocaleString('en-IN')}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <div className="mt-12 flex justify-between items-end text-xs font-bold">
-                        <div><p>___________________</p><p className="mt-1">Parent Signature</p></div>
-                        <div className="text-right"><p>___________________</p><p className="mt-1">Accountant Signature</p></div>
+
+                        {/* Payment Info */}
+                        <div style={{ borderBottom: '1px solid black', padding: '12px 14px', background: '#f9fafb' }}>
+                            <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px', color: '#888' }}>Payment Info</div>
+                            <div style={{ fontSize: '10px' }}>Date: {new Date(info.created_at || Date.now()).toLocaleDateString()}</div>
+                            <div style={{ fontWeight: 700, fontSize: '12px', marginTop: '4px', color: totalRemaining <= 0 ? '#16a34a' : (totalPaid > 0 ? '#ca8a04' : '#dc2626') }}>
+                                STATUS: {invoiceStatus}
+                            </div>
+                        </div>
+
+                        {/* Issuer — full width */}
+                        <div style={{ gridColumn: '1 / -1', borderBottom: '2px solid black', padding: '8px 14px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '10px' }}>
+                            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', color: '#888', marginRight: '4px' }}>Issuer:</span>
+                            <span style={{ fontWeight: 700 }}>{JSON.parse(localStorage.getItem('user') || '{}').schoolName || 'VidyaSetu School'}</span>
+                            <span style={{ color: '#555' }}>· 123 Education Lane, Learning City · Delhi 110001</span>
+                        </div>
+
+                        {/* Fee Table — full width */}
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                                <thead>
+                                    <tr style={{ background: '#f3f4f6', borderBottom: '2px solid black' }}>
+                                        <th style={{ padding: '6px 10px', textAlign: 'left', borderRight: '1px solid black', fontWeight: 700 }}>Description</th>
+                                        <th style={{ padding: '6px 10px', borderRight: '1px solid black', width: '70px', fontWeight: 700 }}>Status</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: '80px', fontWeight: 700 }}>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {fees.map((fee, idx) => {
+                                        const due = parseFloat(fee.due_amount || 0);
+                                        const paid = parseFloat(fee.paid_amount || 0);
+                                        const rem = due - paid;
+                                        const fStatus = rem <= 0 ? 'PAID' : (paid > 0 ? 'PARTIAL' : 'PENDING');
+                                        return (
+                                        <tr key={idx} style={{ borderBottom: '1px solid black' }}>
+                                            <td style={{ padding: '8px 10px', borderRight: '1px solid black' }}>
+                                                <div style={{ fontWeight: 700 }}>{fee.fee_type || fee.description || 'Academic Fee'}</div>
+                                            </td>
+                                            <td style={{ padding: '8px 10px', borderRight: '1px solid black', fontWeight: 700, fontSize: '10px' }}>
+                                                {fStatus}
+                                            </td>
+                                            <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
+                                                ₹{due.toLocaleString('en-IN')}
+                                            </td>
+                                        </tr>
+                                    )})}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Totals Summary */}
+                        <div style={{ gridColumn: '1 / -1', background: '#f8fafc', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end', borderBottom: '2px solid black' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '200px', fontSize: '11px' }}>
+                                <span>Total Amount:</span>
+                                <span>₹{totalDue.toLocaleString('en-IN')}</span>
+                            </div>
+                            {totalPaid > 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '200px', fontSize: '11px', color: '#16a34a' }}>
+                                    <span>Amount Paid:</span>
+                                    <span>- ₹{totalPaid.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '200px', fontSize: '14px', fontWeight: 900, marginTop: '4px', paddingTop: '6px', borderTop: '1px solid #ccc' }}>
+                                <span>Balance Due:</span>
+                                <span>₹{totalRemaining.toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+
+                        {/* Footer Barcode */}
+                        <div style={{ gridColumn: '1 / -1', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <div style={{ fontSize: '32px', fontFamily: '"Libre Barcode 39", monospace', lineHeight: 1 }}>*{info.id || '0000'}*</div>
+                            <div style={{ textAlign: 'right', fontSize: '9px', color: '#666' }}>
+                                <div style={{ fontWeight: 700, color: '#000', marginBottom: '2px' }}>VidyaSetu School</div>
+                                <div>123 Education Lane</div>
+                                <div>Thank you!</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -474,12 +731,27 @@ const StudentFeeManagement = () => {
                             </tr>
                         </thead>
                         <tbody className="text-xs">
-                            {filteredFees.map((student) => {
-                                const due = parseFloat(student.due_amount);
-                                const paid = parseFloat(student.paid_amount);
+                            {Object.values(filteredFees.reduce((acc, curr) => {
+                                const key = curr.student_name + '_' + curr.admission_number;
+                                if (!acc[key]) {
+                                    acc[key] = {
+                                        ...curr,
+                                        due_amount: 0,
+                                        paid_amount: 0,
+                                        fee_type: 'Consolidated Fees'
+                                    };
+                                }
+                                acc[key].due_amount += parseFloat(curr.due_amount || 0);
+                                acc[key].paid_amount += parseFloat(curr.paid_amount || 0);
+                                return acc;
+                            }, {})).map((student) => {
+                                const due = student.due_amount;
+                                const paid = student.paid_amount;
                                 const remaining = due - paid;
+                                const status = remaining <= 0 ? 'PAID' : (paid > 0 ? 'PARTIAL' : 'UNPAID');
+                                
                                 return (
-                                <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                <tr key={student.student_name + student.admission_number} className="border-b border-slate-100 hover:bg-slate-50">
                                     <td className="px-4 py-2.5">
                                         <div className="font-bold text-slate-800">{student.student_name} <span className="text-slate-400 font-normal">({student.admission_number || 'N/A'})</span></div>
                                         <div className="text-[10px] text-slate-500">{student.class_name || 'N/A'}</div>
@@ -489,13 +761,15 @@ const StudentFeeManagement = () => {
                                     <td className="px-4 py-2.5 font-bold text-emerald-600">₹{paid.toLocaleString('en-IN')}</td>
                                     <td className="px-4 py-2.5 font-bold text-red-600">₹{remaining.toLocaleString('en-IN')}</td>
                                     <td className="px-4 py-2.5">
-                                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${getStatusStyle(student.status)}`}>
-                                            {student.status}
+                                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${getStatusStyle(status)}`}>
+                                            {status}
                                         </span>
                                     </td>
                                     <td className="px-4 py-2.5 text-right flex justify-end gap-2">
                                         <button onClick={() => handleOpenReceipt(student)} className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200 transition-colors">Invoice</button>
-                                        <button className="px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded hover:bg-blue-100 transition-colors border border-blue-100">Pay</button>
+                                        {remaining > 0 && (
+                                            <button onClick={() => handleOpenPayModal(student)} className="px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded hover:bg-blue-100 transition-colors border border-blue-100">Pay</button>
+                                        )}
                                     </td>
                                 </tr>
                             )})}
@@ -506,6 +780,58 @@ const StudentFeeManagement = () => {
                     )}
                 </div>
             </div>
+
+            {/* Payment Modal */}
+            {isPayModalOpen && selectedStudentForPay && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 animate-fade-in">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-slide-up">
+                        <div className="flex justify-between items-center p-4 border-b border-slate-100">
+                            <h3 className="font-bold text-slate-800">Verify & Process Payment</h3>
+                            <button onClick={() => setIsPayModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleProcessPayment} className="p-4 space-y-4">
+                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div className="text-xs text-slate-500 uppercase font-bold mb-1">Student Details</div>
+                                <div className="font-bold text-slate-800">{selectedStudentForPay.student_name}</div>
+                                <div className="text-xs text-slate-500">ID: {selectedStudentForPay.admission_number || 'N/A'}</div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method *</label>
+                                <select 
+                                    value={paymentFormData.payment_method}
+                                    onChange={(e) => setPaymentFormData({...paymentFormData, payment_method: e.target.value})}
+                                    className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Online">Online / UPI</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Transaction Ref / Cheque No. (Optional)</label>
+                                <input 
+                                    type="text" 
+                                    value={paymentFormData.transaction_ref}
+                                    onChange={(e) => setPaymentFormData({...paymentFormData, transaction_ref: e.target.value})}
+                                    placeholder="e.g. TXN-123456" 
+                                    className="w-full px-3 py-2 text-sm rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                                />
+                            </div>
+
+                            <div className="pt-4 flex justify-end gap-2">
+                                <button type="button" onClick={() => setIsPayModalOpen(false)} className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-200">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                                    <CheckCircle2 size={16} /> Confirm Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

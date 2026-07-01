@@ -95,7 +95,7 @@ const TransportFees = () => {
                                 <tr>
                                     <th className="px-4 py-2 text-sm font-semibold text-slate-600">Student Details</th>
                                     <th className="px-4 py-2 text-sm font-semibold text-slate-600">Assigned Route</th>
-                                    <th className="px-4 py-2 text-sm font-semibold text-slate-600">Amount</th>
+                                    <th className="px-4 py-2 text-sm font-semibold text-slate-600">Amount (₹)</th>
                                     <th className="px-4 py-2 text-sm font-semibold text-slate-600">Status</th>
                                     <th className="px-4 py-2 text-sm font-semibold text-slate-600">Payment Date</th>
                                     <th className="px-4 py-2 text-sm font-semibold text-slate-600">Actions</th>

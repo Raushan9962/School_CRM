@@ -86,61 +86,44 @@ const ComplaintView = () => {
     const filteredTickets = tickets.filter(t => activeTab === 'all' || t.status.toLowerCase().includes(activeTab));
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Category <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Category <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Filter Date
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Filter Date
                     </button>
-
-                    <div className="relative">
-                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input type="text" placeholder="Search ticket id or subject..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '250px' }} />
-                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button onClick={() => setShowModal(true)} className="px-4 py-2 bg-sky-500 border-none rounded text-white text-sm font-medium cursor-pointer flex items-center gap-1.5 hover:bg-sky-600 transition-colors">
-                        <PlusCircle size={16} /> Raise Ticket
+                <div className="flex gap-3 items-center">
+                    <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search ticket id or subject..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-64" />
+                    </div>
+                    <button onClick={() => setShowModal(true)} className="px-4 py-1.5 bg-blue-600 text-white border-none rounded text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        <PlusCircle size={14} /> Raise Ticket
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            minWidth: '160px',
-                            padding: '16px',
-                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
-                            border: '1px solid',
-                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
-                            borderBottom: 'none',
-                            borderRadius: '8px 8px 0 0',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            position: 'relative',
-                            marginBottom: '-2px',
-                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
-                        }}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -148,44 +131,46 @@ const ComplaintView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading complaints...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading complaints...</div>
                 ) : filteredTickets.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">No complaints found.</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">No complaints found.</div>
                 ) : (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                <th className="px-3 py-4">Ticket ID</th>
-                                <th className="px-3 py-4">Subject</th>
-                                <th className="px-3 py-4">Category</th>
-                                <th className="px-3 py-4">Created Date</th>
-                                <th className="px-3 py-4">Priority</th>
-                                <th className="px-3 py-4 text-right">Status</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">Ticket ID</th>
+                                <th className="px-4 py-2 font-bold">Subject</th>
+                                <th className="px-4 py-2 font-bold">Category</th>
+                                <th className="px-4 py-2 font-bold">Created Date</th>
+                                <th className="px-4 py-2 font-bold">Priority</th>
+                                <th className="px-4 py-2 font-bold text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {filteredTickets.map((row, idx) => (
                                 <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                    <td style={{ padding: '16px 12px', color: '#0ea5e9', fontWeight: '500' }}>
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 font-bold text-blue-600">
                                         TKT-{row.id.toString().padStart(4, '0')}
                                     </td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.subject}</td>
-                                    <td className="px-3 py-4 text-gray-600">{row.category}</td>
-                                    <td className="px-3 py-4 text-gray-600">{new Date(row.created_at).toLocaleDateString()}</td>
-                                    <td className="px-3 py-4">
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: row.priority === 'High' || row.priority === 'Urgent' ? '#ef4444' : (row.priority === 'Medium' ? '#d97706' : '#6b7280') }}>
-                                            {(row.priority === 'High' || row.priority === 'Urgent') && <AlertCircle size={14} />}
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.subject}</td>
+                                    <td className="px-4 py-2.5 text-slate-600">{row.category}</td>
+                                    <td className="px-4 py-2.5 text-slate-600 font-medium">{new Date(row.created_at).toLocaleDateString()}</td>
+                                    <td className="px-4 py-2.5">
+                                        <span className={`inline-flex items-center gap-1 font-bold ${
+                                            row.priority === 'High' || row.priority === 'Urgent' ? 'text-red-500' : 
+                                            (row.priority === 'Medium' ? 'text-amber-600' : 'text-slate-500')
+                                        }`}>
+                                            {(row.priority === 'High' || row.priority === 'Urgent') && <AlertCircle size={12} />}
                                             {row.priority}
                                         </span>
                                     </td>
-                                    <td className="px-3 py-4 text-right">
-                                        <span style={{ 
-                                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
-                                            background: row.status === 'Resolved' ? '#dcfce7' : (row.status === 'Open' ? '#fee2e2' : '#fef3c7'),
-                                            color: row.status === 'Resolved' ? '#166534' : (row.status === 'Open' ? '#dc2626' : '#b45309')
-                                        }}>
+                                    <td className="px-4 py-2.5 text-center">
+                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                                            row.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600' : 
+                                            (row.status === 'Open' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')
+                                        }`}>
                                             {row.status}
                                         </span>
                                     </td>
@@ -196,56 +181,56 @@ const ComplaintView = () => {
                 )}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchComplaints} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchComplaints} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
+                <div className="flex items-center gap-2">
                     Rows per page: 
-                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
                 </div>
                 <div>1-{filteredTickets.length} of {filteredTickets.length}</div>
-                <div className="flex gap-2">
-                    <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center' }} disabled><ChevronLeft size={20} /></button>
-                    <button style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={20} /></button>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                 </div>
             </div>
 
             {/* Raise Ticket Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div style={{ background: 'white', borderRadius: '8px', width: '400px', padding: '24px', position: 'relative' }}>
-                        <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
-                            <X size={20} />
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+                    <div className="bg-white rounded-lg w-full max-w-md p-6 relative shadow-xl">
+                        <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                            <X size={18} />
                         </button>
-                        <h2 style={{ margin: '0 0 20px', fontSize: '18px', color: '#111827' }}>Raise a Complaint Ticket</h2>
+                        <h2 className="text-lg font-bold text-slate-800 mb-6">Raise a Complaint Ticket</h2>
                         
                         <form onSubmit={handleRaiseTicket} className="flex flex-col gap-4">
                             <div>
-                                <label style={{ display: 'block', fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>Subject</label>
-                                <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} required placeholder="Brief description of the issue" style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #e2e8f0', outline: 'none' }} />
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Subject</label>
+                                <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} required placeholder="Brief description of the issue" className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" />
                             </div>
 
-                            <div className="flex gap-3">
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>Category</label>
-                                    <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #e2e8f0', outline: 'none' }}>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Category</label>
+                                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow">
                                         <option>IT Support</option>
                                         <option>Maintenance</option>
                                         <option>Administration</option>
                                         <option>Academics</option>
                                     </select>
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>Priority</label>
-                                    <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #e2e8f0', outline: 'none' }}>
+                                <div className="flex-1">
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Priority</label>
+                                    <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow">
                                         <option>Low</option>
                                         <option>Medium</option>
                                         <option>High</option>
@@ -254,11 +239,11 @@ const ComplaintView = () => {
                             </div>
 
                             <div>
-                                <label style={{ display: 'block', fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>Detailed Description</label>
-                                <textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows="4" placeholder="Provide more details..." style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #e2e8f0', outline: 'none', resize: 'none' }}></textarea>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Detailed Description</label>
+                                <textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows="4" placeholder="Provide more details..." className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow resize-none"></textarea>
                             </div>
 
-                            <button type="submit" style={{ padding: '12px', background: '#0ea5e9', color: 'white', border: 'none', borderRadius: '4px', fontWeight: '600', cursor: 'pointer', marginTop: '8px' }}>
+                            <button type="submit" className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold transition-colors cursor-pointer shadow-sm">
                                 Submit Complaint
                             </button>
                         </form>

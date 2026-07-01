@@ -137,7 +137,7 @@ const Transactions = () => {
                     <td className="p-3 font-medium text-slate-800">{t.school_name || 'N/A'}</td>
                     <td className="p-3 text-slate-600 font-mono text-xs">{t.reference_no}</td>
                     <td className="p-3 text-slate-600">{t.payment_method}</td>
-                    <td className="p-3 font-bold text-slate-900">${t.amount}</td>
+                    <td className="p-3 font-bold text-slate-900">₹{parseFloat(t.amount).toLocaleString('en-IN')}</td>
                     <td className="p-3">
                       <span className={`px-2 py-1 rounded text-xs font-bold ${
                         t.status === 'Completed' || t.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' :
@@ -188,7 +188,7 @@ const Transactions = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Amount ($)</label>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Amount (₹)</label>
                     <input type="number" step="0.01" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0.00" />
                   </div>
                   <div>

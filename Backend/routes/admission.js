@@ -11,5 +11,6 @@ router.post('/pay', admissionController.processPayment);
 router.get('/fee-structures', admissionController.getFeeStructures);
 router.post('/fee-structures', admissionController.createFeeStructure);
 router.delete('/fee-structures/:id', admissionController.deleteFeeStructure);
+router.put('/fee-structures/:id', admissionController.updateFeeStructure);
 
 module.exports = router;

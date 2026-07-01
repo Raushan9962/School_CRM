@@ -50,64 +50,47 @@ const AttendanceView = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Filter <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Filter <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Current Semester
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Current Semester
                     </button>
-
-                    <div className="relative">
-                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input type="text" placeholder="Search records..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
-                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#4b5563', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                <div className="flex gap-3 items-center">
+                    <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search records..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-48" />
+                    </div>
+                    <button className="px-4 py-1.5 bg-slate-100 text-slate-700 border border-slate-200 rounded text-xs font-bold hover:bg-slate-200 transition-colors cursor-pointer">
                         Correction Request
                     </button>
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                    <button className="px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded text-xs font-bold hover:bg-blue-100 transition-colors cursor-pointer">
                         Download Report
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            minWidth: '160px',
-                            padding: '16px',
-                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
-                            border: '1px solid',
-                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
-                            borderBottom: 'none',
-                            borderRadius: '8px 8px 0 0',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            position: 'relative',
-                            marginBottom: '-2px',
-                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
-                        }}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -115,38 +98,37 @@ const AttendanceView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading attendance data...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading attendance data...</div>
                 ) : activeTab === 'daily' ? (
                     records.length === 0 ? (
-                        <div className="p-10 text-center text-gray-500">No attendance records found.</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">No attendance records found.</div>
                     ) : (
-                        <table className="w-full border-collapse text-left text-sm">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                    <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                    <th className="px-3 py-4">Date</th>
-                                    <th className="px-3 py-4">Day</th>
-                                    <th className="px-3 py-4">Remark</th>
-                                    <th className="px-3 py-4 text-right">Status</th>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                    <th className="px-4 py-2 font-bold">Date</th>
+                                    <th className="px-4 py-2 font-bold">Day</th>
+                                    <th className="px-4 py-2 font-bold">Remark</th>
+                                    <th className="px-4 py-2 font-bold text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="text-xs">
                                 {records.map((row, idx) => (
                                     <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                        <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                        <td className="px-3 py-4 text-gray-900 font-medium">
+                                        <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">
                                             {new Date(row.date).toLocaleDateString()}
                                         </td>
-                                        <td className="px-3 py-4 text-gray-600">
+                                        <td className="px-4 py-2.5 font-medium text-slate-600">
                                             {new Date(row.date).toLocaleDateString('en-US', { weekday: 'long' })}
                                         </td>
-                                        <td className="px-3 py-4 text-gray-500">{row.remarks || '-'}</td>
-                                        <td className="px-3 py-4 text-right">
-                                            <span style={{ 
-                                                padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500',
-                                                background: row.status === 'Present' ? '#dcfce7' : (row.status === 'Absent' ? '#fee2e2' : '#f1f5f9'),
-                                                color: row.status === 'Present' ? '#166534' : (row.status === 'Absent' ? '#dc2626' : '#4b5563')
-                                            }}>
+                                        <td className="px-4 py-2.5 text-slate-500">{row.remarks || '-'}</td>
+                                        <td className="px-4 py-2.5 text-center">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                row.status === 'Present' ? 'bg-emerald-50 text-emerald-600' : 
+                                                (row.status === 'Absent' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600')
+                                            }`}>
                                                 {row.status}
                                             </span>
                                         </td>
@@ -156,32 +138,35 @@ const AttendanceView = () => {
                         </table>
                     )
                 ) : activeTab === 'subject' ? (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                <th className="px-3 py-4">Code</th>
-                                <th className="px-3 py-4">Subject</th>
-                                <th className="px-3 py-4">Total Classes</th>
-                                <th className="px-3 py-4">Classes Attended</th>
-                                <th className="px-3 py-4">Visual</th>
-                                <th className="px-3 py-4 text-right">Percentage</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">Code</th>
+                                <th className="px-4 py-2 font-bold">Subject</th>
+                                <th className="px-4 py-2 font-bold text-center">Total Classes</th>
+                                <th className="px-4 py-2 font-bold text-center">Classes Attended</th>
+                                <th className="px-4 py-2 font-bold">Visual</th>
+                                <th className="px-4 py-2 font-bold text-right">Percentage</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {subjectRecords.map((row, idx) => (
                                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                    <td style={{ padding: '16px 12px', color: '#111827' }}>{row.id}</td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.subject}</td>
-                                    <td className="px-3 py-4 text-gray-500">{row.total}</td>
-                                    <td style={{ padding: '16px 12px', color: '#111827', fontWeight: '600' }}>{row.present}</td>
-                                    <td style={{ padding: '16px 12px', width: '200px' }}>
-                                        <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${row.percent}%`, background: row.percent > 90 ? '#10b981' : (row.percent > 75 ? '#0ea5e9' : '#ef4444'), borderRadius: '3px' }}></div>
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.id}</td>
+                                    <td className="px-4 py-2.5 font-medium text-slate-600">{row.subject}</td>
+                                    <td className="px-4 py-2.5 text-center text-slate-500">{row.total}</td>
+                                    <td className="px-4 py-2.5 text-center font-bold text-slate-800">{row.present}</td>
+                                    <td className="px-4 py-2.5 w-[200px]">
+                                        <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                            <div 
+                                                className={`h-full rounded-full ${row.percent > 90 ? 'bg-emerald-500' : (row.percent > 75 ? 'bg-blue-500' : 'bg-red-500')}`}
+                                                style={{ width: `${row.percent}%` }}
+                                            ></div>
                                         </div>
                                     </td>
-                                    <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: '600', color: row.percent > 90 ? '#10b981' : '#0ea5e9' }}>
+                                    <td className={`px-4 py-2.5 text-right font-bold ${row.percent > 90 ? 'text-emerald-600' : 'text-blue-600'}`}>
                                         {row.percent}%
                                     </td>
                                 </tr>
@@ -189,15 +174,32 @@ const AttendanceView = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <div className="p-10 text-center text-gray-500">
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">
                         <p>No tabular data available for leaves. Please select Daily or Subject-wise.</p>
                     </div>
                 )}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchAttendance} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchAttendance} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
+            </div>
+
+            {/* Pagination Footer */}
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
+                <div className="flex items-center gap-2">
+                    Rows per page: 
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                </div>
+                <div>1-{records.length} of {records.length}</div>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
+                </div>
             </div>
         </div>
     );

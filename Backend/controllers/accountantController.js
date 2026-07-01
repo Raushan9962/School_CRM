@@ -19,7 +19,7 @@ exports.getDashboardStats = async (req, res) => {
 
         // Today's Expenses
         const todayExpenseResult = await pool.query(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE school_id = $1 AND date = CURRENT_DATE",
+            "SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE school_id = $1 AND expense_date = CURRENT_DATE",
             [schoolId]
         );
         
@@ -253,11 +253,11 @@ exports.getVendors = async (req, res) => {
 exports.addVendor = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
-        const { name, type, contact, email, pending_due } = req.body;
+        const { name, type, contact, email, pending_due, bank_name, account_name, account_number, ifsc_code, upi_id } = req.body;
         const result = await pool.query(
-            `INSERT INTO vendors (school_id, name, type, contact, email, pending_due)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [schoolId, name, type, contact, email, pending_due || 0]
+            `INSERT INTO vendors (school_id, name, type, contact, email, pending_due, bank_name, account_name, account_number, ifsc_code, upi_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+            [schoolId, name, type, contact, email, pending_due || 0, bank_name, account_name, account_number, ifsc_code, upi_id]
         );
         res.json({ success: true, message: "Vendor added successfully", data: result.rows[0] });
     } catch (err) {
@@ -301,9 +301,10 @@ exports.getScholarships = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
         const result = await pool.query(`
-            SELECT sd.*, u.name as student_name, u.admission_number as student_roll
+            SELECT sd.*, u.name as student_name, s.admission_no as student_roll
             FROM scholarships_discounts sd
             JOIN users u ON sd.student_id = u.id
+            LEFT JOIN students s ON u.id = s.user_id
             WHERE sd.school_id = $1
             ORDER BY sd.created_at DESC
         `, [schoolId]);
@@ -362,10 +363,12 @@ exports.getStudents = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
         const result = await pool.query(`
-            SELECT id, name, email, admission_number, class_name, section 
-            FROM users 
-            WHERE school_id = $1 AND role_name = 'Student'
-            ORDER BY name ASC
+            SELECT u.id, u.name, u.email, s.admission_no as admission_number, c.name as class_name, s.section 
+            FROM users u
+            LEFT JOIN students s ON u.id = s.user_id
+            LEFT JOIN classes c ON s.class_id = c.id
+            WHERE u.school_id = $1 AND u.role_name = 'Student'
+            ORDER BY u.name ASC
         `, [schoolId]);
         res.json({ success: true, data: result.rows });
     } catch (err) {
@@ -378,7 +381,7 @@ exports.getClasses = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
         const result = await pool.query(`
-            SELECT id, name, section, class_teacher_id
+            SELECT id, name, section
             FROM classes
             WHERE school_id = $1
             ORDER BY name ASC
@@ -394,10 +397,13 @@ exports.getClasses = async (req, res) => {
 exports.getFeeStructures = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
-        const result = await pool.query(
-            "SELECT * FROM fee_structures WHERE school_id = $1 ORDER BY created_at DESC",
-            [schoolId]
-        );
+        const result = await pool.query(`
+            SELECT f.id, f.fee_type as name, c.name as class_name, f.amount as total_amount
+            FROM fee_structures f
+            JOIN classes c ON f.class_id = c.id
+            WHERE f.school_id = $1 
+            ORDER BY f.created_at DESC
+        `, [schoolId]);
         res.json({ success: true, data: result.rows });
     } catch (err) {
         console.error("Get Fee Structures Error:", err);
@@ -406,18 +412,67 @@ exports.getFeeStructures = async (req, res) => {
 };
 
 exports.addFeeStructure = async (req, res) => {
+    const client = await pool.connect();
     try {
         const schoolId = req.user.schoolId;
         const { name, className, totalAmount } = req.body;
-        const result = await pool.query(
-            `INSERT INTO fee_structures (school_id, name, class_name, total_amount, created_by)
-             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [schoolId, name, className, totalAmount, req.user.userId]
-        );
-        res.json({ success: true, message: "Fee structure added successfully", data: result.rows[0] });
+        // name maps to fee_type, totalAmount maps to amount
+
+        if (className === 'All Classes') {
+            await client.query('BEGIN');
+            const classesRes = await client.query('SELECT id FROM classes WHERE school_id = $1', [schoolId]);
+            
+            for (let c of classesRes.rows) {
+                const existing = await client.query('SELECT id FROM fee_structures WHERE school_id = $1 AND class_id = $2 AND fee_type = $3', [schoolId, c.id, name]);
+                if (existing.rows.length === 0) {
+                    await client.query(
+                        `INSERT INTO fee_structures (school_id, class_id, fee_type, amount) VALUES ($1, $2, $3, $4)`,
+                        [schoolId, c.id, name, totalAmount]
+                    );
+                }
+            }
+            await client.query('COMMIT');
+            res.json({ success: true, message: "Fee structure applied to all classes successfully" });
+        } else {
+            // Find class_id
+            const classRes = await client.query('SELECT id FROM classes WHERE school_id = $1 AND name = $2 LIMIT 1', [schoolId, className]);
+            if (classRes.rows.length === 0) {
+                return res.status(404).json({ success: false, message: "Class not found" });
+            }
+            const classId = classRes.rows[0].id;
+            
+            const result = await client.query(
+                `INSERT INTO fee_structures (school_id, class_id, fee_type, amount)
+                 VALUES ($1, $2, $3, $4) RETURNING *`,
+                [schoolId, classId, name, totalAmount]
+            );
+            res.json({ success: true, message: "Fee structure added successfully", data: result.rows[0] });
+        }
     } catch (err) {
+        await client.query('ROLLBACK');
         console.error("Add Fee Structure Error:", err);
         res.status(500).json({ success: false, message: "Failed to add fee structure" });
+    } finally {
+        client.release();
+    }
+};
+
+exports.updateFeeStructure = async (req, res) => {
+    try {
+        const schoolId = req.user.schoolId;
+        const { id } = req.params;
+        const { name, totalAmount } = req.body;
+        const result = await pool.query(
+            `UPDATE fee_structures SET fee_type = $1, amount = $2 WHERE id = $3 AND school_id = $4 RETURNING *`,
+            [name, totalAmount, id, schoolId]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: "Fee structure not found" });
+        }
+        res.json({ success: true, message: "Fee structure updated successfully", data: result.rows[0] });
+    } catch (err) {
+        console.error("Update Fee Structure Error:", err);
+        res.status(500).json({ success: false, message: "Failed to update fee structure" });
     }
 };
 
@@ -425,12 +480,24 @@ exports.getStudentFees = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
         const result = await pool.query(`
-            SELECT sfi.*, u.name as student_name, u.admission_number, u.father_name, u.class_name, fs.name as fee_type, fs.total_amount
+            SELECT concat('new_', sfi.id) as id, sfi.created_at, u.name as student_name, s.admission_no as admission_number, s.father_name, c.name as class_name, fs.fee_type as fee_type, sfi.due_amount, sfi.paid_amount, sfi.status
             FROM student_fee_invoices sfi
             JOIN users u ON sfi.student_id = u.id
+            JOIN students s ON u.id = s.user_id
+            LEFT JOIN classes c ON s.class_id = c.id
             JOIN fee_structures fs ON sfi.fee_structure_id = fs.id
             WHERE sfi.school_id = $1
-            ORDER BY sfi.created_at DESC
+            
+            UNION ALL
+            
+            SELECT concat('old_', f.id) as id, f.created_at, u.name as student_name, s.admission_no as admission_number, s.father_name, c.name as class_name, 'General Fee' as fee_type, f.amount as due_amount, CASE WHEN f.status = 'Paid' THEN f.amount ELSE 0 END as paid_amount, f.status
+            FROM fees f
+            JOIN students s ON f.student_id = s.id
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN classes c ON s.class_id = c.id
+            WHERE u.school_id = $1
+            
+            ORDER BY created_at DESC
         `, [schoolId]);
         res.json({ success: true, data: result.rows });
     } catch (err) {
@@ -455,7 +522,7 @@ exports.assignStudentFee = async (req, res) => {
         const result = await pool.query(
             `INSERT INTO student_fee_invoices (school_id, student_id, fee_structure_id, due_amount, assigned_by)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [schoolId, studentId, feeStructureId, feeStructure.total_amount, req.user.userId]
+            [schoolId, studentId, feeStructureId, feeStructure.amount, req.user.userId]
         );
         res.json({ success: true, message: "Fee assigned successfully", data: result.rows[0] });
     } catch (err) {
@@ -468,17 +535,28 @@ exports.bulkGenerateStudentFees = async (req, res) => {
     const client = await pool.connect();
     try {
         const schoolId = req.user.schoolId;
-        const { className, feeStructureId } = req.body;
+        const { className, feeStructureIds } = req.body;
 
-        const structureCheck = await client.query("SELECT * FROM fee_structures WHERE id = $1 AND school_id = $2", [feeStructureId, schoolId]);
-        if (structureCheck.rows.length === 0) return res.status(404).json({ success: false, message: "Fee structure not found" });
-        const feeStructure = structureCheck.rows[0];
+        if (!feeStructureIds || feeStructureIds.length === 0) {
+            return res.status(400).json({ success: false, message: "No fee structures selected" });
+        }
 
-        let studentsQuery = "SELECT id FROM users WHERE school_id = $1 AND role_name = 'Student'";
+        // Fetch all selected fee structures
+        const structureCheck = await client.query("SELECT * FROM fee_structures WHERE id = ANY($1) AND school_id = $2", [feeStructureIds, schoolId]);
+        if (structureCheck.rows.length === 0) return res.status(404).json({ success: false, message: "Fee structures not found" });
+        const selectedStructures = structureCheck.rows;
+
+        let studentsQuery = `
+            SELECT u.id, s.class_id 
+            FROM users u
+            JOIN students s ON u.id = s.user_id
+            JOIN classes c ON s.class_id = c.id
+            WHERE u.school_id = $1 AND u.role_name = 'Student'
+        `;
         let queryParams = [schoolId];
         
-        if (className && className !== 'All Classes') {
-            studentsQuery += " AND class_name = $2";
+        if (className && className !== 'All Classes' && className !== '') {
+            studentsQuery += " AND c.name = $2";
             queryParams.push(className);
         }
         
@@ -491,19 +569,26 @@ exports.bulkGenerateStudentFees = async (req, res) => {
         
         let generatedCount = 0;
         for (let student of students.rows) {
-            // Check if already assigned
-            const existingCheck = await client.query(
-                "SELECT id FROM student_fee_invoices WHERE student_id = $1 AND fee_structure_id = $2",
-                [student.id, feeStructureId]
-            );
-            
-            if (existingCheck.rows.length === 0) {
-                await client.query(
-                    `INSERT INTO student_fee_invoices (school_id, student_id, fee_structure_id, due_amount, assigned_by)
-                     VALUES ($1, $2, $3, $4, $5)`,
-                    [schoolId, student.id, feeStructureId, feeStructure.total_amount, req.user.userId]
+            for (let feeStructure of selectedStructures) {
+                // Ensure the fee structure belongs to the student's class
+                if (feeStructure.class_id !== student.class_id) {
+                    continue;
+                }
+
+                // Check if already assigned
+                const existingCheck = await client.query(
+                    "SELECT id FROM student_fee_invoices WHERE student_id = $1 AND fee_structure_id = $2",
+                    [student.id, feeStructure.id]
                 );
-                generatedCount++;
+                
+                if (existingCheck.rows.length === 0) {
+                    await client.query(
+                        `INSERT INTO student_fee_invoices (school_id, student_id, fee_structure_id, due_amount, assigned_by)
+                         VALUES ($1, $2, $3, $4, $5)`,
+                        [schoolId, student.id, feeStructure.id, feeStructure.amount, req.user.userId]
+                    );
+                    generatedCount++;
+                }
             }
         }
         

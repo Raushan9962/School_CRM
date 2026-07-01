@@ -57,61 +57,44 @@ const AssignmentsView = () => {
     const filteredRecords = records.filter(r => activeTab === 'all' || r.status.toLowerCase() === activeTab);
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Subject <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Subject <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Due Date Range
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Due Date Range
                     </button>
-
-                    <div className="relative">
-                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input type="text" placeholder="Search assignment..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
-                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                <div className="flex gap-3 items-center">
+                    <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search assignment..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-48" />
+                    </div>
+                    <button className="px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded text-xs font-bold hover:bg-blue-100 transition-colors cursor-pointer">
                         Upload Submission
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            minWidth: '160px',
-                            padding: '16px',
-                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
-                            border: '1px solid',
-                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
-                            borderBottom: 'none',
-                            borderRadius: '8px 8px 0 0',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            position: 'relative',
-                            marginBottom: '-2px',
-                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
-                        }}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -119,49 +102,48 @@ const AssignmentsView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading assignments...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading assignments...</div>
                 ) : filteredRecords.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">No assignments found.</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">No assignments found.</div>
                 ) : (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                <th className="px-3 py-4">ID</th>
-                                <th className="px-3 py-4">Subject</th>
-                                <th className="px-3 py-4">Title</th>
-                                <th className="px-3 py-4">Due Date</th>
-                                <th className="px-3 py-4 text-right">Status</th>
-                                <th className="px-3 py-4 text-right">Action</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">ID</th>
+                                <th className="px-4 py-2 font-bold">Subject</th>
+                                <th className="px-4 py-2 font-bold">Title & Description</th>
+                                <th className="px-4 py-2 font-bold">Due Date</th>
+                                <th className="px-4 py-2 font-bold text-center">Status</th>
+                                <th className="px-4 py-2 font-bold text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {filteredRecords.map((row, idx) => (
                                 <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                    <td style={{ padding: '16px 12px', color: '#0ea5e9' }}>ASN-{row.id.toString().padStart(3, '0')}</td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.subject_name}</td>
-                                    <td className="px-3 py-4 text-gray-600">
-                                        <div style={{ fontWeight: '500', color: '#1e293b' }}>{row.title}</div>
-                                        <div style={{ fontSize: '12px', color: '#94a3b8' }}>{row.description}</div>
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 font-bold text-blue-600">ASN-{row.id.toString().padStart(3, '0')}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.subject_name}</td>
+                                    <td className="px-4 py-2.5">
+                                        <div className="font-bold text-slate-800">{row.title}</div>
+                                        <div className="text-[10px] text-slate-500 mt-0.5">{row.description}</div>
                                     </td>
-                                    <td className="px-3 py-4 text-gray-600">{new Date(row.due_date).toLocaleDateString()}</td>
-                                    <td className="px-3 py-4 text-right">
-                                        <span style={{ 
-                                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
-                                            background: row.status === 'Graded' ? '#dcfce7' : (row.status === 'Submitted' ? '#e0f2fe' : '#fef9c3'),
-                                            color: row.status === 'Graded' ? '#166534' : (row.status === 'Submitted' ? '#0369a1' : '#ca8a04')
-                                        }}>
+                                    <td className="px-4 py-2.5 font-medium text-slate-600">{new Date(row.due_date).toLocaleDateString()}</td>
+                                    <td className="px-4 py-2.5 text-center">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                            row.status === 'Graded' ? 'bg-emerald-50 text-emerald-600' : 
+                                            (row.status === 'Submitted' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600')
+                                        }`}>
                                             {row.status}
                                         </span>
                                     </td>
-                                    <td className="px-3 py-4 text-right">
+                                    <td className="px-4 py-2.5 text-right">
                                         {row.status === 'Pending' ? (
-                                            <button style={{ padding: '6px 12px', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '4px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '500' }}>
+                                            <button className="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200 transition-colors inline-flex items-center gap-1.5 border border-slate-200">
                                                 <Upload size={14} /> Submit
                                             </button>
                                         ) : (
-                                            <span style={{ color: '#94a3b8', fontSize: '13px' }}>-</span>
+                                            <span className="text-slate-400 font-bold">-</span>
                                         )}
                                     </td>
                                 </tr>
@@ -171,25 +153,25 @@ const AssignmentsView = () => {
                 )}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchAssignments} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchAssignments} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
+                <div className="flex items-center gap-2">
                     Rows per page: 
-                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
                 </div>
                 <div>1-{filteredRecords.length} of {filteredRecords.length}</div>
-                <div className="flex gap-2">
-                    <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center' }} disabled><ChevronLeft size={20} /></button>
-                    <button style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={20} /></button>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                 </div>
             </div>
         </div>

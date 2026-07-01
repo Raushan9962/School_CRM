@@ -145,51 +145,51 @@ const StudentProfile = () => {
     }, []);
 
     if (loading) {
-        return <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading profile...</div>;
+        return <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading profile...</div>;
     }
 
     if (!student) {
-        return <div style={{ padding: '40px', textAlign: 'center', color: '#ef4444' }}>Profile not found.</div>;
+        return <div className="p-10 text-center text-red-500 font-bold text-sm bg-red-50 rounded-lg">Profile not found.</div>;
     }
 
     // Default mock documents since there is no documents table
     const documents = ["Aadhar Card", "Previous Marksheet", "Transfer Certificate"];
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5 animate-fade-in">
             {/* Header & Actions */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-slate-200 flex-wrap gap-4">
+                <div className="flex items-center gap-6">
                     <div className="relative">
-                        <img src={student.image || `https://ui-avatars.com/api/?name=${student.name}&background=random`} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #f1f5f9' }} />
-                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
-                        <button onClick={() => fileInputRef.current.click()} style={{ position: 'absolute', bottom: 0, right: 0, background: '#3b82f6', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} title="Upload Profile Photo"><Camera size={16} /></button>
+                        <img src={student.image || `https://ui-avatars.com/api/?name=${student.name}&background=random`} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-sm" />
+                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
+                        <button onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 bg-blue-600 text-white border-none rounded-full w-8 h-8 cursor-pointer flex items-center justify-center shadow hover:bg-blue-700 transition-colors" title="Upload Profile Photo"><Camera size={14} /></button>
                     </div>
                     <div>
-                        <h2 style={{ margin: '0 0 8px 0', fontSize: '28px', color: '#0f172a' }}>{student.name}</h2>
-                        <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '14px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><IdCard size={14} /> ID: STU-{student.id}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FileText size={14} /> Adm No: {student.admission_number || 'N/A'}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>Class: {student.class_name || 'N/A'}</span>
+                        <h2 className="m-0 mb-2 text-2xl font-bold text-slate-800">{student.name}</h2>
+                        <div className="flex flex-wrap gap-4 text-slate-500 text-xs font-bold">
+                            <span className="flex items-center gap-1.5"><IdCard size={14} className="text-blue-500" /> ID: STU-{student.id}</span>
+                            <span className="flex items-center gap-1.5"><FileText size={14} className="text-purple-500" /> Adm No: {student.admission_number || 'N/A'}</span>
+                            <span className="flex items-center gap-1.5 text-slate-700 bg-slate-100 px-2 py-0.5 rounded">Class: {student.class_name || 'N/A'}</span>
                         </div>
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => setShowPasswordModal(true)} style={{ padding: '10px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Lock size={16} /> Change Password
+                    <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold cursor-pointer flex items-center gap-2 hover:bg-slate-50 transition-colors shadow-sm">
+                        <Lock size={14} className="text-slate-500" /> Change Password
                     </button>
-                    <button onClick={() => setShowUpdateModal(true)} style={{ padding: '10px 16px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(59,130,246,0.2)' }}>
-                        <Edit size={16} /> Update Request
+                    <button onClick={() => setShowUpdateModal(true)} className="px-4 py-2 bg-blue-600 border-none rounded text-white text-xs font-bold cursor-pointer flex items-center gap-2 hover:bg-blue-700 transition-colors shadow-sm">
+                        <Edit size={14} /> Update Request
                     </button>
                 </div>
             </div>
 
             {/* Profile Information */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Personal Info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><User size={20} /> Personal Details</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <h3 className="m-0 mb-5 text-sm font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100"><User size={16} className="text-blue-600" /> Personal Details</h3>
+                    <div className="grid grid-cols-2 gap-4">
                         <DetailItem label="Date of Birth" value={student.dob ? new Date(student.dob).toLocaleDateString() : 'N/A'} />
                         <DetailItem label="Gender" value={student.gender || 'N/A'} />
                         <DetailItem label="Blood Group" value={student.blood_group || 'N/A'} />
@@ -199,62 +199,69 @@ const StudentProfile = () => {
                     </div>
                 </div>
 
-                {/* Parent & Emergency Info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><Users size={20} /> Parent Details</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                        {/* If we had a specific parents table join, we would show father/mother. For now generic */}
-                        <div style={{ color: '#64748b', fontSize: '14px', fontStyle: 'italic' }}>
+                {/* Right Column Stack */}
+                <div className="flex flex-col gap-5">
+                    {/* Parent & Emergency Info */}
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                        <h3 className="m-0 mb-5 text-sm font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100"><Users size={16} className="text-purple-600" /> Parent Details</h3>
+                        <div className="text-xs text-slate-500 font-medium italic bg-slate-50 p-4 rounded border border-slate-100 text-center">
                             Parent records are managed by the administration separately.
                         </div>
                     </div>
-                </div>
 
-                {/* Transport & Hostel Info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><Bus size={20} /> Transport & Hostel</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                        <DetailItem label="Transport Status" value="Not Opted" />
-                        <DetailItem label="Hostel Status" value="Day Scholar" />
+                    {/* Transport & Hostel Info */}
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                        <h3 className="m-0 mb-5 text-sm font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100"><Bus size={16} className="text-amber-500" /> Transport & Hostel</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <DetailItem label="Transport Status" value="Not Opted" />
+                            <DetailItem label="Hostel Status" value="Day Scholar" />
+                        </div>
                     </div>
-                </div>
 
-                {/* Documents Info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}><FolderOpen size={20} /> Submitted Documents</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {documents.map((doc, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <File size={20} color="#3b82f6" />
-                                <span style={{ fontSize: '14px', fontWeight: '500', color: '#334155' }}>{doc}</span>
-                                <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#10b981', fontWeight: '600', background: '#d1fae5', padding: '2px 8px', borderRadius: '12px' }}>Verified</span>
-                            </div>
-                        ))}
+                    {/* Documents Info */}
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                        <h3 className="m-0 mb-5 text-sm font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100"><FolderOpen size={16} className="text-emerald-500" /> Submitted Documents</h3>
+                        <div className="flex flex-col gap-3">
+                            {documents.map((doc, idx) => (
+                                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-100 transition-colors hover:bg-slate-100">
+                                    <File size={16} className="text-blue-500" />
+                                    <span className="text-xs font-bold text-slate-700">{doc}</span>
+                                    <span className="ml-auto text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded uppercase">Verified</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Password Modal */}
             {showPasswordModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '400px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                            <h3 style={{ margin: 0 }}>Change Password</h3>
-                            <button onClick={() => { setShowPasswordModal(false); setPasswordStep(1); }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-                        </div>
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
+                    <div className="bg-white rounded-lg w-full max-w-sm p-6 relative shadow-xl">
+                        <button onClick={() => { setShowPasswordModal(false); setPasswordStep(1); }} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                            <X size={18} />
+                        </button>
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">Change Password</h3>
+                        
                         {passwordStep === 1 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                <label>Enter your email to verify:</label>
-                                <input type="email" value={pwdEmail} onChange={e => setPwdEmail(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
-                                <button onClick={handleVerifyEmail} style={{ padding: '10px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Verify Email</button>
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Enter your email to verify</label>
+                                    <input type="email" value={pwdEmail} onChange={e => setPwdEmail(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                                </div>
+                                <button onClick={handleVerifyEmail} className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold transition-colors cursor-pointer mt-2 shadow-sm">Verify Email</button>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                <label>Enter OTP:</label>
-                                <input type="text" value={pwdOtp} onChange={e => setPwdOtp(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
-                                <label>New Password:</label>
-                                <input type="password" value={pwdNew} onChange={e => setPwdNew(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
-                                <button onClick={handleResetPassword} style={{ padding: '10px', background: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Reset Password</button>
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Enter OTP</label>
+                                    <input type="text" value={pwdOtp} onChange={e => setPwdOtp(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">New Password</label>
+                                    <input type="password" value={pwdNew} onChange={e => setPwdNew(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                                </div>
+                                <button onClick={handleResetPassword} className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-bold transition-colors cursor-pointer mt-2 shadow-sm">Reset Password</button>
                             </div>
                         )}
                     </div>
@@ -263,19 +270,24 @@ const StudentProfile = () => {
 
             {/* Update Request Modal */}
             {showUpdateModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '400px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                            <h3 style={{ margin: 0 }}>Request Profile Update</h3>
-                            <button onClick={() => setShowUpdateModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <label>New Phone Number:</label>
-                            <input type="text" value={updateFields.phone} onChange={e => setUpdateFields({...updateFields, phone: e.target.value})} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} placeholder="Leave blank if no change" />
-                            <label>New Address:</label>
-                            <input type="text" value={updateFields.address} onChange={e => setUpdateFields({...updateFields, address: e.target.value})} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} placeholder="Leave blank if no change" />
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
+                    <div className="bg-white rounded-lg w-full max-w-sm p-6 relative shadow-xl">
+                        <button onClick={() => setShowUpdateModal(false)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                            <X size={18} />
+                        </button>
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">Request Profile Update</h3>
+                        
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">New Phone Number</label>
+                                <input type="text" value={updateFields.phone} onChange={e => setUpdateFields({...updateFields, phone: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Leave blank if no change" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">New Address</label>
+                                <input type="text" value={updateFields.address} onChange={e => setUpdateFields({...updateFields, address: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Leave blank if no change" />
+                            </div>
                             
-                            <button onClick={handleUpdateRequest} style={{ padding: '10px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px' }}>Submit Request</button>
+                            <button onClick={handleUpdateRequest} className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold transition-colors cursor-pointer mt-2 shadow-sm">Submit Request</button>
                         </div>
                     </div>
                 </div>
@@ -285,9 +297,9 @@ const StudentProfile = () => {
 };
 
 const DetailItem = ({ label, value, fullWidth }) => (
-    <div style={{ gridColumn: fullWidth ? '1 / -1' : 'auto' }}>
-        <p className="m-0 mb-1 text-[13px] text-slate-500">{label}</p>
-        <p style={{ margin: 0, fontWeight: '500', color: '#334155', fontSize: '15px' }}>{value}</p>
+    <div className={fullWidth ? 'col-span-1 md:col-span-2' : ''}>
+        <p className="m-0 mb-1 text-[10px] uppercase font-bold text-slate-400">{label}</p>
+        <p className="m-0 font-bold text-slate-800 text-sm">{value}</p>
     </div>
 );
 

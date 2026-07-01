@@ -65,7 +65,7 @@ exports.createUser = async (req, res) => {
         // 5. Create Core User
         const image = `https://api.dicebear.com/5.x/initials/svg?seed=${name}`;
         const userData = { 
-            name, email, phone: phone || null, password: hashedPassword, roleName: targetRoleName, 
+            name, email, username: admissionNo, phone: phone || null, password: hashedPassword, roleName: targetRoleName, 
             schoolId: finalSchoolId, image, gender, dob: dob || null, address,
             bloodGroup, aadhaarNumber, city, state, pincode, emergencyContact 
         };
@@ -631,5 +631,28 @@ exports.removeProfileImage = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to remove image' });
+    }
+};
+
+exports.getNextAdmissionNo = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT admission_no FROM students 
+            WHERE admission_no LIKE 'ADM-%' 
+            ORDER BY CAST(SUBSTRING(admission_no FROM 5) AS INTEGER) DESC LIMIT 1
+        `);
+        
+        let nextNo = 101;
+        if (result.rows.length > 0 && result.rows[0].admission_no) {
+            const lastNo = parseInt(result.rows[0].admission_no.replace('ADM-', ''));
+            if (!isNaN(lastNo)) {
+                nextNo = lastNo + 1;
+            }
+        }
+        
+        return res.status(200).json({ success: true, nextAdmissionNo: `ADM-${nextNo}` });
+    } catch (error) {
+        console.error("Error generating admission no:", error);
+        return res.status(500).json({ success: false, message: 'Failed to generate admission number' });
     }
 };

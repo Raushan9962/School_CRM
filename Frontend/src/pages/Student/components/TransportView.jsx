@@ -36,59 +36,59 @@ const TransportView = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4 bg-white">
                 <div>
-                    <h2 className="m-0 text-sm text-gray-900 font-semibold">Transport & Route Details</h2>
+                    <h2 className="m-0 text-sm font-bold text-slate-800">Transport & Route Details</h2>
                 </div>
                 <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-sky-500 border-none rounded text-white text-sm font-medium cursor-pointer flex items-center gap-1.5 hover:bg-sky-600 transition-colors">
-                        <MapPin size={16} /> Track Bus Live
+                    <button className="px-4 py-1.5 bg-blue-600 text-white border-none rounded text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        <MapPin size={14} /> Track Bus Live
                     </button>
                 </div>
             </div>
 
             {loading ? (
-                <div className="p-10 text-center text-gray-500">Loading transport data...</div>
+                <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading transport data...</div>
             ) : !myBus ? (
-                <div className="p-10 text-center text-gray-500">No transport opted or found.</div>
+                <div className="p-10 text-center text-slate-500 font-medium text-sm">No transport opted or found.</div>
             ) : (
                 <div className="flex flex-wrap gap-0">
                     
                     {/* Left Side: Summary & Driver */}
-                    <div className="flex-1 basis-[300px] p-4 border-r border-slate-200 flex flex-col gap-4">
+                    <div className="flex-1 basis-[300px] p-6 border-r border-slate-200 flex flex-col gap-6 bg-slate-50/50">
                         
                         {/* Bus Info */}
                         <div>
-                            <h3 className="m-0 mb-4 text-sm text-gray-500 uppercase tracking-wider font-semibold">Assignment</h3>
+                            <h3 className="m-0 mb-4 text-[10px] text-slate-400 uppercase tracking-wider font-bold">Assignment</h3>
                             <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-sky-50 text-sky-500 flex items-center justify-center">
-                                        <Bus size={20} />
+                                <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                                    <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                        <Bus size={16} />
                                     </div>
                                     <div>
-                                        <div className="text-xs text-gray-500">Bus Number</div>
-                                        <div className="text-sm text-gray-900 font-semibold">Bus {myBus.id} ({myBus.vehicle_number})</div>
+                                        <div className="text-[10px] font-bold text-slate-500 uppercase">Bus Number</div>
+                                        <div className="text-sm text-slate-800 font-bold">Bus {myBus.id} ({myBus.vehicle_number})</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                                        <Navigation size={20} />
+                                <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                                    <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                                        <Navigation size={16} />
                                     </div>
                                     <div>
-                                        <div className="text-xs text-gray-500">Route Name</div>
-                                        <div className="text-sm text-gray-900 font-semibold">{myBus.route || 'Main Route'}</div>
+                                        <div className="text-[10px] font-bold text-slate-500 uppercase">Route Name</div>
+                                        <div className="text-sm text-slate-800 font-bold">{myBus.route || 'Main Route'}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-green-50 text-green-700 flex items-center justify-center">
-                                        <Clock size={20} />
+                                <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                                    <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                        <Clock size={16} />
                                     </div>
                                     <div>
-                                        <div className="text-xs text-gray-500">Capacity</div>
-                                        <div className="text-sm text-gray-900 font-semibold">{myBus.capacity} Seats</div>
+                                        <div className="text-[10px] font-bold text-slate-500 uppercase">Capacity</div>
+                                        <div className="text-sm text-slate-800 font-bold">{myBus.capacity} Seats</div>
                                     </div>
                                 </div>
                             </div>
@@ -98,13 +98,13 @@ const TransportView = () => {
 
                         {/* Driver Info */}
                         <div>
-                            <h3 className="m-0 mb-4 text-sm text-gray-500 uppercase tracking-wider font-semibold">Driver Details</h3>
-                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col gap-3">
-                                <div className="text-sm text-gray-900 font-semibold">Assigned Driver ID: {myBus.driver_id || 'Pending'}</div>
-                                <div className="text-sm text-gray-600">Managed By School Admin</div>
-                                <div className="flex items-center justify-between mt-1">
-                                    <span className="text-sm text-gray-900 font-medium">Contact Office</span>
-                                    <button className="px-3 py-1.5 bg-white border border-sky-500 text-sky-500 rounded cursor-pointer flex items-center gap-1.5 text-xs font-medium hover:bg-sky-50 transition-colors">
+                            <h3 className="m-0 mb-4 text-[10px] text-slate-400 uppercase tracking-wider font-bold">Driver Details</h3>
+                            <div className="bg-white p-4 rounded-lg border border-slate-200 flex flex-col gap-3">
+                                <div className="text-sm text-slate-800 font-bold">Assigned Driver ID: <span className="text-blue-600">{myBus.driver_id || 'Pending'}</span></div>
+                                <div className="text-xs font-medium text-slate-500">Managed By School Admin</div>
+                                <div className="flex items-center justify-between mt-2 pt-3 border-t border-slate-100">
+                                    <span className="text-xs text-slate-700 font-bold">Contact Office</span>
+                                    <button className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded cursor-pointer flex items-center gap-1.5 text-xs font-bold hover:bg-blue-100 transition-colors">
                                         <Phone size={14} /> Call
                                     </button>
                                 </div>
@@ -114,28 +114,31 @@ const TransportView = () => {
                     </div>
 
                     {/* Right Side: Route Table */}
-                    <div className="flex-[2_1_400px] pb-6">
-                        <table className="w-full border-collapse text-left text-sm">
+                    <div className="flex-[2_1_400px] overflow-x-auto bg-white">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 text-gray-900 font-semibold bg-slate-50">
-                                    <th className="p-4 px-6 w-[60px]">Stop</th>
-                                    <th className="p-4 px-6">Location / Landmark</th>
-                                    <th className="p-4 px-6">Scheduled Time</th>
-                                    <th className="p-4 px-6 text-right">Status</th>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-6 py-3 font-bold w-[60px]">Stop</th>
+                                    <th className="px-6 py-3 font-bold">Location / Landmark</th>
+                                    <th className="px-6 py-3 font-bold">Scheduled Time</th>
+                                    <th className="px-6 py-3 font-bold text-right">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="text-xs">
                                 {routeSchedule.map((row, idx) => (
-                                    <tr key={idx} className={`border-b border-slate-100 ${row.isCurrent ? 'bg-green-50' : 'bg-transparent hover:bg-slate-50 transition-colors'}`}>
-                                        <td className="p-4 px-6 text-gray-500">{idx + 1}</td>
-                                        <td className={`p-4 px-6 text-gray-900 ${row.isCurrent ? 'font-semibold' : 'font-medium'}`}>
-                                            {row.stop}
-                                            {row.isCurrent && <span className="ml-2 text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded">Current</span>}
+                                    <tr key={idx} className={`border-b border-slate-100 transition-colors ${row.isCurrent ? 'bg-blue-50/50' : 'hover:bg-slate-50'}`}>
+                                        <td className="px-6 py-4 text-slate-500">{idx + 1}</td>
+                                        <td className="px-6 py-4">
+                                            <div className={`font-bold ${row.isCurrent ? 'text-blue-700' : 'text-slate-800'}`}>
+                                                {row.stop}
+                                            </div>
+                                            {row.isCurrent && <div className="mt-1"><span className="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded font-bold uppercase">Current Stop</span></div>}
                                         </td>
-                                        <td className="p-4 px-6 text-gray-600">{row.time}</td>
-                                        <td className="p-4 px-6 text-right">
-                                            <span className={`font-semibold text-sm ${
-                                                row.status === 'Passed' ? 'text-gray-400' : (row.status === 'Your Stop' ? 'text-green-700' : 'text-sky-500')
+                                        <td className="px-6 py-4 font-bold text-slate-600">{row.time}</td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className={`font-bold px-2 py-1 rounded text-[10px] uppercase ${
+                                                row.status === 'Passed' ? 'bg-slate-100 text-slate-500' : 
+                                                (row.status === 'Your Stop' ? 'bg-blue-100 text-blue-700' : 'bg-amber-50 text-amber-600')
                                             }`}>
                                                 {row.status}
                                             </span>

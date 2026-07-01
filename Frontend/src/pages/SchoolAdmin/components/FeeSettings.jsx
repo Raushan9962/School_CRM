@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, IndianRupee } from 'lucide-react';
+import { Plus, Trash2, IndianRupee, Edit } from 'lucide-react';
 
 const FeeSettings = () => {
     const [fees, setFees] = useState([]);
@@ -13,6 +13,8 @@ const FeeSettings = () => {
         fee_type: '',
         amount: ''
     });
+    const [editingFeeId, setEditingFeeId] = useState(null);
+    const [editFormData, setEditFormData] = useState({ fee_type: '', amount: '' });
 
     const fetchData = async () => {
         try {
@@ -78,44 +80,85 @@ const FeeSettings = () => {
         }
     };
 
-    if (loading) return <div>Loading fee settings...</div>;
+    const handleUpdateFee = async (id) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/admission/fee-structures/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: JSON.stringify(editFormData)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setEditingFeeId(null);
+                fetchData();
+            } else {
+                alert(data.message || 'Failed to update');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error updating fee');
+        }
+    };
+
+    if (loading) return <div className="p-6">Loading...</div>;
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Class Fee Settings</h2>
                 <button 
                     onClick={() => setShowForm(!showForm)}
-                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 flex items-center gap-2"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                    <Plus size={16} /> Add New Fee
+                    <Plus size={18} /> {showForm ? 'Cancel' : 'Add New Fee'}
                 </button>
-            </div>
-            
-            <div className="bg-blue-50 p-4 border border-blue-200 rounded-lg text-blue-800 mb-6 text-sm">
-                <p>Configure the fees for each class. When an admission request is approved, an invoice is generated dynamically based on these settings for the requested class. If no fees are configured for a class, a default ₹5000 admission fee will be applied.</p>
             </div>
 
             {showForm && (
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                    <h3 className="font-bold mb-4">Add Fee Structure</h3>
+                <div className="mb-8 p-4 border rounded-lg bg-gray-50">
                     <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 items-end">
                         <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Class *</label>
-                            <select required name="class_id" value={formData.class_id} onChange={handleChange} className="w-full p-2 border rounded">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                            <select 
+                                required
+                                name="class_id"
+                                value={formData.class_id}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded"
+                            >
                                 <option value="">Select Class...</option>
+                                <option value="ALL">All Classes (Apply to all)</option>
                                 {classes.map(c => (
                                     <option key={c.id} value={c.id}>{c.name} - {c.section}</option>
                                 ))}
                             </select>
                         </div>
                         <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Fee Type *</label>
-                            <input required type="text" name="fee_type" placeholder="e.g., Admission Fee, Library Fee" value={formData.fee_type} onChange={handleChange} className="w-full p-2 border rounded" />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Fee Type</label>
+                            <input 
+                                required
+                                type="text"
+                                name="fee_type"
+                                value={formData.fee_type}
+                                onChange={handleChange}
+                                placeholder="e.g. Tuition Fee, Library Fee"
+                                className="w-full p-2 border rounded"
+                            />
                         </div>
                         <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹) *</label>
-                            <input required type="number" step="0.01" name="amount" value={formData.amount} onChange={handleChange} className="w-full p-2 border rounded" />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-gray-500"><IndianRupee size={16}/></span>
+                                <input 
+                                    required
+                                    type="number"
+                                    name="amount"
+                                    value={formData.amount}
+                                    onChange={handleChange}
+                                    placeholder="0"
+                                    className="w-full p-2 pl-8 border rounded"
+                                />
+                            </div>
                         </div>
                         <div>
                             <button type="submit" className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save</button>
@@ -131,7 +174,7 @@ const FeeSettings = () => {
                             <th className="px-4 py-3 font-semibold text-gray-600">Class</th>
                             <th className="px-4 py-3 font-semibold text-gray-600">Fee Type</th>
                             <th className="px-4 py-3 font-semibold text-gray-600">Amount (₹)</th>
-                            <th className="px-4 py-3 font-semibold text-gray-600 w-24">Actions</th>
+                            <th className="px-4 py-3 font-semibold text-gray-600 w-32">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,15 +186,45 @@ const FeeSettings = () => {
                             fees.map(fee => (
                                 <tr key={fee.id} className="border-b hover:bg-gray-50">
                                     <td className="px-4 py-3 font-medium">{fee.class_name} - {fee.class_section}</td>
-                                    <td className="px-4 py-3">{fee.fee_type}</td>
-                                    <td className="px-4 py-3">₹{parseFloat(fee.amount).toFixed(2)}</td>
                                     <td className="px-4 py-3">
-                                        <button 
-                                            onClick={() => handleDelete(fee.id)}
-                                            className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200" title="Delete"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                        {editingFeeId === fee.id ? (
+                                            <input type="text" className="border rounded p-1 w-full text-sm" value={editFormData.fee_type} onChange={e => setEditFormData({...editFormData, fee_type: e.target.value})} />
+                                        ) : (
+                                            fee.fee_type
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {editingFeeId === fee.id ? (
+                                            <input type="number" className="border rounded p-1 w-full text-sm" value={editFormData.amount} onChange={e => setEditFormData({...editFormData, amount: e.target.value})} />
+                                        ) : (
+                                            `₹${parseFloat(fee.amount).toFixed(2)}`
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {editingFeeId === fee.id ? (
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleUpdateFee(fee.id)} className="text-xs bg-green-600 text-white px-2 py-1 rounded">Save</button>
+                                                <button onClick={() => setEditingFeeId(null)} className="text-xs bg-gray-300 text-gray-700 px-2 py-1 rounded">Cancel</button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => {
+                                                        setEditingFeeId(fee.id);
+                                                        setEditFormData({ fee_type: fee.fee_type, amount: fee.amount });
+                                                    }}
+                                                    className="p-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200" title="Edit"
+                                                >
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDelete(fee.id)}
+                                                    className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200" title="Delete"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))

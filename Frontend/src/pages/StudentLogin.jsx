@@ -70,9 +70,9 @@ const StudentLogin = () => {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Email or Admission Number</label>
             <input 
-              type="email" 
+              type="text" 
               required
               className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-orange-500"
               value={email}

@@ -44,64 +44,47 @@ const ExamsView = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Semester <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Semester <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Select Date Range
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Select Date Range
                     </button>
-
-                    <div className="relative">
-                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input type="text" placeholder="Search subject..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
-                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#4b5563', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                <div className="flex gap-3 items-center">
+                    <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search subject..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-48" />
+                    </div>
+                    <button className="px-4 py-1.5 bg-slate-100 text-slate-700 border border-slate-200 rounded text-xs font-bold hover:bg-slate-200 transition-colors cursor-pointer">
                         Re-evaluation
                     </button>
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                    <button className="px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded text-xs font-bold hover:bg-blue-100 transition-colors cursor-pointer">
                         Export Report
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            minWidth: '160px',
-                            padding: '16px',
-                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
-                            border: '1px solid',
-                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
-                            borderBottom: 'none',
-                            borderRadius: '8px 8px 0 0',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            position: 'relative',
-                            marginBottom: '-2px',
-                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
-                        }}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -109,44 +92,48 @@ const ExamsView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading exam results...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading exam results...</div>
                 ) : activeTab === 'results' ? (
                     results.length === 0 ? (
-                        <div className="p-10 text-center text-gray-500">No exam results found.</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">No exam results found.</div>
                     ) : (
-                        <table className="w-full border-collapse text-left text-sm">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                    <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                    <th className="px-3 py-4">Code</th>
-                                    <th className="px-3 py-4">Subject</th>
-                                    <th className="px-3 py-4">Date</th>
-                                    <th className="px-3 py-4">Obtained / Total</th>
-                                    <th className="px-3 py-4">Grade</th>
-                                    <th className="px-3 py-4 text-right">Status</th>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                    <th className="px-4 py-2 font-bold">Code</th>
+                                    <th className="px-4 py-2 font-bold">Subject</th>
+                                    <th className="px-4 py-2 font-bold">Date</th>
+                                    <th className="px-4 py-2 font-bold">Obtained / Total</th>
+                                    <th className="px-4 py-2 font-bold">Grade</th>
+                                    <th className="px-4 py-2 font-bold text-right">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="text-xs">
                                 {results.map((row, idx) => (
                                     <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                        <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                        <td style={{ padding: '16px 12px', color: '#111827' }}>
+                                        <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">
                                             {row.exam_id}
                                         </td>
-                                        <td className="px-3 py-4 text-gray-900 font-medium">
+                                        <td className="px-4 py-2.5 font-medium text-slate-600">
                                             {row.subject_name || row.exam_name}
                                         </td>
-                                        <td className="px-3 py-4 text-gray-500">
+                                        <td className="px-4 py-2.5 text-slate-500">
                                             {new Date(row.exam_date).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '16px 12px', color: '#111827', fontWeight: '600' }}>
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">
                                             {row.marks_obtained}
                                         </td>
-                                        <td style={{ padding: '16px 12px', color: row.grade?.includes('A') ? '#10b981' : '#0ea5e9', fontWeight: 'bold' }}>
+                                        <td className={`px-4 py-2.5 font-bold ${row.grade?.includes('A') ? 'text-emerald-500' : 'text-blue-500'}`}>
                                             {row.grade}
                                         </td>
-                                        <td style={{ padding: '16px 12px', textAlign: 'right', color: row.grade?.includes('F') ? '#ef4444' : '#10b981', fontWeight: '500' }}>
-                                            {row.grade?.includes('F') ? 'Fail' : 'Pass'}
+                                        <td className="px-4 py-2.5 text-right">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                row.grade?.includes('F') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+                                            }`}>
+                                                {row.grade?.includes('F') ? 'Fail' : 'Pass'}
+                                            </span>
                                         </td>
                                     </tr>
                                 ))}
@@ -154,48 +141,48 @@ const ExamsView = () => {
                         </table>
                     )
                 ) : activeTab === 'schedule' ? (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                <th className="px-3 py-4">Code</th>
-                                <th className="px-3 py-4">Exam Subject</th>
-                                <th className="px-3 py-4">Date</th>
-                                <th className="px-3 py-4">Time</th>
-                                <th className="px-3 py-4 text-right">Type</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">Code</th>
+                                <th className="px-4 py-2 font-bold">Exam Subject</th>
+                                <th className="px-4 py-2 font-bold">Date</th>
+                                <th className="px-4 py-2 font-bold">Time</th>
+                                <th className="px-4 py-2 font-bold text-right">Type</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {schedule.map((row, idx) => (
                                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                    <td style={{ padding: '16px 12px', position: 'relative' }}>
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 relative">
                                         {row.isNew && (
-                                            <div style={{ position: 'absolute', top: 0, left: 0, background: '#0ea5e9', color: 'white', fontSize: '10px', padding: '2px 16px 2px 4px', clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)', fontWeight: 'bold' }}>
-                                                New
+                                            <div className="absolute top-0 left-0 bg-blue-500 text-white text-[8px] px-2 py-0.5 rounded-br-lg font-bold">
+                                                NEW
                                             </div>
                                         )}
-                                        <span style={{ color: '#111827', display: 'block', marginTop: row.isNew ? '8px' : '0' }}>{row.id}</span>
+                                        <span className={`block font-bold text-slate-700 ${row.isNew ? 'mt-3' : ''}`}>{row.id}</span>
                                     </td>
-                                    <td className="px-3 py-4 text-gray-900 font-medium">{row.subject}</td>
-                                    <td className="px-3 py-4 text-gray-600">{row.date}</td>
-                                    <td className="px-3 py-4 text-gray-600">{row.time}</td>
-                                    <td className="px-3 py-4 text-right">
-                                        <span style={{ padding: '4px 8px', background: '#f1f5f9', color: '#4b5563', borderRadius: '4px', fontSize: '12px', fontWeight: '500' }}>{row.type}</span>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.subject}</td>
+                                    <td className="px-4 py-2.5 text-slate-600">{row.date}</td>
+                                    <td className="px-4 py-2.5 text-slate-600">{row.time}</td>
+                                    <td className="px-4 py-2.5 text-right">
+                                        <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">{row.type}</span>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 ) : (
-                    <div className="p-10 text-center text-gray-500">
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">
                         <p>No tabular data available for this view. Please select Results or Schedule.</p>
                     </div>
                 )}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchResults} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchResults} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
             </div>
         </div>

@@ -1,9 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import apiFetch from '../../../services/api';
 
 const StudentForm = ({ onSave, onCancel }) => {
     const [activeTab, setActiveTab] = useState('personal');
     const [loading, setLoading] = useState(false);
+    const [classesList, setClassesList] = useState([]);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                // Fetch classes
+                const resClasses = await apiFetch('/classes');
+                if (resClasses.ok) {
+                    const data = await resClasses.json();
+                    if (Array.isArray(data)) setClassesList(data);
+                } else {
+                    const res2 = await fetch('http://localhost:5000/api/classes');
+                    if (res2.ok) {
+                        const data2 = await res2.json();
+                        if (Array.isArray(data2)) setClassesList(data2);
+                    }
+                }
+                
+                // Fetch next admission number
+                const resAdm = await apiFetch('/users/next-admission-no');
+                if (resAdm.ok) {
+                    const dataAdm = await resAdm.json();
+                    if (dataAdm.success) {
+                        setFormData(prev => ({ ...prev, admissionNo: dataAdm.nextAdmissionNo }));
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch initial data", err);
+            }
+        };
+        fetchInitialData();
+    }, []);
     
     // Massive state object for all fields
     const [formData, setFormData] = useState({
@@ -38,8 +70,8 @@ const StudentForm = ({ onSave, onCancel }) => {
         e.preventDefault();
         
         // Manual validation since hidden tabs break HTML5 required validation
-        if (!formData.name || !formData.parentPhone || !formData.classId || !formData.admissionNo || !formData.emergencyContact) {
-            alert('Please fill in all required fields: Full Name, Parent Phone, Class ID, Admission No, and Emergency Contact.');
+        if (!formData.name || !formData.classId || !formData.admissionNo) {
+            alert('Please fill in all required fields: Full Name, Class ID, and Admission No.');
             return;
         }
 
@@ -73,13 +105,29 @@ const StudentForm = ({ onSave, onCancel }) => {
         { id: 'transport', label: 'Transport & Hostel' }
     ];
 
+    const activeTabIndex = tabs.findIndex(tab => tab.id === activeTab);
+    const isFirstTab = activeTabIndex === 0;
+    const isLastTab = activeTabIndex === tabs.length - 1;
+
+    const handleNext = () => {
+        if (!isLastTab) {
+            setActiveTab(tabs[activeTabIndex + 1].id);
+        }
+    };
+
+    const handlePrev = () => {
+        if (!isFirstTab) {
+            setActiveTab(tabs[activeTabIndex - 1].id);
+        }
+    };
+
     const inputClass = "w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm";
     const labelClass = "block text-sm font-medium text-slate-700 mb-1";
 
     return (
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
             <div className="p-4 border-b border-slate-200 bg-slate-50 flex gap-4 overflow-x-auto rounded-t-2xl">
-                {tabs.map(tab => (
+                {tabs.map((tab, index) => (
                     <button
                         key={tab.id}
                         type="button"
@@ -87,10 +135,12 @@ const StudentForm = ({ onSave, onCancel }) => {
                         className={`whitespace-nowrap px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                             activeTab === tab.id 
                             ? 'bg-blue-600 text-white shadow-sm' 
-                            : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100'
+                            : index < activeTabIndex
+                                ? 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
+                                : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
                         }`}
                     >
-                        {tab.label}
+                        {index + 1}. {tab.label}
                     </button>
                 ))}
             </div>
@@ -98,7 +148,7 @@ const StudentForm = ({ onSave, onCancel }) => {
             <form onSubmit={handleSubmit} className="p-4" noValidate>
                 
                 {/* Personal Tab */}
-                <div className={activeTab === 'personal' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'personal' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label className={labelClass}>Full Name *</label><input required type="text" name="name" value={formData.name} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Date of Birth</label><input type="date" name="dob" value={formData.dob} onChange={handleChange} className={inputClass} /></div>
@@ -116,7 +166,7 @@ const StudentForm = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* Contact Tab */}
-                <div className={activeTab === 'contact' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'contact' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2"><label className={labelClass}>Residential Address</label><textarea name="address" value={formData.address} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>City</label><input type="text" name="city" value={formData.city} onChange={handleChange} className={inputClass} /></div>
@@ -129,22 +179,30 @@ const StudentForm = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* Parent Tab */}
-                <div className={activeTab === 'parent' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'parent' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label className={labelClass}>Father's Name</label><input type="text" name="fatherName" value={formData.fatherName} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Mother's Name</label><input type="text" name="motherName" value={formData.motherName} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Guardian Name (If applicable)</label><input type="text" name="guardianName" value={formData.guardianName} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Parent Occupation</label><input type="text" name="parentOccupation" value={formData.parentOccupation} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Annual Income</label><input type="text" name="parentIncome" value={formData.parentIncome} onChange={handleChange} className={inputClass} /></div>
-                        <div><label className={labelClass}>Parent Phone *</label><input required type="text" name="parentPhone" value={formData.parentPhone} onChange={handleChange} className={inputClass} /></div>
+                        <div><label className={labelClass}>Parent Phone</label><input type="text" name="parentPhone" value={formData.parentPhone} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Parent Email</label><input type="email" name="parentEmail" value={formData.parentEmail} onChange={handleChange} className={inputClass} /></div>
                     </div>
                 </div>
 
                 {/* Academic Tab */}
-                <div className={activeTab === 'academic' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'academic' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><label className={labelClass}>Class ID *</label><input required type="number" name="classId" value={formData.classId} onChange={handleChange} className={inputClass} /></div>
+                        <div>
+                            <label className={labelClass}>Class *</label>
+                            <select required name="classId" value={formData.classId} onChange={handleChange} className={inputClass}>
+                                <option value="">Select Class...</option>
+                                {classesList.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
                         <div><label className={labelClass}>Section</label><input type="text" name="section" value={formData.section} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Roll Number</label><input type="text" name="rollNumber" value={formData.rollNumber} onChange={handleChange} className={inputClass} /></div>
                         <div><label className={labelClass}>Admission Number *</label><input required type="text" name="admissionNo" value={formData.admissionNo} onChange={handleChange} className={inputClass} /></div>
@@ -155,17 +213,17 @@ const StudentForm = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* Medical Tab */}
-                <div className={activeTab === 'medical' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'medical' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label className={labelClass}>Allergies</label><textarea name="medicalAllergies" value={formData.medicalAllergies} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>Disabilities / Health Issues</label><textarea name="medicalDisabilities" value={formData.medicalDisabilities} onChange={handleChange} className={inputClass} rows="2"></textarea></div>
                         <div><label className={labelClass}>Family Doctor Name</label><input type="text" name="medicalDoctorName" value={formData.medicalDoctorName} onChange={handleChange} className={inputClass} /></div>
-                        <div><label className={labelClass}>Emergency Contact Number *</label><input required type="text" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} className={inputClass} /></div>
+                        <div><label className={labelClass}>Emergency Contact Number</label><input type="text" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} className={inputClass} /></div>
                     </div>
                 </div>
 
                 {/* Transport & Hostel Tab */}
-                <div className={activeTab === 'transport' ? 'block' : 'hidden'}>
+                <div className={activeTab === 'transport' ? 'block animate-fade-in' : 'hidden'}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div>
                             <h3 className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">Transport Allocation</h3>
@@ -198,11 +256,29 @@ const StudentForm = ({ onSave, onCancel }) => {
                     </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-slate-200 flex justify-end gap-4">
-                    <button type="button" onClick={onCancel} className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors">Cancel</button>
-                    <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors disabled:opacity-50">
-                        {loading ? 'Creating...' : 'Save Student Record'}
-                    </button>
+                <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center gap-4">
+                    <div>
+                        <button type="button" onClick={onCancel} className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                    <div className="flex gap-3">
+                        {!isFirstTab && (
+                            <button type="button" onClick={handlePrev} className="px-6 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-200 font-medium transition-colors">
+                                Previous
+                            </button>
+                        )}
+                        
+                        {!isLastTab ? (
+                            <button type="button" onClick={handleNext} className="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors">
+                                Next Step
+                            </button>
+                        ) : (
+                            <button type="submit" disabled={loading} className="px-8 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium shadow-sm transition-colors disabled:opacity-50">
+                                {loading ? 'Saving...' : 'Save Student Record'}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </form>
         </div>

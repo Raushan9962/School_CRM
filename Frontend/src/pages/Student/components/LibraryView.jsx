@@ -52,61 +52,44 @@ const LibraryView = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Category <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Category <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Due Date
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Due Date
                     </button>
-
-                    <div className="relative">
-                        <Search size={16} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input type="text" placeholder="Search books, authors..." style={{ padding: '8px 12px 8px 36px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '14px', outline: 'none', width: '200px' }} />
-                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button style={{ padding: '8px 16px', background: 'white', border: '1px solid #0ea5e9', borderRadius: '4px', color: '#0ea5e9', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                <div className="flex gap-3 items-center">
+                    <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search books, authors..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-48" />
+                    </div>
+                    <button className="px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded text-xs font-bold hover:bg-blue-100 transition-colors cursor-pointer">
                         Pay Fines
                     </button>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            minWidth: '160px',
-                            padding: '16px',
-                            background: activeTab === tab.id ? '#e0f2fe' : 'white',
-                            border: '1px solid',
-                            borderColor: activeTab === tab.id ? '#0ea5e9' : '#e2e8f0',
-                            borderBottom: 'none',
-                            borderRadius: '8px 8px 0 0',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            position: 'relative',
-                            marginBottom: '-2px',
-                            borderTopWidth: activeTab === tab.id ? '3px' : '1px'
-                        }}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -114,47 +97,46 @@ const LibraryView = () => {
             {/* Data Table */}
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {loading ? (
-                    <div className="p-10 text-center text-gray-500">Loading library data...</div>
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading library data...</div>
                 ) : activeTab === 'issued' || activeTab === 'overdue' || activeTab === 'history' ? (
                     (activeTab === 'issued' ? issuedBooks : (activeTab === 'overdue' ? issuedBooks.filter(b => b.status === 'Overdue') : history)).length === 0 ? (
-                        <div className="p-10 text-center text-gray-500">No books found for this section.</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">No books found for this section.</div>
                     ) : (
-                        <table className="w-full border-collapse text-left text-sm">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                    <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                    <th className="px-3 py-4">Book ID</th>
-                                    <th className="px-3 py-4">Title & Author</th>
-                                    <th className="px-3 py-4">Issued On</th>
-                                    <th className="px-3 py-4">Due On</th>
-                                    <th className="px-3 py-4">Fine Amount</th>
-                                    <th className="px-3 py-4 text-right">Status</th>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                    <th className="px-4 py-2 font-bold">Book ID</th>
+                                    <th className="px-4 py-2 font-bold">Title & Author</th>
+                                    <th className="px-4 py-2 font-bold">Issued On</th>
+                                    <th className="px-4 py-2 font-bold">Due On</th>
+                                    <th className="px-4 py-2 font-bold text-right">Fine Amount</th>
+                                    <th className="px-4 py-2 font-bold text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="text-xs">
                                 {(activeTab === 'issued' ? issuedBooks : (activeTab === 'overdue' ? issuedBooks.filter(b => b.status === 'Overdue') : history)).map((row, idx) => (
                                     <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                        <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                        <td style={{ padding: '16px 12px', color: '#111827' }}>
+                                        <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">
                                             {row.book_id}
                                         </td>
-                                        <td className="px-3 py-4">
-                                            <div className="text-gray-900 font-medium">{row.title}</div>
-                                            <div style={{ color: '#6b7280', fontSize: '12px' }}>{row.author}</div>
+                                        <td className="px-4 py-2.5">
+                                            <div className="font-bold text-slate-800">{row.title}</div>
+                                            <div className="text-[10px] text-slate-500 mt-0.5">{row.author}</div>
                                         </td>
-                                        <td className="px-3 py-4 text-gray-600">{new Date(row.issued_on).toLocaleDateString()}</td>
-                                        <td style={{ padding: '16px 12px', color: row.status === 'Overdue' ? '#dc2626' : '#4b5563', fontWeight: row.status === 'Overdue' ? '600' : 'normal' }}>
+                                        <td className="px-4 py-2.5 text-slate-600">{new Date(row.issued_on).toLocaleDateString()}</td>
+                                        <td className={`px-4 py-2.5 ${row.status === 'Overdue' ? 'text-red-600 font-bold' : 'text-slate-600 font-medium'}`}>
                                             {new Date(row.due_on).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '16px 12px', color: row.fine > 0 ? '#dc2626' : '#6b7280', fontWeight: row.fine > 0 ? 'bold' : 'normal' }}>
+                                        <td className={`px-4 py-2.5 text-right ${row.fine > 0 ? 'text-red-600 font-bold' : 'text-slate-500 font-medium'}`}>
                                             {row.fine > 0 ? `₹ ${row.fine}` : '₹ 0'}
                                         </td>
-                                        <td className="px-3 py-4 text-right">
-                                            <span style={{ 
-                                                padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600',
-                                                background: row.status === 'Issued' ? '#dcfce7' : (row.status === 'Returned' ? '#f1f5f9' : '#fee2e2'),
-                                                color: row.status === 'Issued' ? '#166534' : (row.status === 'Returned' ? '#4b5563' : '#dc2626')
-                                            }}>
+                                        <td className="px-4 py-2.5 text-center">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                row.status === 'Issued' ? 'bg-emerald-50 text-emerald-600' : 
+                                                (row.status === 'Returned' ? 'bg-slate-100 text-slate-600' : 'bg-red-50 text-red-600')
+                                            }`}>
                                                 {row.status}
                                             </span>
                                         </td>
@@ -165,34 +147,36 @@ const LibraryView = () => {
                     )
                 ) : activeTab === 'available' ? (
                     catalog.length === 0 ? (
-                        <div className="p-10 text-center text-gray-500">No books available in catalog.</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">No books available in catalog.</div>
                     ) : (
-                        <table className="w-full border-collapse text-left text-sm">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                    <th className="px-3 py-4 w-[60px]">S.No.</th>
-                                    <th className="px-3 py-4">ISBN/Code</th>
-                                    <th className="px-3 py-4">Title & Author</th>
-                                    <th className="px-3 py-4">Availability</th>
-                                    <th className="px-3 py-4 text-right">Action</th>
+                                <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                    <th className="px-4 py-2 font-bold">ISBN/Code</th>
+                                    <th className="px-4 py-2 font-bold">Title & Author</th>
+                                    <th className="px-4 py-2 font-bold text-center">Availability</th>
+                                    <th className="px-4 py-2 font-bold text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="text-xs">
                                 {catalog.map((row, idx) => (
                                     <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                        <td className="px-3 py-4 text-gray-500">{idx + 1}</td>
-                                        <td style={{ padding: '16px 12px', color: '#111827' }}>{row.isbn || row.id}</td>
-                                        <td className="px-3 py-4">
-                                            <div className="text-gray-900 font-medium">{row.title}</div>
-                                            <div style={{ color: '#6b7280', fontSize: '12px' }}>{row.author}</div>
+                                        <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                        <td className="px-4 py-2.5 font-bold text-slate-800">{row.isbn || row.id}</td>
+                                        <td className="px-4 py-2.5">
+                                            <div className="font-bold text-slate-800">{row.title}</div>
+                                            <div className="text-[10px] text-slate-500 mt-0.5">{row.author}</div>
                                         </td>
-                                        <td className="px-3 py-4">
-                                            <span style={{ color: row.available > 0 ? '#10b981' : '#dc2626', fontWeight: '600' }}>
+                                        <td className="px-4 py-2.5 text-center">
+                                            <span className={`font-bold ${row.available > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                                 {row.available} / {row.quantity}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-4 text-right">
-                                            <button disabled={row.available === 0} style={{ padding: '6px 12px', background: row.available > 0 ? 'white' : '#f1f5f9', border: `1px solid ${row.available > 0 ? '#0ea5e9' : '#cbd5e1'}`, color: row.available > 0 ? '#0ea5e9' : '#9ca3af', borderRadius: '4px', cursor: row.available > 0 ? 'pointer' : 'not-allowed', fontWeight: '500' }}>
+                                        <td className="px-4 py-2.5 text-right">
+                                            <button disabled={row.available === 0} className={`px-3 py-1.5 rounded font-bold transition-colors inline-flex items-center gap-1.5 border ${
+                                                row.available > 0 ? 'bg-white border-blue-200 text-blue-600 hover:bg-blue-50 cursor-pointer' : 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed'
+                                            }`}>
                                                 {row.available > 0 ? 'Reserve' : 'Waitlist'}
                                             </button>
                                         </td>
@@ -204,25 +188,25 @@ const LibraryView = () => {
                 ) : null}
                 
                 {/* Floating Action Button */}
-                <button onClick={fetchLibraryData} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white border-none flex items-center justify-center cursor-pointer shadow-lg shadow-sky-500/40 hover:bg-sky-600 transition-colors">
-                    <RefreshCw size={20} />
+                <button onClick={fetchLibraryData} className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer">
+                    <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center px-4 py-2 border-t border-slate-200 text-gray-600 text-sm gap-4">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
+                <div className="flex items-center gap-2">
                     Rows per page: 
-                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent">
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
                 </div>
                 <div>1-{activeTab === 'available' ? catalog.length : (activeTab === 'issued' ? issuedBooks.length : history.length)} of {activeTab === 'available' ? catalog.length : (activeTab === 'issued' ? issuedBooks.length : history.length)}</div>
-                <div className="flex gap-2">
-                    <button style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center' }} disabled><ChevronLeft size={20} /></button>
-                    <button style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={20} /></button>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                 </div>
             </div>
         </div>

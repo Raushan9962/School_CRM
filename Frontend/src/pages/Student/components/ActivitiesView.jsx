@@ -53,43 +53,41 @@ const ActivitiesView = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col gap-5 bg-white rounded-lg border border-slate-200 overflow-hidden relative animate-fade-in">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 flex-wrap gap-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-wrap gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        Category <ChevronDown size={16} />
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-slate-700 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        Category <ChevronDown size={14} />
                     </button>
                     
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded text-sky-500 text-sm flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <Calendar size={16} /> Filter Date
+                    <button className="px-4 py-2 bg-white border border-slate-300 rounded text-blue-600 text-xs font-bold flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <Calendar size={14} /> Filter Date
                     </button>
+                </div>
 
+                <div className="flex gap-3 items-center">
                     <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder="Search events..." className="py-2 pr-3 pl-9 border border-slate-200 rounded text-sm outline-none w-48 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-shadow" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" placeholder="Search events..." className="pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 w-48" />
                     </div>
                 </div>
             </div>
 
             {/* Horizontal Tabs */}
-            <div className="flex overflow-x-auto px-6 gap-2 border-b-2 border-slate-200">
+            <div className="flex overflow-x-auto px-6 gap-2 border-b border-slate-200">
                 {tabs.map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[2px] rounded-t-lg transition-colors border ${
-                            activeTab === tab.id 
-                                ? 'bg-sky-50 border-sky-500 border-b-0 border-t-4' 
-                                : 'bg-white border-slate-200 border-b-0 border-t-transparent hover:bg-slate-50'
-                        }`}
+                        className={`min-w-[160px] p-4 text-left cursor-pointer flex flex-col gap-1 relative -mb-[1px] border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-500 bg-blue-50/50' : 'border-transparent hover:bg-slate-50'}`}
                     >
                         <div className="flex justify-between items-start w-full">
-                            <span className="text-sm text-gray-600 font-medium">{tab.label}</span>
-                            <span className="text-xl font-bold text-gray-900 leading-none">{tab.count}</span>
+                            <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-blue-700' : 'text-slate-600'}`}>{tab.label}</span>
+                            <span className={`text-lg font-bold leading-none ${activeTab === tab.id ? 'text-blue-800' : 'text-slate-800'}`}>{tab.count}</span>
                         </div>
-                        <span className="text-xs text-gray-400 self-end">{tab.subtext}</span>
+                        <span className="text-[10px] text-slate-400 font-medium self-end">{tab.subtext}</span>
                     </button>
                 ))}
             </div>
@@ -98,50 +96,50 @@ const ActivitiesView = () => {
             <div className="overflow-x-auto px-6 pb-6 min-h-[300px]">
                 {activeTab === 'upcoming' ? (
                     loading ? (
-                        <div className="p-10 text-center text-gray-500">Loading events...</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">Loading events...</div>
                     ) : upcomingEvents.length === 0 ? (
-                        <div className="p-10 text-center text-gray-500">No events found.</div>
+                        <div className="p-10 text-center text-slate-500 font-medium text-sm">No events found.</div>
                     ) : (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="p-4 w-[60px]">S.No.</th>
-                                <th className="p-4">Event ID</th>
-                                <th className="p-4">Event Title</th>
-                                <th className="p-4">Category</th>
-                                <th className="p-4">Event Date</th>
-                                <th className="p-4">Reg. Deadline</th>
-                                <th className="p-4 text-right">Action</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">Event ID</th>
+                                <th className="px-4 py-2 font-bold">Event Title</th>
+                                <th className="px-4 py-2 font-bold text-center">Category</th>
+                                <th className="px-4 py-2 font-bold">Event Date</th>
+                                <th className="px-4 py-2 font-bold">Reg. Deadline</th>
+                                <th className="px-4 py-2 font-bold text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {upcomingEvents.map((row, idx) => (
-                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                    <td className="p-4 text-gray-500">{idx + 1}</td>
-                                    <td className="p-4 relative">
+                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 relative">
                                         {row.isNew && (
-                                            <div className="absolute top-0 left-0 bg-sky-500 text-white text-[10px] py-0.5 pr-4 pl-1 font-bold" style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}>
-                                                New
+                                            <div className="absolute top-0 left-0 bg-blue-500 text-white text-[8px] px-2 py-0.5 rounded-br-lg font-bold">
+                                                NEW
                                             </div>
                                         )}
-                                        <span className={`text-gray-900 block ${row.isNew ? 'mt-2' : 'mt-0'}`}>{row.id}</span>
+                                        <span className={`block font-bold text-slate-700 ${row.isNew ? 'mt-3' : ''}`}>{row.id}</span>
                                     </td>
-                                    <td className="p-4 text-gray-900 font-medium">
-                                        {row.title}
-                                        <div className="text-xs text-gray-500 mt-1">📍 {row.venue}</div>
+                                    <td className="px-4 py-2.5">
+                                        <div className="font-bold text-slate-800">{row.title}</div>
+                                        <div className="text-[10px] text-slate-500 mt-0.5">📍 {row.venue}</div>
                                     </td>
-                                    <td className="p-4">
-                                        <span className="px-2 py-1 bg-slate-100 text-gray-600 rounded text-xs font-medium">{row.category}</span>
+                                    <td className="px-4 py-2.5 text-center">
+                                        <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">{row.category}</span>
                                     </td>
-                                    <td className="p-4 text-gray-600">{row.date}</td>
-                                    <td className={`p-4 ${row.status === 'Closed' ? 'text-red-500' : 'text-gray-600'}`}>{row.deadline}</td>
-                                    <td className="p-4 text-right">
+                                    <td className="px-4 py-2.5 text-slate-600 font-medium">{row.date}</td>
+                                    <td className={`px-4 py-2.5 font-bold ${row.status === 'Closed' ? 'text-red-500' : 'text-slate-600'}`}>{row.deadline}</td>
+                                    <td className="px-4 py-2.5 text-right">
                                         <button 
                                             disabled={row.status === 'Closed'} 
-                                            className={`px-3 py-1.5 rounded font-medium ${
+                                            className={`px-3 py-1.5 rounded font-bold transition-colors inline-flex items-center gap-1.5 border ${
                                                 row.status === 'Open' 
-                                                    ? 'bg-sky-500 text-white hover:bg-sky-600 cursor-pointer transition-colors' 
-                                                    : 'bg-slate-100 text-gray-400 cursor-not-allowed'
+                                                    ? 'bg-white border-blue-200 text-blue-600 hover:bg-blue-50 cursor-pointer' 
+                                                    : 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed'
                                             }`}
                                         >
                                             {row.status === 'Open' ? 'Register Now' : 'Closed'}
@@ -153,41 +151,41 @@ const ActivitiesView = () => {
                     </table>
                     )
                 ) : activeTab === 'history' ? (
-                    <table className="w-full border-collapse text-left text-sm">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 text-gray-900 font-semibold">
-                                <th className="p-4 w-[60px]">S.No.</th>
-                                <th className="p-4">Event ID</th>
-                                <th className="p-4">Event Title</th>
-                                <th className="p-4">Category</th>
-                                <th className="p-4">Date Participated</th>
-                                <th className="p-4">Result / Position</th>
-                                <th className="p-4 text-right">Certificate</th>
+                            <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                                <th className="px-4 py-2 font-bold w-[60px]">S.No.</th>
+                                <th className="px-4 py-2 font-bold">Event ID</th>
+                                <th className="px-4 py-2 font-bold">Event Title</th>
+                                <th className="px-4 py-2 font-bold text-center">Category</th>
+                                <th className="px-4 py-2 font-bold">Date Participated</th>
+                                <th className="px-4 py-2 font-bold">Result / Position</th>
+                                <th className="px-4 py-2 font-bold text-right">Certificate</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {history.map((row, idx) => (
-                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                    <td className="p-4 text-gray-500">{idx + 1}</td>
-                                    <td className="p-4 text-gray-900">{row.id}</td>
-                                    <td className="p-4 text-gray-900 font-medium">{row.title}</td>
-                                    <td className="p-4">
-                                        <span className="px-2 py-1 bg-slate-100 text-gray-600 rounded text-xs font-medium">{row.category}</span>
+                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="px-4 py-2.5 text-slate-500">{idx + 1}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.id}</td>
+                                    <td className="px-4 py-2.5 font-bold text-slate-800">{row.title}</td>
+                                    <td className="px-4 py-2.5 text-center">
+                                        <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">{row.category}</span>
                                     </td>
-                                    <td className="p-4 text-gray-600">{row.date}</td>
-                                    <td className={`p-4 ${row.result !== 'Participant' ? 'text-emerald-500 font-semibold' : 'text-gray-600'}`}>
+                                    <td className="px-4 py-2.5 text-slate-600 font-medium">{row.date}</td>
+                                    <td className={`px-4 py-2.5 font-bold ${row.result !== 'Participant' ? 'text-emerald-500' : 'text-slate-600'}`}>
                                         {row.result}
                                     </td>
-                                    <td className="p-4 text-right">
+                                    <td className="px-4 py-2.5 text-right">
                                         <button 
                                             disabled={!row.certificate} 
-                                            className={`inline-flex items-center gap-1 bg-transparent border-none font-medium ${
+                                            className={`inline-flex items-center gap-1.5 font-bold ${
                                                 row.certificate 
-                                                    ? 'text-sky-500 cursor-pointer hover:text-sky-600 transition-colors' 
-                                                    : 'text-slate-300 cursor-not-allowed'
+                                                    ? 'text-blue-600 cursor-pointer hover:text-blue-700 transition-colors bg-transparent border-none' 
+                                                    : 'text-slate-300 cursor-not-allowed bg-transparent border-none'
                                             }`}
                                         >
-                                            <Download size={16} /> Download
+                                            <Download size={14} /> Download
                                         </button>
                                     </td>
                                 </tr>
@@ -195,7 +193,7 @@ const ActivitiesView = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <div className="p-10 text-center text-gray-500">
+                    <div className="p-10 text-center text-slate-500 font-medium text-sm">
                         <p>No major achievements recorded yet. Keep participating!</p>
                     </div>
                 )}
@@ -203,26 +201,26 @@ const ActivitiesView = () => {
                 {/* Floating Action Button */}
                 <button 
                     onClick={fetchEvents} 
-                    className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-sky-500 text-white flex items-center justify-center cursor-pointer shadow-[0_4px_6px_rgba(14,165,233,0.4)] hover:bg-sky-600 transition-all hover:scale-105 active:scale-95"
+                    className="absolute bottom-20 right-10 w-12 h-12 rounded-full bg-blue-600 text-white border-none flex items-center justify-center shadow-lg shadow-blue-500/40 hover:bg-blue-700 transition-colors cursor-pointer"
                 >
-                    <RefreshCw size={20} />
+                    <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Pagination Footer */}
-            <div className="flex justify-end items-center p-4 px-6 border-t border-slate-200 text-gray-600 text-sm gap-4">
+            <div className="flex justify-end items-center px-6 py-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] font-bold gap-4">
                 <div className="flex items-center gap-2">
                     Rows per page: 
-                    <select className="border-none outline-none text-gray-900 cursor-pointer bg-transparent focus:ring-0">
-                        <option>100</option>
+                    <select className="border-none outline-none text-slate-700 bg-transparent font-bold cursor-pointer">
+                        <option>10</option>
+                        <option>25</option>
                         <option>50</option>
-                        <option>20</option>
                     </select>
                 </div>
                 <div>1-{activeTab === 'upcoming' ? upcomingEvents.length : history.length} of {activeTab === 'upcoming' ? upcomingEvents.length : history.length}</div>
-                <div className="flex gap-2">
-                    <button className="bg-transparent border-none text-gray-400 flex items-center disabled:opacity-50" disabled><ChevronLeft size={20} /></button>
-                    <button className="bg-transparent border-none text-gray-600 cursor-pointer flex items-center hover:text-gray-900 transition-colors"><ChevronRight size={20} /></button>
+                <div className="flex gap-1">
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled><ChevronLeft size={16} /></button>
+                    <button className="p-1 rounded hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                 </div>
             </div>
         </div>

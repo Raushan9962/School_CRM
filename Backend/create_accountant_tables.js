@@ -83,6 +83,11 @@ async function createAccountantTables() {
                 address TEXT,
                 gst_number VARCHAR(50),
                 pan_number VARCHAR(50),
+                bank_name VARCHAR(255),
+                account_name VARCHAR(255),
+                account_number VARCHAR(100),
+                ifsc_code VARCHAR(50),
+                upi_id VARCHAR(100),
                 bank_details TEXT,
                 status VARCHAR(50) DEFAULT 'Active',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

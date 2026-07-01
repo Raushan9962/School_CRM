@@ -14,7 +14,10 @@ pool.on('error', (err, client) => {
 
 pool
     .connect()
-    .then(() => console.log("✅ PostgreSQL Connected Successfully"))
+    .then((client) => {
+        console.log("✅ PostgreSQL Connected Successfully");
+        client.release();
+    })
     .catch((err) => console.error("❌ Connection Failed:", err));
 
 module.exports = pool;

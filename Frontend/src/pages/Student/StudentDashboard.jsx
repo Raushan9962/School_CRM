@@ -102,16 +102,20 @@ const StudentDashboard = () => {
     if (!currentUser) return null;
 
     return (
-        <div className="flex min-h-screen bg-slate-50 font-sans">
+        <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
             {/* Sidebar */}
             <aside className={`overflow-hidden bg-white transition-[width] duration-300 flex flex-col border-r border-slate-200 z-10 ${isSidebarOpen ? 'w-[260px]' : 'w-0'}`}>
                 {/* Profile Header */}
-                <div className="p-4 pb-2 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                <div 
+                    className="p-4 pb-2 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => setActiveTab('profile')}
+                >
+                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
                         {currentUser?.name ? currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : 'ST'}
                     </div>
                     <div className="flex-1 overflow-hidden">
                         <p className="text-slate-800 m-0 text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{currentUser?.name || 'Student'}</p>
+                        <p className="text-slate-500 m-0 text-[10px] font-bold uppercase mt-0.5">View Profile</p>
                     </div>
                 </div>
                 
@@ -165,7 +169,7 @@ const StudentDashboard = () => {
 
                 {/* Content Area */}
                 <div className="flex-1 px-8 py-6 overflow-y-auto">
-                    <div className="max-w-[1400px] mx-auto">
+                    <div className="w-full mx-auto">
                         {renderContent()}
                     </div>
                 </div>

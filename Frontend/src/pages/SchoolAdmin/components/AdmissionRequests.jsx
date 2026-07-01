@@ -4,6 +4,7 @@ import { Check, X, Eye } from 'lucide-react';
 const AdmissionRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [credentialsModal, setCredentialsModal] = useState(null);
 
     const fetchRequests = () => {
         fetch('http://localhost:5000/api/admission/requests')
@@ -31,7 +32,14 @@ const AdmissionRequests = () => {
             });
             const data = await res.json();
             if (data.success) {
-                alert('Request approved and Invoice Generated. Link: http://localhost:5173/invoice/' + id);
+                if (data.credentials) {
+                    setCredentialsModal({
+                        ...data.credentials,
+                        student_name: requests.find(r => r.id === id)?.student_name || 'Student'
+                    });
+                } else {
+                    alert('Request approved and Invoice Generated.');
+                }
                 fetchRequests();
             } else {
                 alert('Failed to approve request');
@@ -103,6 +111,61 @@ const AdmissionRequests = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Credentials Modal */}
+            {credentialsModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+                            <h3 className="font-bold text-gray-800 text-lg">Admission Approved</h3>
+                            <button onClick={() => setCredentialsModal(null)} className="text-gray-400 hover:text-gray-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-5">
+                            <div className="text-center text-sm text-green-600 font-semibold mb-4 bg-green-50 p-2 rounded">
+                                User accounts successfully created! Notifications sent via Email/SMS.
+                            </div>
+                            
+                            {/* Student Credentials */}
+                            <div className="border border-blue-100 rounded-lg p-4 bg-blue-50/30">
+                                <h4 className="text-sm font-bold text-blue-800 uppercase mb-3">Student Login ({credentialsModal.student_name})</h4>
+                                <div className="grid grid-cols-3 gap-2 text-sm mb-2">
+                                    <span className="text-gray-500 font-medium">User ID:</span>
+                                    <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.student.username}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-sm">
+                                    <span className="text-gray-500 font-medium">Password:</span>
+                                    <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.student.password}</span>
+                                </div>
+                            </div>
+
+                            {/* Parent Credentials */}
+                            <div className="border border-purple-100 rounded-lg p-4 bg-purple-50/30">
+                                <h4 className="text-sm font-bold text-purple-800 uppercase mb-3">Parent Login</h4>
+                                <div className="grid grid-cols-3 gap-2 text-sm mb-2">
+                                    <span className="text-gray-500 font-medium">User ID:</span>
+                                    <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.parent.username}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-sm">
+                                    <span className="text-gray-500 font-medium">Password:</span>
+                                    <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.parent.password}</span>
+                                </div>
+                            </div>
+
+                            <div className="pt-2">
+                                <p className="text-xs text-gray-500 italic text-center mb-4">Please ensure to note down these credentials. They have been sent to the parent's registered email and phone number.</p>
+                                <button 
+                                    onClick={() => setCredentialsModal(null)} 
+                                    className="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Done
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

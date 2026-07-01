@@ -19,6 +19,7 @@ router.get('/fees/receipts', accountantController.getFeeReceipts);
 // Student Fee Management (New)
 router.get('/fee-structures', accountantController.getFeeStructures);
 router.post('/fee-structures', accountantController.addFeeStructure);
+router.put('/fee-structures/:id', accountantController.updateFeeStructure);
 router.get('/student-fees', accountantController.getStudentFees);
 router.post('/student-fees/assign', accountantController.assignStudentFee);
 router.post('/student-fees/bulk-generate', accountantController.bulkGenerateStudentFees);

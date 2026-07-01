@@ -121,9 +121,34 @@ const CRMSubscription = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center">
+                    <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg flex justify-between items-center mb-4">
                         <span className="text-xs font-semibold text-slate-600">Pending Amount:</span>
                         <span className="text-sm font-bold text-red-600">₹{pendingAmount > 0 ? pendingAmount.toLocaleString('en-IN') : '0'}</span>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
+                        <h3 className="text-sm font-bold text-blue-800 mb-2">How to Pay?</h3>
+                        <p className="text-xs text-blue-700 mb-3">Please transfer the pending amount to the following bank account or UPI ID, then record the transaction details below.</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div className="bg-white p-3 rounded border border-blue-100 shadow-sm">
+                                <span className="block font-bold text-slate-700 mb-1 border-b pb-1">Bank Transfer Details</span>
+                                <div className="grid grid-cols-2 gap-1 mt-2 text-slate-600">
+                                    <span className="font-semibold">Bank Name:</span> <span>HDFC Bank</span>
+                                    <span className="font-semibold">Account Name:</span> <span>VidyaSetu CRM</span>
+                                    <span className="font-semibold">Account No:</span> <span className="font-mono font-bold">50200012345678</span>
+                                    <span className="font-semibold">IFSC Code:</span> <span className="font-mono">HDFC0001234</span>
+                                </div>
+                            </div>
+                            <div className="bg-white p-3 rounded border border-blue-100 shadow-sm">
+                                <span className="block font-bold text-slate-700 mb-1 border-b pb-1">UPI Details</span>
+                                <div className="mt-2 text-slate-600">
+                                    <span className="font-semibold block mb-1">UPI ID:</span> 
+                                    <span className="font-mono font-bold text-sm bg-slate-50 px-2 py-1 rounded border">vidyasetu@hdfcbank</span>
+                                    <p className="mt-2 text-[10px] text-slate-400">Scan QR or enter UPI ID in any payment app (GPay, PhonePe, Paytm)</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

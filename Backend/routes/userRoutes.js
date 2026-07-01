@@ -21,6 +21,9 @@ router.get('/school-students', auth, userController.getSchoolStudents);
 router.get('/school-teachers', auth, userController.getSchoolTeachers);
 router.get('/school-parents', auth, userController.getSchoolParents);
 
+// Admission Number auto-generation
+router.get('/next-admission-no', auth, userController.getNextAdmissionNo);
+
 // Specialized Staff (Phase 2)
 router.get('/school-accountants', auth, userController.getSchoolAccountants);
 router.get('/school-librarians', auth, userController.getSchoolLibrarians);

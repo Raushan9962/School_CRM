@@ -94,48 +94,122 @@ const InvoicePayment = () => {
                     </div>
                 ) : (
                     <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Admission Fee Invoice</h2>
-                        
-                        <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-500">Student Name</p>
-                                <p className="font-semibold">{invoice.student_name}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-500">Class</p>
-                                <p className="font-semibold">{invoice.class_name}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-500">Invoice Status</p>
-                                <p className={`font-bold ${invoice.status === 'Paid' ? 'text-green-600' : 'text-orange-600'}`}>{invoice.status}</p>
-                            </div>
-                        </div>
-                        
-                        <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                            <h3 className="font-bold mb-4 border-b pb-2">Fee Breakdown</h3>
-                            {breakdown.map((item, idx) => (
-                                <div key={idx} className="flex justify-between py-2">
-                                    <span className="text-gray-600">{item.type}</span>
-                                    <span className="font-semibold">₹{parseFloat(item.amount).toFixed(2)}</span>
+                        <style>{`@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');`}</style>
+                        <div className="overflow-auto pb-4 mb-4">
+                            <div className="bg-white font-mono text-[11px] text-black mx-auto shadow-sm"
+                                style={{ width: '384px', border: '2px solid black', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                                
+                                {/* Top header — full width */}
+                                <div style={{ gridColumn: '1 / -1', borderBottom: '2px solid black', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                                    <div>
+                                        <div style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase' }}>VidyaSetu School</div>
+                                        <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginTop: '2px', color: '#555' }}>ADMISSION INVOICE</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '28px', fontFamily: '"Libre Barcode 39", monospace', lineHeight: 1 }}>*ADM-{id}*</div>
+                                        <div style={{ fontSize: '9px', fontWeight: 700, marginTop: '2px' }}>ID: ADM-{id}</div>
+                                    </div>
                                 </div>
-                            ))}
-                            <div className="flex justify-between py-3 mt-2 border-t border-gray-300 font-bold text-lg">
-                                <span>Total Amount</span>
-                                <span className="text-orange-700">₹{parseFloat(invoice.total_amount).toFixed(2)}</span>
+
+                                {/* Billed To */}
+                                <div style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '12px 14px' }}>
+                                    <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px', color: '#888' }}>Billed To</div>
+                                    <div style={{ fontWeight: 700, fontSize: '13px' }}>{invoice.student_name || 'Student'}</div>
+                                    <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>Class: {invoice.class_name || 'N/A'}</div>
+                                </div>
+
+                                {/* Payment Info */}
+                                <div style={{ borderBottom: '1px solid black', padding: '12px 14px', background: '#f9fafb' }}>
+                                    <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px', color: '#888' }}>Payment Info</div>
+                                    <div style={{ fontSize: '10px' }}>Date: {new Date().toLocaleDateString()}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '12px', marginTop: '4px', color: invoice.status === 'Paid' ? '#16a34a' : '#dc2626' }}>
+                                        STATUS: {invoice.status.toUpperCase()}
+                                    </div>
+                                </div>
+
+                                {/* Issuer — full width */}
+                                <div style={{ gridColumn: '1 / -1', borderBottom: '2px solid black', padding: '8px 14px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '10px' }}>
+                                    <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', color: '#888', marginRight: '4px' }}>Issuer:</span>
+                                    <span style={{ fontWeight: 700 }}>VidyaSetu School</span>
+                                    <span style={{ color: '#555' }}>· 123 Education Lane, Learning City · Delhi 110001</span>
+                                </div>
+
+                                {/* Fee Table — full width */}
+                                <div style={{ gridColumn: '1 / -1' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                                        <thead>
+                                            <tr style={{ background: '#f3f4f6', borderBottom: '2px solid black' }}>
+                                                <th style={{ padding: '6px 10px', textAlign: 'left', borderRight: '1px solid black', fontWeight: 700 }}>Description</th>
+                                                <th style={{ padding: '6px 10px', borderRight: '1px solid black', width: '70px', fontWeight: 700 }}>Status</th>
+                                                <th style={{ padding: '6px 10px', textAlign: 'right', width: '80px', fontWeight: 700 }}>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {breakdown.map((item, idx) => (
+                                                <tr key={idx} style={{ borderBottom: '1px solid black' }}>
+                                                    <td style={{ padding: '8px 10px', borderRight: '1px solid black' }}>
+                                                        <div style={{ fontWeight: 700 }}>{item.type}</div>
+                                                    </td>
+                                                    <td style={{ padding: '8px 10px', borderRight: '1px solid black', fontWeight: 700, fontSize: '10px' }}>
+                                                        {invoice.status.toUpperCase()}
+                                                    </td>
+                                                    <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
+                                                        ₹{parseFloat(item.amount).toLocaleString('en-IN')}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Totals Summary */}
+                                <div style={{ gridColumn: '1 / -1', background: '#f8fafc', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end', borderBottom: '2px solid black' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '200px', fontSize: '11px' }}>
+                                        <span>Total Amount:</span>
+                                        <span>₹{parseFloat(invoice.total_amount).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '200px', fontSize: '14px', fontWeight: 900, marginTop: '4px', paddingTop: '6px', borderTop: '1px solid #ccc' }}>
+                                        <span>Balance Due:</span>
+                                        <span>₹{(invoice.status === 'Paid' ? 0 : parseFloat(invoice.total_amount)).toLocaleString('en-IN')}</span>
+                                    </div>
+                                </div>
+
+                                {/* Footer Barcode */}
+                                <div style={{ gridColumn: '1 / -1', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                    <div style={{ fontSize: '32px', fontFamily: '"Libre Barcode 39", monospace', lineHeight: 1 }}>*ADM-{id}*</div>
+                                    <div style={{ textAlign: 'right', fontSize: '9px', color: '#666' }}>
+                                        <div style={{ fontWeight: 700, color: '#000', marginBottom: '2px' }}>VidyaSetu School</div>
+                                        <div>123 Education Lane</div>
+                                        <div>Thank you!</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        {invoice.status !== 'Paid' && (
-                            <div className="flex justify-end pt-4">
-                                <button 
-                                    onClick={handlePayment}
-                                    disabled={status === 'paying'}
-                                    className="px-8 py-3 bg-green-600 text-white font-bold rounded hover:bg-green-700 disabled:opacity-50"
-                                >
-                                    {status === 'paying' ? 'Processing...' : `Pay ₹${parseFloat(invoice.total_amount).toFixed(2)}`}
-                                </button>
-                            </div>
-                        )}
+                        {invoice.status !== 'Paid' && (() => {
+                            const user = JSON.parse(localStorage.getItem('user') || 'null');
+                            const isAdmin = user && (user.role === 'School Admin' || user.role === 'Admin');
+                            if (isAdmin) {
+                                return (
+                                    <div className="flex justify-end pt-4">
+                                        <div className="px-6 py-2 bg-gray-100 text-gray-600 rounded font-semibold border border-gray-200">
+                                            Waiting for parent to complete payment online...
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div className="flex justify-end pt-4">
+                                    <button 
+                                        onClick={handlePayment}
+                                        disabled={status === 'paying'}
+                                        className="px-8 py-3 bg-green-600 text-white font-bold rounded hover:bg-green-700 disabled:opacity-50"
+                                    >
+                                        {status === 'paying' ? 'Processing...' : `Pay ₹${parseFloat(invoice.total_amount).toFixed(2)}`}
+                                    </button>
+                                </div>
+                            );
+                        })()}
                     </div>
                 )}
             </main>

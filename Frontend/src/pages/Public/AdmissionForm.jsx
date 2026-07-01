@@ -7,13 +7,14 @@ import Navbar from '../../components/layout/Navbar';
 const AdmissionForm = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        student_name: '', dob: '', gender: '', blood_group: '', category: '', aadhaar_number: '',
-        father_name: '', father_occupation: '',
-        mother_name: '', mother_occupation: '',
-        phone: '', alternate_phone: '', email: '',
-        class_applied_for: '',
+        student_name: '', dob: '', gender: '', blood_group: '', category: '', aadhaar_number: '', religion: '',
+        father_name: '', mother_name: '', guardian_name: '', parent_occupation: '', parent_income: '',
+        phone: '', alternate_phone: '', email: '', emergency_contact: '',
+        class_applied_for: '', previous_school: '', board: '',
         address: '', city: '', state: '', pincode: '',
-        transport_required: false, previous_school: ''
+        medical_allergies: '', medical_disabilities: '', medical_doctor_name: '',
+        transport_required: false, transport_route_id: '', transport_stop: '', transport_pass_number: '',
+        hostel_required: false, hostel_block: '', hostel_room: '', hostel_bed: ''
     });
 
     const [classes, setClasses] = useState([]);
@@ -120,13 +121,17 @@ const AdmissionForm = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Aadhaar Number</label>
                                         <input type="text" name="aadhaar_number" value={formData.aadhaar_number} onChange={handleChange} className="w-full p-2 border rounded" placeholder="12-digit Aadhaar" />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Religion</label>
+                                        <input type="text" name="religion" value={formData.religion} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* SECTION 2: Admission & Academic Details */}
                             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">2. Admission & Academic Details</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Class Applying For *</label>
                                         <select required name="class_applied_for" value={formData.class_applied_for} onChange={handleChange} className="w-full p-2 border rounded focus:ring-orange-500">
@@ -140,6 +145,10 @@ const AdmissionForm = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Previous School Name</label>
                                         <input type="text" name="previous_school" value={formData.previous_school} onChange={handleChange} className="w-full p-2 border rounded" placeholder="If applicable" />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Board</label>
+                                        <input type="text" name="board" value={formData.board} onChange={handleChange} className="w-full p-2 border rounded" placeholder="e.g. CBSE" />
+                                    </div>
                                 </div>
                             </div>
 
@@ -148,27 +157,31 @@ const AdmissionForm = () => {
                                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">3. Parent/Guardian Details</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Father's Name *</label>
-                                        <input required type="text" name="father_name" value={formData.father_name} onChange={handleChange} className="w-full p-2 border rounded" />
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Father's Name</label>
+                                        <input type="text" name="father_name" value={formData.father_name} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Father's Occupation</label>
-                                        <input type="text" name="father_occupation" value={formData.father_occupation} onChange={handleChange} className="w-full p-2 border rounded" />
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Name</label>
+                                        <input type="text" name="mother_name" value={formData.mother_name} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Name *</label>
-                                        <input required type="text" name="mother_name" value={formData.mother_name} onChange={handleChange} className="w-full p-2 border rounded" />
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Guardian's Name (If applicable)</label>
+                                        <input type="text" name="guardian_name" value={formData.guardian_name} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Occupation</label>
-                                        <input type="text" name="mother_occupation" value={formData.mother_occupation} onChange={handleChange} className="w-full p-2 border rounded" />
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Parent Occupation</label>
+                                        <input type="text" name="parent_occupation" value={formData.parent_occupation} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Annual Income</label>
+                                        <input type="text" name="parent_income" value={formData.parent_income} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* SECTION 4: Contact & Transport Details */}
+                            {/* SECTION 4: Contact & Medical Details */}
                             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">4. Contact & Transport Details</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">4. Contact & Medical Details</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Parent Primary Phone *</label>
@@ -182,9 +195,9 @@ const AdmissionForm = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Parent Email Address *</label>
                                         <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
-                                    <div className="flex items-center mt-6">
-                                        <input type="checkbox" id="transport" name="transport_required" checked={formData.transport_required} onChange={handleChange} className="w-5 h-5 text-orange-600 rounded border-gray-300" />
-                                        <label htmlFor="transport" className="ml-2 text-sm font-bold text-gray-700">School Transport Required?</label>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                                        <input type="text" name="emergency_contact" value={formData.emergency_contact} onChange={handleChange} className="w-full p-2 border rounded" />
                                     </div>
                                 </div>
                                 
@@ -192,7 +205,7 @@ const AdmissionForm = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Residential Address *</label>
                                     <input required type="text" name="address" value={formData.address} onChange={handleChange} className="w-full p-2 border rounded mb-4" placeholder="Street Address / House No." />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                                         <input required type="text" name="city" value={formData.city} onChange={handleChange} className="w-full p-2 border rounded" />
@@ -204,6 +217,76 @@ const AdmissionForm = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">PIN Code *</label>
                                         <input required type="text" name="pincode" value={formData.pincode} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Medical Allergies</label>
+                                        <input type="text" name="medical_allergies" value={formData.medical_allergies} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Disabilities / Health Issues</label>
+                                        <input type="text" name="medical_disabilities" value={formData.medical_disabilities} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Family Doctor Name</label>
+                                        <input type="text" name="medical_doctor_name" value={formData.medical_doctor_name} onChange={handleChange} className="w-full p-2 border rounded" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* SECTION 5: Facilities */}
+                            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">5. Facilities (Transport & Hostel)</h3>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Transport */}
+                                    <div>
+                                        <div className="flex items-center mb-4">
+                                            <input type="checkbox" id="transport" name="transport_required" checked={formData.transport_required} onChange={handleChange} className="w-5 h-5 text-orange-600 rounded border-gray-300" />
+                                            <label htmlFor="transport" className="ml-2 text-sm font-bold text-gray-700">School Transport Required?</label>
+                                        </div>
+                                        {formData.transport_required && (
+                                            <div className="space-y-4 pl-7">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bus Route ID</label>
+                                                    <input type="text" name="transport_route_id" value={formData.transport_route_id} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Stop</label>
+                                                    <input type="text" name="transport_stop" value={formData.transport_stop} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bus Pass Number</label>
+                                                    <input type="text" name="transport_pass_number" value={formData.transport_pass_number} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Hostel */}
+                                    <div>
+                                        <div className="flex items-center mb-4">
+                                            <input type="checkbox" id="hostel" name="hostel_required" checked={formData.hostel_required} onChange={handleChange} className="w-5 h-5 text-orange-600 rounded border-gray-300" />
+                                            <label htmlFor="hostel" className="ml-2 text-sm font-bold text-gray-700">Hostel Accommodation Required?</label>
+                                        </div>
+                                        {formData.hostel_required && (
+                                            <div className="space-y-4 pl-7">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Hostel Block</label>
+                                                    <input type="text" name="hostel_block" value={formData.hostel_block} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
+                                                    <input type="text" name="hostel_room" value={formData.hostel_room} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bed Number</label>
+                                                    <input type="text" name="hostel_bed" value={formData.hostel_bed} onChange={handleChange} className="w-full p-2 border rounded" />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
