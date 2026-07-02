@@ -12,6 +12,7 @@ import TransportDashboard from './pages/Transport/TransportDashboard';
 import LibrarianDashboard from './pages/Librarian/LibrarianDashboard';
 import ReceptionistDashboard from './pages/Receptionist/ReceptionistDashboard';
 import LabAssistantDashboard from './pages/LabAssistant/LabAssistantDashboard';
+import ParentDashboard from './pages/Parent/ParentDashboard';
 import AdmissionForm from './pages/Public/AdmissionForm';
 import InvoicePayment from './pages/Public/InvoicePayment';
 import './App.css';
@@ -34,6 +35,7 @@ function App() {
       <Route path="/LibrarianDashboard" element={<LibrarianDashboard />} />
       <Route path="/ReceptionistDashboard" element={<ReceptionistDashboard />} />
       <Route path="/LabAssistantDashboard" element={<LabAssistantDashboard />} />
+      <Route path="/ParentDashboard" element={<ParentDashboard />} />
     </Routes>
   );
 }
