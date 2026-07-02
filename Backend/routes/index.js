@@ -29,6 +29,7 @@ const principalRoutes = require('./principalRoutes');
 const leaveRoutes = require('./leaveRoutes');
 const complaintRoutes = require('./complaintRoutes');
 const accountantRoutes = require('./accountantRoutes');
+const parentRoutes = require('./parentRoutes');
 // API routes mapping
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -62,5 +63,6 @@ router.use('/school-admin', require('./schoolAdminRoutes'));
 router.use('/teacher-portal', require('./teacherPortalRoutes'));
 router.use('/accountant', accountantRoutes);
 router.use('/admission', require('./admission'));
+router.use('/parent', parentRoutes);
 
 module.exports = router;
