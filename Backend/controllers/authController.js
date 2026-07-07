@@ -1,7 +1,12 @@
 const { User } = require('../models');
+const pool = require('../config/db');
+const { sendOTPEmail } = require('../utils/mailer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
+// Simple in-memory OTP store
+const otpStore = {};
 
 // Login
 exports.login = async (req, res) => {
@@ -120,7 +125,7 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-// Verify Email for forgot password (Mocked OTP)
+// Verify Email for forgot password (Real OTP)
 exports.verifyEmail = async (req, res) => {
     try {
         const { email } = req.body;
@@ -129,14 +134,24 @@ exports.verifyEmail = async (req, res) => {
         const user = await User.findByEmailWithRole(email);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-        // Mock sending OTP
-        const otp = '123456';
-        console.log(`Mock OTP for ${email} is ${otp}`);
+        // Generate 6-digit real OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Save to in-memory store with expiry (15 mins)
+        otpStore[email] = {
+            otp,
+            expiresAt: Date.now() + 15 * 60 * 1000
+        };
+
+        // Send via Email
+        const emailSent = await sendOTPEmail(email, otp);
+        if (!emailSent) {
+             return res.status(500).json({ success: false, message: "Failed to send OTP email. Please try again." });
+        }
 
         return res.status(200).json({
             success: true,
-            message: "OTP sent to email successfully (Mocked: 123456)",
-            otp: otp // Returning OTP for testing purposes
+            message: "OTP sent to your email successfully"
         });
     } catch (error) {
         console.error(error);
@@ -153,9 +168,22 @@ exports.resetPassword = async (req, res) => {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
-        if (otp !== '123456') {
+        const storedOtpData = otpStore[email];
+        if (!storedOtpData) {
+            return res.status(400).json({ success: false, message: "OTP not found or expired. Please request a new one." });
+        }
+
+        if (Date.now() > storedOtpData.expiresAt) {
+            delete otpStore[email];
+            return res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
+        }
+
+        if (storedOtpData.otp !== otp) {
             return res.status(400).json({ success: false, message: "Invalid OTP" });
         }
+
+        // OTP is valid, remove it
+        delete otpStore[email];
 
         const user = await User.findByEmailWithRole(email);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });

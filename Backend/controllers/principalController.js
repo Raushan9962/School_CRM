@@ -164,12 +164,21 @@ exports.getStudents = async (req, res) => {
 exports.createStudent = async (req, res) => {
     try {
         const pool = require('../config/db');
+        const { sendCredentialsEmail } = require('../utils/mailer');
+        const { generatePassword } = require('../utils/passwordGenerator');
+        const bcrypt = require('bcryptjs');
+
         const { name, email, admissionNo, rollNumber, classId, section, parentPhone } = req.body;
         
         // 1. Create User
+        const password = generatePassword ? generatePassword() : 'password123';
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const username = `${admissionNo}`;
+        const studentEmail = email || `${admissionNo}@school.com`;
+
         const userRes = await pool.query(
-            `INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, 'Student') RETURNING id`,
-            [name, email || `${admissionNo}@school.com`, 'password123'] // Default pass
+            `INSERT INTO users (name, username, email, password, role_name) VALUES ($1, $2, $3, $4, 'Student') RETURNING id`,
+            [name, username, studentEmail, hashedPassword] 
         );
         const userId = userRes.rows[0].id;
 
@@ -178,6 +187,10 @@ exports.createStudent = async (req, res) => {
             `INSERT INTO students (user_id, admission_no, roll_number, class_id, section, parent_phone) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
             [userId, admissionNo, rollNumber, classId, section, parentPhone]
         );
+
+        if (email) {
+            await sendCredentialsEmail(email, name, username, password, null, null, false);
+        }
 
         res.status(201).json({ message: 'Student created successfully', data: studentRes.rows[0] });
     } catch (error) {

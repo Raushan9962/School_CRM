@@ -1,5 +1,6 @@
 const Fee = require('../models/Fee');
 const pool = require('../config/db');
+const { sendGenericEmail } = require('../utils/mailer');
 
 exports.createFee = async (req, res) => {
     try {
@@ -72,6 +73,26 @@ exports.updateFee = async (req, res) => {
                 [status, paid_date || new Date(), payment_method || null, transaction_ref || null, actualId]
             );
             if (result.rows.length === 0) return res.status(404).json({ error: 'Fee not found' });
+
+            if (status === 'Paid') {
+                const userRes = await pool.query(
+                    `SELECT u.email, u.name FROM student_fee_invoices sfi JOIN users u ON sfi.student_id = u.id WHERE sfi.id = $1`,
+                    [actualId]
+                );
+                if (userRes.rows.length > 0 && userRes.rows[0].email) {
+                    const student = userRes.rows[0];
+                    const receiptHtml = `
+                        <h3>Fee Payment Successful</h3>
+                        <p>Dear ${student.name},</p>
+                        <p>We have successfully received your fee payment.</p>
+                        <p>Amount Paid: <strong>₹${result.rows[0].paid_amount}</strong></p>
+                        <p>Date: ${new Date().toLocaleDateString()}</p>
+                        <p>Thank you!</p>
+                    `;
+                    await sendGenericEmail(student.email, 'Fee Payment Receipt', receiptHtml);
+                }
+            }
+
             return res.status(200).json({ message: 'Fee updated successfully', data: result.rows[0] });
         } else if (idStr.startsWith('old_')) {
             const actualId = idStr.replace('old_', '');

@@ -45,92 +45,85 @@ const FeeManagement = ({ childId }) => {
             </div>
 
             {/* Fee Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10">
-                        <IndianRupee size={80} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 shrink-0">
+                        <IndianRupee size={18} />
                     </div>
-                    <p className="text-sm font-medium text-slate-500 mb-2">Total Annual Fee</p>
-                    <h3 className="text-3xl font-bold text-slate-800">₹{feeData.totalAnnualFee.toLocaleString()}</h3>
-                    
-                    <div className="mt-6">
-                        <div className="flex justify-between text-xs font-medium text-slate-500 mb-2">
-                            <span>Paid: {percentagePaid}%</span>
-                            <span>Remaining: {100 - percentagePaid}%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                            <div 
-                                className="bg-blue-500 h-2 rounded-full" 
-                                style={{ width: `${percentagePaid}%` }}
-                            ></div>
-                        </div>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Total Annual Fee</p>
+                        <h3 className="m-0 text-base font-bold text-slate-800">₹{feeData.totalAnnualFee.toLocaleString()}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 shrink-0">
+                        <CheckIcon size={18} />
+                    </div>
                     <div>
-                        <div className="flex justify-between items-start mb-2">
-                            <p className="text-sm font-medium text-slate-500">Paid Amount</p>
-                            <span className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><CheckIcon size={16} /></span>
-                        </div>
-                        <h3 className="text-2xl font-bold text-emerald-600">₹{feeData.paidAmount.toLocaleString()}</h3>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Paid Amount</p>
+                        <h3 className="m-0 text-base font-bold text-slate-800">₹{feeData.paidAmount.toLocaleString()}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between border-l-4 border-l-rose-500">
-                    <div>
-                        <div className="flex justify-between items-start mb-2">
-                            <p className="text-sm font-medium text-slate-500">Pending Amount</p>
-                            <span className="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><AlertCircle size={16} /></span>
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <div className="flex items-center gap-3 mb-1">
+                        <div className="w-9 h-9 bg-rose-100 rounded-lg flex items-center justify-center text-rose-700 shrink-0">
+                            <AlertCircle size={18} />
                         </div>
-                        <h3 className="text-2xl font-bold text-rose-600">₹{feeData.pendingAmount.toLocaleString()}</h3>
-                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                            <Calendar size={14} /> Next due date: {feeData.nextDueDate}
+                        <div>
+                            <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Pending Amount</p>
+                            <h3 className="m-0 text-base font-bold text-slate-800">₹{feeData.pendingAmount.toLocaleString()}</h3>
+                        </div>
+                    </div>
+                    {feeData.nextDueDate && (
+                        <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1 pl-12 m-0">
+                            <Calendar size={12} /> Next due: {feeData.nextDueDate}
                         </p>
-                    </div>
+                    )}
                 </div>
             </div>
 
             {/* Payment History Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mt-6">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                         <Receipt size={18} className="text-slate-500" />
-                        Payment History
-                    </h3>
+                        <h3 className="m-0 text-sm font-bold text-slate-800">Payment History</h3>
+                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50">
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Receipt No</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Date</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Amount</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">Action</th>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Receipt No</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Amount</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {feeData.history && feeData.history.map((record, index) => (
                                 <tr key={index} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 text-sm font-medium text-slate-800">{record.receiptNo}</td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{record.date}</td>
-                                    <td className="px-6 py-4 text-sm font-bold text-slate-800">₹{record.amount.toLocaleString()}</td>
-                                    <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-emerald-50 text-emerald-700 border-emerald-200">
+                                    <td className="px-4 py-3 text-[13px] font-medium text-slate-800">{record.receiptNo}</td>
+                                    <td className="px-4 py-3 text-[13px] text-slate-500">{record.date}</td>
+                                    <td className="px-4 py-3 text-[13px] font-bold text-slate-800">₹{record.amount.toLocaleString()}</td>
+                                    <td className="px-4 py-3">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200">
                                             {record.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100">
-                                            <Download size={16} /> Receipt
+                                    <td className="px-4 py-3 text-right">
+                                        <button className="inline-flex items-center gap-1 px-3 py-1.5 text-[12px] font-semibold text-slate-700 hover:text-blue-700 hover:bg-slate-50 rounded-md transition-colors border border-slate-300">
+                                            <Download size={14} /> Receipt
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                             {(!feeData.history || feeData.history.length === 0) && (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan="5" className="px-4 py-8 text-center text-slate-500 text-[13px]">
                                         No payment history found.
                                     </td>
                                 </tr>

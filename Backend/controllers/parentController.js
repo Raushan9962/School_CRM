@@ -6,9 +6,13 @@ exports.getChildren = async (req, res) => {
         
         try {
             const result = await pool.query(
-                `SELECT u.id as "studentId", u.name, u.email, u.image, u.phone as mobile
+                `SELECT u.id as "studentId", u.name, u.email, u.image, 
+                        s.admission_no as "admissionNo", s.id as "studentDbId",
+                        c.name as class, s.section
                  FROM parents p
-                 JOIN users u ON p.student_id = u.id
+                 JOIN students s ON p.student_id = s.id
+                 JOIN users u ON s.user_id = u.id
+                 LEFT JOIN classes c ON s.class_id = c.id
                  WHERE p.user_id = $1`,
                 [parentUserId]
             );
@@ -29,6 +33,97 @@ exports.getChildren = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch children' });
+    }
+};
+
+exports.getChildOverview = async (req, res) => {
+    try {
+        const { childId } = req.params;
+
+        // Fetch Student ID associated with this child (childId is user_id)
+        const studentRes = await pool.query('SELECT id, admission_no, class_id FROM students WHERE user_id = $1', [childId]);
+        if (studentRes.rows.length === 0) return res.status(404).json({ error: 'Student not found' });
+        const student = studentRes.rows[0];
+
+        // 1. Fee Metrics
+        const feeRes = await pool.query(
+            `SELECT COALESCE(SUM(paid_amount), 0) as total_paid, 
+                    COALESCE(SUM(due_amount - paid_amount), 0) as total_pending 
+             FROM student_fee_invoices WHERE student_id = $1`,
+            [childId] // student_fee_invoices uses users.id as student_id usually, based on previous checks
+        );
+        const fees = feeRes.rows[0] || { total_paid: 0, total_pending: 0 };
+
+        // 2. Attendance Metric
+        const attRes = await pool.query(
+            `SELECT 
+                COUNT(*) as total_days, 
+                COUNT(CASE WHEN status = 'Present' THEN 1 END) as present_days 
+             FROM attendance WHERE student_id = $1`,
+            [student.id] // attendance might use students.id
+        );
+        const att = attRes.rows[0];
+        const attendance_percentage = parseInt(att.total_days) > 0 
+            ? Math.round((parseInt(att.present_days) / parseInt(att.total_days)) * 100) 
+            : 0;
+
+        // 3. Exams Metric
+        const examsRes = await pool.query(
+            `SELECT COUNT(DISTINCT exam_id) as total_exams 
+             FROM results WHERE student_id = $1`,
+            [student.id] // results uses students.id
+        );
+        
+        // 4. Recent Activity (Recent Fee payments + Leaves + Admissions)
+        const recentActivity = [];
+        
+        // Recent Fees
+        const recentFees = await pool.query(
+            `SELECT paid_amount, updated_at FROM student_fee_invoices 
+             WHERE student_id = $1 AND status = 'Paid' ORDER BY updated_at DESC LIMIT 3`,
+            [childId]
+        );
+        recentFees.rows.forEach(f => {
+            recentActivity.push({
+                title: 'Fee Paid',
+                description: `₹${f.paid_amount} was paid.`,
+                time: f.updated_at,
+                type: 'fee'
+            });
+        });
+
+        // Recent Leaves
+        const recentLeaves = await pool.query(
+            `SELECT type, status, created_at FROM leaves 
+             WHERE user_id = $1 ORDER BY created_at DESC LIMIT 3`,
+            [childId]
+        );
+        recentLeaves.rows.forEach(l => {
+            recentActivity.push({
+                title: `Leave ${l.status}`,
+                description: `${l.type} request was ${l.status.toLowerCase()}.`,
+                time: l.created_at,
+                type: 'leave'
+            });
+        });
+
+        // Sort combined activity
+        recentActivity.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+        res.status(200).json({
+            success: true,
+            data: {
+                total_paid: fees.total_paid,
+                total_pending: fees.total_pending,
+                attendance_percentage: attendance_percentage,
+                total_exams: examsRes.rows[0]?.total_exams || 0,
+                recent_activity: recentActivity.slice(0, 5) // top 5
+            }
+        });
+
+    } catch (error) {
+        console.error("Error in getChildOverview:", error.message);
+        res.status(500).json({ error: 'Failed to fetch child overview', details: error.message });
     }
 };
 

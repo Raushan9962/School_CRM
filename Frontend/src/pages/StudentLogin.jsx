@@ -49,6 +49,8 @@ const StudentLogin = () => {
           navigate('/ReceptionistDashboard');
         } else if (role === 'labassistant') {
           navigate('/LabAssistantDashboard');
+        } else if (role === 'parent') {
+          navigate('/ParentDashboard');
         } else {
           navigate('/'); // fallback
         }

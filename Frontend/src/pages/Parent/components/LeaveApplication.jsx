@@ -29,16 +29,16 @@ const LeaveApplication = ({ childId }) => {
 
             {/* Leave Application Form */}
             {showForm && (
-                <div className="bg-white p-6 rounded-2xl border border-blue-100 shadow-md mb-6">
-                    <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <FileText size={18} className="text-blue-500" />
-                        New Leave Request
-                    </h3>
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-6">
+                    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <FileText size={16} className="text-blue-500" />
+                        <h3 className="m-0 text-sm font-bold text-slate-800">New Leave Request</h3>
+                    </div>
                     <form className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1">Leave Type</label>
-                                <select className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors">
+                                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Leave Type</label>
+                                <select className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-[13px] font-medium focus:outline-none focus:border-blue-500 transition-colors">
                                     <option>Medical Leave</option>
                                     <option>Casual Leave</option>
                                     <option>Family Function</option>
@@ -47,27 +47,27 @@ const LeaveApplication = ({ childId }) => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1">From Date</label>
-                                    <input type="date" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">From Date</label>
+                                    <input type="date" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-[13px] font-medium focus:outline-none focus:border-blue-500 transition-colors" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1">To Date</label>
-                                    <input type="date" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">To Date</label>
+                                    <input type="date" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-[13px] font-medium focus:outline-none focus:border-blue-500 transition-colors" />
                                 </div>
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-semibold text-slate-700 mb-1">Reason for Leave</label>
-                                <textarea rows="3" placeholder="Please provide a valid reason..." className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors custom-scrollbar"></textarea>
+                                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Reason for Leave</label>
+                                <textarea rows="3" placeholder="Please provide a valid reason..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-[13px] font-medium focus:outline-none focus:border-blue-500 transition-colors custom-scrollbar"></textarea>
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-semibold text-slate-700 mb-1">Supporting Document (Optional)</label>
-                                <input type="file" className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <p className="text-[10px] text-slate-500 mt-1">Upload medical certificate if leave is more than 2 days.</p>
+                                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Supporting Document (Optional)</label>
+                                <input type="file" className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-[12px] focus:outline-none focus:border-blue-500 transition-colors file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                <p className="text-[10px] text-slate-500 mt-1 m-0">Upload medical certificate if leave is more than 2 days.</p>
                             </div>
                         </div>
                         <div className="flex justify-end pt-2">
-                            <button type="button" className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-sm">
-                                <Send size={18} />
+                            <button type="button" className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-md text-[13px] font-semibold hover:bg-emerald-700 transition-colors shadow-sm">
+                                <Send size={14} />
                                 Submit Application
                             </button>
                         </div>
@@ -76,46 +76,46 @@ const LeaveApplication = ({ childId }) => {
             )}
 
             {/* Leave History */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Clock size={18} className="text-slate-500" />
-                        Leave Application History
-                    </h3>
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Clock size={16} className="text-slate-500" />
+                        <h3 className="m-0 text-sm font-bold text-slate-800">Leave Application History</h3>
+                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50">
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Leave Details</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Duration</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Reason</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Leave Details</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Duration</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Reason</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {leaveHistory.map((leave) => (
                                 <tr key={leave.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <p className="text-sm font-bold text-slate-800">{leave.type}</p>
-                                        <p className="text-xs text-slate-500">Applied on: {leave.appliedOn}</p>
+                                    <td className="px-4 py-3">
+                                        <p className="m-0 text-[13px] font-bold text-slate-800">{leave.type}</p>
+                                        <p className="m-0 text-[11px] text-slate-500 mt-0.5">Applied on: {leave.appliedOn}</p>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <p className="text-sm font-medium text-slate-800">{leave.fromDate} to {leave.toDate}</p>
-                                        <p className="text-xs text-slate-500">{leave.days} Day(s)</p>
+                                    <td className="px-4 py-3">
+                                        <p className="m-0 text-[13px] font-bold text-slate-800">{leave.fromDate} to {leave.toDate}</p>
+                                        <p className="m-0 text-[11px] text-slate-500 mt-0.5">{leave.days} Day(s)</p>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <p className="text-sm text-slate-600 max-w-[200px] truncate">{leave.reason}</p>
+                                    <td className="px-4 py-3">
+                                        <p className="m-0 text-[12px] font-medium text-slate-600 max-w-[200px] truncate">{leave.reason}</p>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                    <td className="px-4 py-3">
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
                                             leave.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                                             leave.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' :
                                             'bg-amber-50 text-amber-700 border-amber-200'
                                         }`}>
-                                            {leave.status === 'Approved' && <CheckCircle2 size={12} />}
-                                            {leave.status === 'Rejected' && <XCircle size={12} />}
-                                            {leave.status === 'Pending' && <Clock size={12} />}
+                                            {leave.status === 'Approved' && <CheckCircle2 size={10} />}
+                                            {leave.status === 'Rejected' && <XCircle size={10} />}
+                                            {leave.status === 'Pending' && <Clock size={10} />}
                                             {leave.status}
                                         </span>
                                     </td>

@@ -91,9 +91,9 @@ exports.getStudentDashboardStats = async (req, res) => {
                 
                 SELECT SUM(due_amount) as total_pending
                 FROM student_fee_invoices
-                WHERE student_id = $2 AND status = 'Pending'
+                WHERE student_id = $1 AND status = 'Pending'
             ) combined_fees
-        `, [studentId, userId]);
+        `, [studentId]);
         const pendingFees = feesRes.rows[0].pending_amount || 0;
 
         // 4. Latest Result

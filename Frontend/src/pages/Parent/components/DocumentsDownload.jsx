@@ -17,26 +17,26 @@ const DocumentsDownload = () => {
                 <p className="text-slate-500">Access and download official school documents and certificates.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {documents.map((doc) => (
-                    <div key={doc.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                    <div key={doc.id} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:border-blue-200 transition-colors flex flex-col">
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center">
                                 {doc.icon}
                             </div>
-                            <span className="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-bold uppercase tracking-wider rounded-lg">
+                            <span className="px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-200 text-[9px] font-bold uppercase tracking-wider rounded">
                                 {doc.type}
                             </span>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-800 mb-1">{doc.name}</h3>
-                        <div className="flex items-center gap-3 text-xs text-slate-500 mb-6">
+                        <h3 className="m-0 text-[14px] font-bold text-slate-800 mb-0.5">{doc.name}</h3>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500 mb-4 font-medium">
                             <span>{doc.date}</span>
                             <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                             <span>{doc.size}</span>
                         </div>
-                        <div className="mt-auto pt-4 border-t border-slate-100">
-                            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-xl text-sm font-semibold transition-colors">
-                                <Download size={16} /> Download PDF
+                        <div className="mt-auto pt-3 border-t border-slate-100">
+                            <button className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md text-[12px] font-semibold transition-colors">
+                                <Download size={14} /> Download PDF
                             </button>
                         </div>
                     </div>

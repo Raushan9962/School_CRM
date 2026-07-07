@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { sendGenericEmail } = require('../utils/mailer');
 
 exports.getDashboardStats = async (req, res) => {
     try {
@@ -206,6 +207,22 @@ exports.updateLeaveStatus = async (req, res) => {
             'UPDATE leaves SET status = $1 WHERE id = $2 RETURNING *',
             [status, id]
         );
+
+        // Fetch user email
+        const userRes = await pool.query(
+            `SELECT name, email FROM users WHERE id = $1`,
+            [updated.rows[0].user_id]
+        );
+        if (userRes.rows.length > 0 && userRes.rows[0].email) {
+            const user = userRes.rows[0];
+            const leaveHtml = `
+                <h3>Leave Request Update</h3>
+                <p>Dear ${user.name},</p>
+                <p>Your leave request has been <strong>${status}</strong> by the administration.</p>
+                <p>Regards,<br/>School Admin</p>
+            `;
+            await sendGenericEmail(user.email, `Leave Request ${status}`, leaveHtml);
+        }
 
         return res.status(200).json({ success: true, message: 'Leave status updated', data: updated.rows[0] });
     } catch (error) {

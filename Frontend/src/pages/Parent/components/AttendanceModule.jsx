@@ -35,60 +35,60 @@ const AttendanceModule = ({ childId }) => {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                        <CalendarIcon size={18} />
+                    </div>
                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">Overall Attendance</p>
-                        <h3 className="text-3xl font-bold text-blue-600">{attendance.percentage}%</h3>
-                    </div>
-                    <div className="w-16 h-16 rounded-full border-4 border-blue-100 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
-                            <CalendarIcon size={24} className="text-blue-500" />
-                        </div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Overall Attendance</p>
+                        <h3 className="m-0 text-base font-bold text-slate-800">{attendance.percentage}%</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="flex items-center gap-3 mb-2">
-                        <CheckCircle2 size={20} className="text-emerald-500" />
-                        <h3 className="text-sm font-semibold text-slate-700">Days Present</h3>
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <CheckCircle2 size={18} />
                     </div>
-                    <p className="text-2xl font-bold text-slate-800">{attendance.presentDays}</p>
-                    <p className="text-xs text-slate-500 mt-1">Total days attended</p>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Days Present</p>
+                        <h3 className="m-0 text-base font-bold text-slate-800">{attendance.presentDays}</h3>
+                    </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="flex items-center gap-3 mb-2">
-                        <XCircle size={20} className="text-rose-500" />
-                        <h3 className="text-sm font-semibold text-slate-700">Days Absent</h3>
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                        <XCircle size={18} />
                     </div>
-                    <p className="text-2xl font-bold text-slate-800">{attendance.absentDays}</p>
-                    <p className="text-xs text-slate-500 mt-1">Total days missed</p>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Days Absent</p>
+                        <h3 className="m-0 text-base font-bold text-slate-800">{attendance.absentDays}</h3>
+                    </div>
                 </div>
             </div>
 
             {/* Recent History Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                         <Clock size={18} className="text-slate-500" />
-                        Recent Attendance History
-                    </h3>
+                        <h3 className="m-0 text-sm font-bold text-slate-800">Recent Attendance History</h3>
+                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50">
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Date</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {attendance.recent && attendance.recent.map((record, index) => (
                                 <tr key={index} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 text-sm font-medium text-slate-800">{record.date}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                                    <td className="px-4 py-3 text-[13px] font-medium text-slate-800">{record.date}</td>
+                                    <td className="px-4 py-3">
+                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
                                             record.status === 'Present' 
                                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                                             : 'bg-rose-50 text-rose-700 border-rose-200'

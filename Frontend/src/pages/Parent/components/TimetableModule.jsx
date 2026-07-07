@@ -40,14 +40,14 @@ const TimetableModule = ({ childId }) => {
             </div>
 
             {/* Day Selector */}
-            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex overflow-x-auto">
+            <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-sm flex overflow-x-auto mb-4">
                 {days.map((day) => (
                     <button
                         key={day}
                         onClick={() => setActiveDay(day)}
-                        className={`flex-1 min-w-[100px] py-2.5 px-4 rounded-xl text-sm font-semibold transition-all ${
+                        className={`flex-1 min-w-[100px] py-1.5 px-3 rounded-md text-[12px] font-bold tracking-wide transition-all ${
                             activeDay === day 
-                            ? 'bg-blue-600 text-white shadow-md' 
+                            ? 'bg-blue-600 text-white shadow-sm' 
                             : 'text-slate-600 hover:bg-slate-50'
                         }`}
                     >
@@ -57,41 +57,41 @@ const TimetableModule = ({ childId }) => {
             </div>
 
             {/* Timetable List */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center gap-2">
-                    <CalendarIcon size={18} className="text-blue-500" />
-                    <h3 className="text-lg font-bold text-slate-800">Schedule for {activeDay}</h3>
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center gap-2">
+                    <CalendarIcon size={16} className="text-blue-500" />
+                    <h3 className="m-0 text-sm font-bold text-slate-800">Schedule for {activeDay}</h3>
                 </div>
                 
                 <div className="divide-y divide-slate-100">
                     {timetable.map((period, index) => (
-                        <div key={index} className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:bg-slate-50 transition-colors">
-                            <div className="w-24 text-center shrink-0">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold mb-2">
-                                    <Clock size={12} /> Period {period.period}
+                        <div key={index} className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-slate-50 transition-colors">
+                            <div className="w-24 text-left sm:text-center shrink-0">
+                                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 rounded text-[10px] font-bold mb-1 uppercase tracking-wider">
+                                    <Clock size={10} /> Period {period.period}
                                 </span>
-                                <p className="text-sm font-bold text-slate-800">{period.time}</p>
+                                <p className="m-0 text-[13px] font-bold text-slate-800">{period.time}</p>
                             </div>
                             
-                            <div className="w-1 sm:w-px h-10 sm:h-12 bg-slate-200"></div>
+                            <div className="hidden sm:block w-px h-8 bg-slate-200"></div>
 
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                                        <BookOpen size={20} />
+                                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 shrink-0">
+                                        <BookOpen size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-500">Subject</p>
-                                        <p className="text-sm font-bold text-slate-800">{period.subject}</p>
+                                        <p className="m-0 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Subject</p>
+                                        <p className="m-0 text-[13px] font-bold text-slate-800">{period.subject}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-                                        <User size={20} />
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                                        <User size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-500">Teacher</p>
-                                        <p className="text-sm font-bold text-slate-800">{period.teacher}</p>
+                                        <p className="m-0 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Teacher</p>
+                                        <p className="m-0 text-[13px] font-bold text-slate-800">{period.teacher}</p>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@ const TimetableModule = ({ childId }) => {
                     ))}
                     
                     {(!timetable || timetable.length === 0) && (
-                        <div className="p-12 text-center text-slate-500">
+                        <div className="p-8 text-center text-slate-500 text-[13px]">
                             No schedule available for {activeDay}.
                         </div>
                     )}

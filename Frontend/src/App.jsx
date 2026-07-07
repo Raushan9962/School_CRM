@@ -15,27 +15,31 @@ import LabAssistantDashboard from './pages/LabAssistant/LabAssistantDashboard';
 import ParentDashboard from './pages/Parent/ParentDashboard';
 import AdmissionForm from './pages/Public/AdmissionForm';
 import InvoicePayment from './pages/Public/InvoicePayment';
+import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
 function App() {
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/admission" element={<AdmissionForm />} />
       <Route path="/invoice/:id" element={<InvoicePayment />} />
       <Route path="/login/student" element={<StudentLogin />} />
-      <Route path="/SuperAdmin" element={<SuperAdmin />} />
-      <Route path="/register-school" element={<SchoolRegister />} />
-      <Route path="/SchoolAdminDashboard" element={<SchoolAdminDashboard />} />
-      <Route path="/PrincipalDashboard" element={<PrincipalDashboard />} />
-      <Route path="/StudentDashboard" element={<StudentDashboard />} />
-      <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
-      <Route path="/AccountantDashboard" element={<AccountantDashboard />} />
-      <Route path="/TransportDashboard" element={<TransportDashboard />} />
-      <Route path="/LibrarianDashboard" element={<LibrarianDashboard />} />
-      <Route path="/ReceptionistDashboard" element={<ReceptionistDashboard />} />
-      <Route path="/LabAssistantDashboard" element={<LabAssistantDashboard />} />
-      <Route path="/ParentDashboard" element={<ParentDashboard />} />
+
+      {/* Protected routes */}
+      <Route path="/SuperAdmin" element={<PrivateRoute allowedRoles={['superadmin']}><SuperAdmin /></PrivateRoute>} />
+      <Route path="/register-school" element={<PrivateRoute allowedRoles={['superadmin']}><SchoolRegister /></PrivateRoute>} />
+      <Route path="/SchoolAdminDashboard" element={<PrivateRoute allowedRoles={['schooladmin']}><SchoolAdminDashboard /></PrivateRoute>} />
+      <Route path="/PrincipalDashboard" element={<PrivateRoute allowedRoles={['principal']}><PrincipalDashboard /></PrivateRoute>} />
+      <Route path="/StudentDashboard" element={<PrivateRoute allowedRoles={['student']}><StudentDashboard /></PrivateRoute>} />
+      <Route path="/TeacherDashboard" element={<PrivateRoute allowedRoles={['teacher']}><TeacherDashboard /></PrivateRoute>} />
+      <Route path="/AccountantDashboard" element={<PrivateRoute allowedRoles={['accountant']}><AccountantDashboard /></PrivateRoute>} />
+      <Route path="/TransportDashboard" element={<PrivateRoute allowedRoles={['transport']}><TransportDashboard /></PrivateRoute>} />
+      <Route path="/LibrarianDashboard" element={<PrivateRoute allowedRoles={['librarian']}><LibrarianDashboard /></PrivateRoute>} />
+      <Route path="/ReceptionistDashboard" element={<PrivateRoute allowedRoles={['receptionist']}><ReceptionistDashboard /></PrivateRoute>} />
+      <Route path="/LabAssistantDashboard" element={<PrivateRoute allowedRoles={['labassistant']}><LabAssistantDashboard /></PrivateRoute>} />
+      <Route path="/ParentDashboard" element={<PrivateRoute allowedRoles={['parent']}><ParentDashboard /></PrivateRoute>} />
     </Routes>
   );
 }

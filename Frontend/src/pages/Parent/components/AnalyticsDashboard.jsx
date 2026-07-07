@@ -9,66 +9,71 @@ const AnalyticsDashboard = () => {
                 <p className="text-slate-500">Interactive charts and progress monitoring.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-sm font-medium text-slate-500 mb-2">Performance Trend</p>
-                    <div className="flex items-end gap-3">
-                        <h3 className="text-3xl font-bold text-emerald-600">+5%</h3>
-                        <div className="flex items-center text-sm font-medium text-emerald-600 mb-1">
-                            <TrendingUp size={16} className="mr-1" />
-                            Up
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 shrink-0">
+                        <TrendingUp size={18} />
+                    </div>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Performance Trend</p>
+                        <div className="flex items-center gap-2">
+                            <h3 className="m-0 text-base font-bold text-slate-800">+5%</h3>
+                            <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">UP</span>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2">Compared to last term</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-sm font-medium text-slate-500 mb-2">Attendance Trend</p>
-                    <div className="flex items-end gap-3">
-                        <h3 className="text-3xl font-bold text-slate-800">85%</h3>
-                        <div className="flex items-center text-sm font-medium text-slate-500 mb-1">
-                            <Minus size={16} className="mr-1" />
-                            Stable
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-700 shrink-0">
+                        <Minus size={18} />
+                    </div>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Attendance Trend</p>
+                        <div className="flex items-center gap-2">
+                            <h3 className="m-0 text-base font-bold text-slate-800">85%</h3>
+                            <span className="text-[10px] text-slate-600 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">STABLE</span>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2">Consistent this month</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-sm font-medium text-slate-500 mb-2">Homework Completion</p>
-                    <div className="flex items-end gap-3">
-                        <h3 className="text-3xl font-bold text-blue-600">92%</h3>
-                        <div className="flex items-center text-sm font-medium text-blue-600 mb-1">
-                            <Target size={16} className="mr-1" />
-                            High
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 shrink-0">
+                        <Target size={18} />
+                    </div>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Homework Done</p>
+                        <div className="flex items-center gap-2">
+                            <h3 className="m-0 text-base font-bold text-slate-800">92%</h3>
+                            <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">HIGH</span>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2">Excellent submission rate</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-sm font-medium text-slate-500 mb-2">Weakest Subject</p>
-                    <div className="flex items-end gap-3">
-                        <h3 className="text-xl font-bold text-rose-600">English</h3>
-                        <div className="flex items-center text-sm font-medium text-rose-600 mb-1">
-                            <TrendingDown size={16} className="mr-1" />
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div className="w-9 h-9 bg-rose-100 rounded-lg flex items-center justify-center text-rose-700 shrink-0">
+                        <TrendingDown size={18} />
+                    </div>
+                    <div>
+                        <p className="m-0 mb-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Weakest Subject</p>
+                        <div className="flex items-center gap-2">
+                            <h3 className="m-0 text-[14px] font-bold text-slate-800">English</h3>
+                            <span className="text-[10px] text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100">FOCUS</span>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2">Needs more attention</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm min-h-[300px] flex flex-col items-center justify-center">
-                    <Activity size={48} className="text-slate-200 mb-4" />
-                    <h3 className="text-lg font-bold text-slate-800 mb-1">Performance Graph</h3>
-                    <p className="text-slate-500 text-sm">Chart integration (e.g. Recharts or Chart.js) goes here</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm min-h-[300px] flex flex-col items-center justify-center">
+                    <Activity size={32} className="text-slate-300 mb-3" />
+                    <h3 className="m-0 text-sm font-bold text-slate-800 mb-1">Performance Graph</h3>
+                    <p className="m-0 text-[12px] text-slate-500">Chart integration goes here</p>
                 </div>
                 
-                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm min-h-[300px] flex flex-col items-center justify-center">
-                    <Book size={48} className="text-slate-200 mb-4" />
-                    <h3 className="text-lg font-bold text-slate-800 mb-1">Subject Comparison Radar</h3>
-                    <p className="text-slate-500 text-sm">Chart integration goes here</p>
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm min-h-[300px] flex flex-col items-center justify-center">
+                    <Book size={32} className="text-slate-300 mb-3" />
+                    <h3 className="m-0 text-sm font-bold text-slate-800 mb-1">Subject Comparison Radar</h3>
+                    <p className="m-0 text-[12px] text-slate-500">Chart integration goes here</p>
                 </div>
             </div>
         </div>

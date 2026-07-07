@@ -128,6 +128,7 @@ const AdmissionRequests = () => {
                             </div>
                             
                             {/* Student Credentials */}
+                            {credentialsModal.student && (
                             <div className="border border-blue-100 rounded-lg p-4 bg-blue-50/30">
                                 <h4 className="text-sm font-bold text-blue-800 uppercase mb-3">Student Login ({credentialsModal.student_name})</h4>
                                 <div className="grid grid-cols-3 gap-2 text-sm mb-2">
@@ -139,8 +140,10 @@ const AdmissionRequests = () => {
                                     <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.student.password}</span>
                                 </div>
                             </div>
+                            )}
 
                             {/* Parent Credentials */}
+                            {credentialsModal.parent && (
                             <div className="border border-purple-100 rounded-lg p-4 bg-purple-50/30">
                                 <h4 className="text-sm font-bold text-purple-800 uppercase mb-3">Parent Login</h4>
                                 <div className="grid grid-cols-3 gap-2 text-sm mb-2">
@@ -152,6 +155,7 @@ const AdmissionRequests = () => {
                                     <span className="col-span-2 font-mono font-bold text-gray-800 bg-white px-2 py-1 rounded border">{credentialsModal.parent.password}</span>
                                 </div>
                             </div>
+                            )}
 
                             <div className="pt-2">
                                 <p className="text-xs text-gray-500 italic text-center mb-4">Please ensure to note down these credentials. They have been sent to the parent's registered email and phone number.</p>
