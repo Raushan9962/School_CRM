@@ -64,5 +64,7 @@ router.use('/teacher-portal', require('./teacherPortalRoutes'));
 router.use('/accountant', accountantRoutes);
 router.use('/admission', require('./admission'));
 router.use('/parent', parentRoutes);
+router.use('/librarian', require('./librarianRoutes'));
+router.use('/staff', require('./staffRoutes'));
 
 module.exports = router;

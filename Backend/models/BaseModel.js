@@ -6,8 +6,12 @@ class BaseModel {
     }
 
     async create(data, client = pool) {
-        const keys = Object.keys(data);
-        const values = Object.values(data);
+        const sanitizedData = {};
+        for (const key in data) {
+            sanitizedData[key] = data[key] === undefined ? null : data[key];
+        }
+        const keys = Object.keys(sanitizedData);
+        const values = Object.values(sanitizedData);
         if (keys.length === 0) throw new Error('No data provided');
         
         const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
@@ -29,8 +33,12 @@ class BaseModel {
     }
 
     async update(id, data, client = pool) {
-        const keys = Object.keys(data);
-        const values = Object.values(data);
+        const sanitizedData = {};
+        for (const key in data) {
+            sanitizedData[key] = data[key] === undefined ? null : data[key];
+        }
+        const keys = Object.keys(sanitizedData);
+        const values = Object.values(sanitizedData);
         if (keys.length === 0) throw new Error('No data provided');
 
         const setClause = keys.map((k, i) => `${k.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)} = $${i + 1}`).join(', ');

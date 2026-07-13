@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, ClipboardList, X } from 'lucide-react';
+import { Settings, ClipboardList, X, ShieldAlert, Globe, Mail } from 'lucide-react';
 import apiFetch from '../../../services/api';
 
 const PlatformSettings = () => {
@@ -123,60 +123,71 @@ const PlatformSettings = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-4">
-        <h2 className="text-xl font-extrabold text-slate-800 m-0">Platform Settings</h2>
-        <p className="text-slate-500 text-sm mt-1">Configure global parameters for the School CRM.</p>
-      </div>
-      
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <ActionBtn text="System Config" icon={<Settings size={16} />} variant="primary" onClick={openConfigModal} />
-        <ActionBtn text="Manage Plans" icon={<ClipboardList size={16} />} variant="secondary" onClick={openPlansModal} />
+    <div className="animate-fade-in p-2">
+      <div className="mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-4 relative overflow-hidden">
+        <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div>
+          <h2 className="text-2xl font-extrabold text-slate-800 m-0 tracking-tight">Platform Settings</h2>
+          <p className="text-slate-500 text-sm mt-2 font-medium">Configure global parameters and manage subscription plans.</p>
+        </div>
+        <div className="flex gap-3 flex-wrap relative z-10">
+          <ActionBtn text="System Config" icon={<Settings size={18} />} variant="primary" onClick={openConfigModal} />
+          <ActionBtn text="Manage Plans" icon={<ClipboardList size={18} />} variant="secondary" onClick={openPlansModal} />
+        </div>
       </div>
 
       <div className="mt-8">
-        <h3 className="m-0 mb-4 text-sm font-bold text-slate-800 uppercase tracking-wider">Global Configurations</h3>
+        <h3 className="m-0 mb-6 text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+          <span className="w-8 h-px bg-slate-200"></span>
+          Global Configurations
+        </h3>
         
         {loading ? (
-          <p className="text-slate-500 text-sm">Loading settings...</p>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+          </div>
         ) : (
-          <div className="flex flex-col md:flex-row gap-0 rounded-lg border border-slate-200 overflow-hidden bg-white shadow-sm">
-            <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-slate-200 hover:bg-slate-50/50 transition-colors min-h-[100px] flex flex-col justify-between">
-              <div className="text-[14px] text-slate-700">Maintenance Mode</div>
-              <div className="text-right mt-4 flex flex-col items-end">
-                <div className="text-[28px] font-semibold text-slate-900 leading-none tracking-tight flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${settings.maintenance_mode === 'true' ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 p-6 group relative overflow-hidden z-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-bl-full -z-10 opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <ShieldAlert size={24} />
+                </div>
+                <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full ${settings.maintenance_mode === 'true' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
                   {settings.maintenance_mode === 'true' ? 'Active' : 'Disabled'}
-                </div>
-                <div className="text-[11px] text-slate-500 mt-1">
-                  Global platform state
-                </div>
+                </span>
               </div>
-            </div>
-            
-            <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-slate-200 hover:bg-slate-50/50 transition-colors min-h-[100px] flex flex-col justify-between">
-              <div className="text-[14px] text-slate-700">Default Currency</div>
-              <div className="text-right mt-4">
-                <div className="text-[28px] font-semibold text-slate-900 leading-none tracking-tight">
-                  {settings.default_currency || 'INR'}
-                </div>
-                <div className="text-[11px] text-slate-500 mt-1">
-                  Used across platform
-                </div>
-              </div>
+              <h4 className="text-lg font-bold text-slate-800 m-0 mb-2">Maintenance Mode</h4>
+              <p className="text-sm text-slate-500 m-0 leading-relaxed">Controls global site accessibility. When active, the system is offline for maintenance.</p>
             </div>
 
-            <div className="flex-1 p-4 hover:bg-slate-50/50 transition-colors min-h-[100px] flex flex-col justify-between">
-              <div className="text-[14px] text-slate-700">Email Notifications</div>
-              <div className="text-right mt-4 flex flex-col items-end">
-                <div className="text-[28px] font-semibold text-slate-900 leading-none tracking-tight flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${settings.email_notifications === 'false' ? 'bg-slate-300' : 'bg-blue-500'}`}></span>
-                  {settings.email_notifications === 'false' ? 'Disabled' : 'Enabled'}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 p-6 group relative overflow-hidden z-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full -z-10 opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3.5 bg-blue-50 text-blue-600 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <Globe size={24} />
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">
-                  System alerts
-                </div>
+                <span className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                  {settings.default_currency || 'INR'}
+                </span>
               </div>
+              <h4 className="text-lg font-bold text-slate-800 m-0 mb-2">Default Currency</h4>
+              <p className="text-sm text-slate-500 m-0 leading-relaxed">The base currency used for all financial transactions and reporting across the platform.</p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 p-6 group relative overflow-hidden z-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-50 to-transparent rounded-bl-full -z-10 opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3.5 bg-purple-50 text-purple-600 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <Mail size={24} />
+                </div>
+                <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full ${settings.email_notifications === 'false' ? 'bg-slate-50 text-slate-500 border border-slate-200' : 'bg-purple-50 text-purple-600 border border-purple-100'}`}>
+                  {settings.email_notifications === 'false' ? 'Disabled' : 'Enabled'}
+                </span>
+              </div>
+              <h4 className="text-lg font-bold text-slate-800 m-0 mb-2">Email Notifications</h4>
+              <p className="text-sm text-slate-500 m-0 leading-relaxed">System-wide automated email alerts and communications for important events.</p>
             </div>
           </div>
         )}

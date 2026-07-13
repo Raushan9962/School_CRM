@@ -14,6 +14,10 @@ import MaintenanceManagement from './components/MaintenanceManagement';
 import TransportFees from './components/TransportFees';
 import TransportReports from './components/TransportReports';
 import Notifications from './components/Notifications';
+import StaffAttendance from '../../components/staff/StaffAttendance';
+import StaffLeave from '../../components/staff/StaffLeave';
+import StaffSalary from '../../components/staff/StaffSalary';
+import { UserCheck, ClipboardList, Wallet } from 'lucide-react';
 
 const PlaceholderView = ({ title }) => (
     <div style={{ background: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
@@ -71,7 +75,10 @@ const TransportDashboard = () => {
         { id: 'maintenance', label: 'Maintenance', icon: <Wrench size={20} strokeWidth={1.5} /> },
         { id: 'fees', label: 'Transport Fees', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
         { id: 'reports', label: 'Reports', icon: <BarChart3 size={20} strokeWidth={1.5} /> },
-        { id: 'notifications', label: 'Notifications', icon: <Bell size={20} strokeWidth={1.5} /> }
+        { id: 'notifications', label: 'Notifications', icon: <Bell size={20} strokeWidth={1.5} /> },
+        { id: 'my_attendance', label: 'My Attendance & ID', icon: <UserCheck size={20} strokeWidth={1.5} /> },
+        { id: 'my_leaves', label: 'My Leave Requests', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+        { id: 'my_salary', label: 'My Salary Slips', icon: <Wallet size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
@@ -88,6 +95,9 @@ const TransportDashboard = () => {
             case 'fees': return <TransportFees />;
             case 'reports': return <TransportReports />;
             case 'notifications': return <Notifications />;
+            case 'my_attendance': return <StaffAttendance />;
+            case 'my_leaves': return <StaffLeave />;
+            case 'my_salary': return <StaffSalary />;
             default: return <TransportOverview />;
         }
     };
