@@ -10,7 +10,7 @@ const TimetableModule = ({ childId }) => {
         const fetchTimetable = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5000/api/parent/children/${childId}/timetable`, {
+                const response = await axios.get(`\${import.meta.env.VITE_API_BASE_URL}/parent/children/${childId}/timetable`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTimetable(response.data);

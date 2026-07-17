@@ -52,7 +52,7 @@ const ExpiringSoon = () => {
         <p className="text-slate-500 text-sm mt-1">Monitor school subscriptions expiring within 30 days.</p>
       </div>
       
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <ActionBtn text="Send Reminders" icon={<Bell size={16} />} variant="primary" onClick={() => setShowReminderModal(true)} />
         <ActionBtn text="View All" icon={<Clock size={16} />} variant="secondary" onClick={() => alert('View All Expiring Schools feature coming soon!')} />
       </div>
@@ -111,7 +111,7 @@ const ExpiringSoon = () => {
 
       {showReminderModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-sm overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">Send Reminders</h3>
               <button onClick={() => setShowReminderModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>

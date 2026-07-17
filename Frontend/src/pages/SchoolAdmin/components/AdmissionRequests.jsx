@@ -7,7 +7,7 @@ const AdmissionRequests = () => {
     const [credentialsModal, setCredentialsModal] = useState(null);
 
     const fetchRequests = () => {
-        fetch('http://localhost:5000/api/admission/requests')
+        fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/requests`)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -27,7 +27,7 @@ const AdmissionRequests = () => {
 
     const handleApprove = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admission/approve/${id}`, {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/approve/${id}`, {
                 method: 'POST'
             });
             const data = await res.json();

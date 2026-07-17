@@ -15,7 +15,7 @@ const StudentForm = ({ onSave, onCancel }) => {
                     const data = await resClasses.json();
                     if (Array.isArray(data)) setClassesList(data);
                 } else {
-                    const res2 = await fetch('http://localhost:5000/api/classes');
+                    const res2 = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/classes`);
                     if (res2.ok) {
                         const data2 = await res2.json();
                         if (Array.isArray(data2)) setClassesList(data2);

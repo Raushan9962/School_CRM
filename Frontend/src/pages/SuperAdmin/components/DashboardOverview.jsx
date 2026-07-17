@@ -35,7 +35,7 @@ ChartJS.register(
 );
 import apiFetch from '../../../services/api';
 
-const DashboardOverview = () => {
+const DashboardOverview = ({ setActiveTab }) => {
   const [stats, setStats] = useState({
     totalSchools: 0,
     totalUsers: 0,
@@ -75,21 +75,21 @@ const DashboardOverview = () => {
     fetchStats();
   }, []);
 
-  const containerStyle = { display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' };
-  const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+  const containerStyle = { display: 'flex', flexDirection: 'column', paddingBottom: '24px' };
+  const headerStyle = { borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
   const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
   const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
   const sectionTitleStyle = { fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' };
 
   const statCards = [
-    { title: 'Total Schools', value: stats.loading ? '...' : stats.totalSchools, icon: <Building2 size={18} />, bg: '#eff6ff', color: '#3b82f6' },
-    { title: 'Total Users', value: stats.loading ? '...' : stats.totalUsers.toLocaleString(), icon: <Users size={18} />, bg: '#ecfdf5', color: '#10b981' },
-    { title: 'Active Plans', value: stats.loading ? '...' : stats.activePlans, icon: <Activity size={18} />, bg: '#f5f3ff', color: '#8b5cf6' },
-    { title: 'Expiring Soon', value: stats.loading ? '...' : stats.expiringSoon, icon: <Clock size={18} />, bg: '#fffbeb', color: '#f59e0b' },
-    { title: 'Total Revenue', value: stats.loading ? '...' : `₹${(stats.totalRevenue/100000).toFixed(1)}L`, icon: <IndianRupee size={18} />, bg: '#f0fdfa', color: '#14b8a6' },
-    { title: 'Monthly MRR', value: stats.loading ? '...' : `₹${(stats.monthlyRevenue/1000).toFixed(1)}k`, icon: <BarChart3 size={18} />, bg: '#fef2f2', color: '#ef4444' },
-    { title: 'New Requests', value: stats.loading ? '...' : stats.newRequests, icon: <AlertTriangle size={18} />, bg: '#eef2ff', color: '#6366f1' },
-    { title: 'Inactive Schools', value: '0', icon: <Building2 size={18} />, bg: '#fdf2f8', color: '#ec4899' },
+    { title: 'Total Schools', value: stats.loading ? '...' : stats.totalSchools, icon: <Building2 size={18} />, bg: '#eff6ff', color: '#3b82f6', targetTab: 'schools' },
+    { title: 'Total Users', value: stats.loading ? '...' : stats.totalUsers.toLocaleString(), icon: <Users size={18} />, bg: '#ecfdf5', color: '#10b981', targetTab: null },
+    { title: 'Active Plans', value: stats.loading ? '...' : stats.activePlans, icon: <Activity size={18} />, bg: '#f5f3ff', color: '#8b5cf6', targetTab: 'finance' },
+    { title: 'Expiring Soon', value: stats.loading ? '...' : stats.expiringSoon, icon: <Clock size={18} />, bg: '#fffbeb', color: '#f59e0b', targetTab: 'schools' },
+    { title: 'Total Revenue', value: stats.loading ? '...' : `₹${(stats.totalRevenue/100000).toFixed(1)}L`, icon: <IndianRupee size={18} />, bg: '#f0fdfa', color: '#14b8a6', targetTab: 'finance' },
+    { title: 'Monthly MRR', value: stats.loading ? '...' : `₹${(stats.monthlyRevenue/1000).toFixed(1)}k`, icon: <BarChart3 size={18} />, bg: '#fef2f2', color: '#ef4444', targetTab: 'finance' },
+    { title: 'New Requests', value: stats.loading ? '...' : stats.newRequests, icon: <AlertTriangle size={18} />, bg: '#eef2ff', color: '#6366f1', targetTab: 'schools' },
+    { title: 'Inactive Schools', value: '0', icon: <Building2 size={18} />, bg: '#fdf2f8', color: '#ec4899', targetTab: 'schools' },
   ];
 
   const chartData = {
@@ -117,20 +117,25 @@ const DashboardOverview = () => {
   };
 
   return (
-    <div style={containerStyle} className="animate-fade-in">
-        <div style={headerStyle}>
+    <div style={containerStyle} className="animate-fade-in gap-6">
+        <div style={headerStyle} className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
                 <h2 style={titleStyle}>Dashboard Overview</h2>
                 <p style={subTitleStyle}>Platform administrative summary and key metrics</p>
             </div>
         </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {statCards.map((card, idx) => (
                 <div 
                     key={idx} 
-                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s' }}
-                    className="hover:border-slate-300 hover:shadow-md"
+                    onClick={() => {
+                        if (card.targetTab && setActiveTab) {
+                            setActiveTab(card.targetTab);
+                        }
+                    }}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s', cursor: card.targetTab ? 'pointer' : 'default' }}
+                    className={`hover:border-slate-300 hover:shadow-md ${card.targetTab ? 'active:scale-[0.98]' : ''}`}
                 >
                     <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {card.icon}
@@ -143,9 +148,9 @@ const DashboardOverview = () => {
             ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Chart Section */}
-            <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            <div className="lg:col-span-2" style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                 <h3 style={sectionTitleStyle}>
                     <BarChart3 size={16} className="text-slate-500" /> Revenue Growth (Yearly)
                 </h3>

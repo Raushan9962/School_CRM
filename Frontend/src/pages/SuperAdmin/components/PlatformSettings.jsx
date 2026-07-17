@@ -130,7 +130,7 @@ const PlatformSettings = () => {
           <h2 className="text-2xl font-extrabold text-slate-800 m-0 tracking-tight">Platform Settings</h2>
           <p className="text-slate-500 text-sm mt-2 font-medium">Configure global parameters and manage subscription plans.</p>
         </div>
-        <div className="flex gap-3 flex-wrap relative z-10">
+        <div className="flex flex-col sm:flex-row gap-3 relative z-10">
           <ActionBtn text="System Config" icon={<Settings size={18} />} variant="primary" onClick={openConfigModal} />
           <ActionBtn text="Manage Plans" icon={<ClipboardList size={18} />} variant="secondary" onClick={openPlansModal} />
         </div>
@@ -195,7 +195,7 @@ const PlatformSettings = () => {
 
       {showConfigModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-sm overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">System Config</h3>
               <button onClick={() => setShowConfigModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>
@@ -244,7 +244,7 @@ const PlatformSettings = () => {
 
       {showPlansModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">Manage Subscription Plans</h3>
               <button onClick={() => setShowPlansModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>

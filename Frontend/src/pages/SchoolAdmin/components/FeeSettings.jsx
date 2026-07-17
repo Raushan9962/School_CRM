@@ -20,8 +20,8 @@ const FeeSettings = () => {
         try {
             setLoading(true);
             const [feesRes, classesRes] = await Promise.all([
-                fetch('http://localhost:5000/api/admission/fee-structures'),
-                fetch('http://localhost:5000/api/classes')
+                fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/fee-structures`),
+                fetch(`\${import.meta.env.VITE_API_BASE_URL}/classes`)
             ]);
             const feesData = await feesRes.json();
             const classesData = await classesRes.json();
@@ -46,7 +46,7 @@ const FeeSettings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/admission/fee-structures', {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/fee-structures`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -68,7 +68,7 @@ const FeeSettings = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this fee structure?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/admission/fee-structures/${id}`, {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/fee-structures/${id}`, {
                 method: 'DELETE'
             });
             const data = await res.json();
@@ -82,7 +82,7 @@ const FeeSettings = () => {
 
     const handleUpdateFee = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admission/fee-structures/${id}`, {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/fee-structures/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify(editFormData)

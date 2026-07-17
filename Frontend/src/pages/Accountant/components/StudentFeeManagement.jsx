@@ -364,7 +364,7 @@ const StudentFeeManagement = () => {
                                         {editingStructureId === fs.id ? (
                                             <div className="flex justify-end gap-2">
                                                 <button onClick={() => {
-                                                    fetch(`http://localhost:5000/api/accountant/fee-structures/${fs.id}`, {
+                                                    fetch(`\${import.meta.env.VITE_API_BASE_URL}/accountant/fee-structures/${fs.id}`, {
                                                         method: 'PUT',
                                                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                                                         body: JSON.stringify(editFormData)

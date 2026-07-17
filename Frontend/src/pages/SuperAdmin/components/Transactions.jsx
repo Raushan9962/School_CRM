@@ -100,7 +100,7 @@ const Transactions = () => {
         <p className="text-slate-500 text-sm mt-1">Manage and track all payment transactions across schools.</p>
       </div>
       
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <ActionBtn text="Add Transaction" icon={<PlusCircle size={16} />} variant="primary" onClick={() => setShowAddModal(true)} />
         <ActionBtn text="Export Report" icon={<Download size={16} />} variant="secondary" onClick={() => alert('Exporting Transactions CSV...')} />
       </div>
@@ -149,7 +149,7 @@ const Transactions = () => {
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {t.receipt_url && (
-                          <a href={`http://localhost:5000${t.receipt_url}`} target="_blank" rel="noreferrer" title="View Receipt" className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition-colors">
+                          <a href={`\${import.meta.env.VITE_API_BASE_URL.replace("/api", "")}\${t.receipt_url}`} target="_blank" rel="noreferrer" title="View Receipt" className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition-colors">
                             <FileText size={16} />
                           </a>
                         )}
@@ -170,7 +170,7 @@ const Transactions = () => {
 
       {showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-lg overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">Add Transaction</h3>
               <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>
@@ -186,7 +186,7 @@ const Transactions = () => {
                   </select>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Amount (₹)</label>
                     <input type="number" step="0.01" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0.00" />
@@ -197,7 +197,7 @@ const Transactions = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Status</label>
                     <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">

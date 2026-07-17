@@ -38,7 +38,7 @@ const RevenueBilling = () => {
         <p className="text-slate-500 text-sm mt-1">Track platform revenue and billing cycles.</p>
       </div>
       
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <ActionBtn text="Monthly Reports" icon={<TrendingUp size={16} />} variant="primary" onClick={() => handleOpenReport('monthly')} />
         <ActionBtn text="Yearly Reports" icon={<CalendarDays size={16} />} variant="secondary" onClick={() => handleOpenReport('yearly')} />
       </div>
@@ -92,7 +92,7 @@ const RevenueBilling = () => {
 
       {showReportModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-lg overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0 capitalize">{reportType} Report</h3>
               <button onClick={() => setShowReportModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>

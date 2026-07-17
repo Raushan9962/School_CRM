@@ -104,7 +104,7 @@ const RegisteredSchools = () => {
         <p className="text-slate-500 text-sm mt-1">Manage onboarded schools and their subscriptions.</p>
       </div>
       
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <ActionBtn text="Add New School" icon={<PlusCircle size={16} />} variant="primary" onClick={() => navigate('/register-school')} />
         <ActionBtn text="Manage Subscriptions" icon={<Settings size={16} />} variant="secondary" onClick={() => setShowSubModal(true)} />
       </div>
@@ -229,7 +229,7 @@ const RegisteredSchools = () => {
       {/* Users Modal */}
       {selectedSchool && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">
                 {selectedRoleFilter === 'All' ? 'All Users' : `${selectedRoleFilter}s`} of {selectedSchool.school_name}
@@ -273,7 +273,7 @@ const RegisteredSchools = () => {
       {/* Manage Subscriptions Modal */}
       {showSubModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-[95%] max-w-lg overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 m-0">Manage Subscriptions</h3>
               <button onClick={() => {setShowSubModal(false); setSelectedSubSchool(null);}} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 border-none bg-transparent cursor-pointer"><X size={18} /></button>
@@ -294,7 +294,7 @@ const RegisteredSchools = () => {
 
               {selectedSubSchool && (
                 <form onSubmit={handleSubSubmit} className="space-y-4 animate-fade-in">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Start Date</label>
                       <input type="date" required value={subFormData.subscription_start_date} onChange={e => setSubFormData({...subFormData, subscription_start_date: e.target.value})} className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
@@ -305,7 +305,7 @@ const RegisteredSchools = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Status</label>
                       <select required value={subFormData.subscription_status} onChange={e => setSubFormData({...subFormData, subscription_status: e.target.value})} className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">

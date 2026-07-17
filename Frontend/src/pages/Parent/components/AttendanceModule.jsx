@@ -10,7 +10,7 @@ const AttendanceModule = ({ childId }) => {
         const fetchAttendance = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5000/api/parent/children/${childId}/attendance`, {
+                const response = await axios.get(`\${import.meta.env.VITE_API_BASE_URL}/parent/children/${childId}/attendance`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAttendance(response.data);

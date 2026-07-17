@@ -70,7 +70,7 @@ const SuperAdmin = () => {
     ];
 
     const renderContent = () => {
-        if (activeTab === 'overview') return <DashboardOverview />;
+        if (activeTab === 'overview') return <DashboardOverview setActiveTab={setActiveTab} />;
 
         if (activeTab === 'schools') {
             const tabs = [
@@ -108,7 +108,7 @@ const SuperAdmin = () => {
             return <ModuleContainer tabs={tabs} contentMap={contentMap} defaultTab="sa_sys_set" />;
         }
 
-        return <DashboardOverview />;
+        return <DashboardOverview setActiveTab={setActiveTab} />;
     };
 
     const getActiveTitle = () => {

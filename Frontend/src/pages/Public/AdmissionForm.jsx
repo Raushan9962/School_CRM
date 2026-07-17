@@ -21,7 +21,7 @@ const AdmissionForm = () => {
     const [status, setStatus] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/classes')
+        fetch(`\${import.meta.env.VITE_API_BASE_URL}/classes`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setClasses(data);
@@ -39,7 +39,7 @@ const AdmissionForm = () => {
         setStatus('submitting');
         
         try {
-            const res = await fetch('http://localhost:5000/api/admission/apply', {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/apply`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

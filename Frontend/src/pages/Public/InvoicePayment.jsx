@@ -13,7 +13,7 @@ const InvoicePayment = () => {
     const [credentials, setCredentials] = useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/api/admission/invoice/${id}`)
+        fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/invoice/${id}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.invoice) {
@@ -33,7 +33,7 @@ const InvoicePayment = () => {
         setStatus('paying');
         try {
             // MOCK PAYMENT PROCESS
-            const res = await fetch('http://localhost:5000/api/admission/pay', {
+            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/pay`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ admission_request_id: id })

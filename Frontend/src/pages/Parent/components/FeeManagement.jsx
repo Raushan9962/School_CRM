@@ -10,7 +10,7 @@ const FeeManagement = ({ childId }) => {
         const fetchFees = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5000/api/parent/children/${childId}/fees`, {
+                const response = await axios.get(`\${import.meta.env.VITE_API_BASE_URL}/parent/children/${childId}/fees`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setFeeData(response.data);

@@ -10,7 +10,7 @@ const ChildProfile = ({ childId }) => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5000/api/parent/children/${childId}`, {
+                const response = await axios.get(`\${import.meta.env.VITE_API_BASE_URL}/parent/children/${childId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setProfile(response.data);
