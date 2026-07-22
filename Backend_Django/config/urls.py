@@ -66,6 +66,14 @@ urlpatterns = [
         "api/principal/",
         include("apps.principal.urls"),
     ),
+    path(
+        "api/academics/",
+        include("apps.academics.urls"),
+    ),
+    path(
+        "api/complaints/",
+        include("apps.complaints.urls"),
+    ),
 ]
 
 

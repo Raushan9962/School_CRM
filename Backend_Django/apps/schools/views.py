@@ -6,17 +6,13 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 
 from .models import (
-    School, Class, Student, Teacher, Subject, Timetable, SyllabusTracking, 
-    Exam, Result, DisciplineLog, AdmissionRequest, Parent
+    School, Student, Teacher, DisciplineLog, AdmissionRequest, Parent
 )
 from apps.accounts.models import User
 from .serializers import (
     SchoolSerializer,
-    ClassSerializer,
     StudentSerializer,
-    TeacherSerializer, SubjectSerializer, TimetableSerializer, 
-    SyllabusTrackingSerializer, ExamSerializer, ResultSerializer, 
-    DisciplineLogSerializer, AdmissionRequestSerializer, ParentSerializer
+    TeacherSerializer, DisciplineLogSerializer, AdmissionRequestSerializer, ParentSerializer
 )
 from apps.finance.models import FeeStructure, StudentFeeInvoice
 import uuid
@@ -54,17 +50,6 @@ class SchoolProfileView(APIView):
             return Response({"success": True, "message": "Profile updated successfully", "data": serializer.data})
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ClassListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Class.objects.all()
-    serializer_class = ClassSerializer
-    
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class ClassDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Class.objects.all()
-    serializer_class = ClassSerializer
 
 class StudentListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     queryset = Student.objects.all()
@@ -153,44 +138,6 @@ class TeacherListCreateView(SchoolBaseView, generics.ListCreateAPIView):
 class TeacherDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-
-class SubjectListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class SubjectDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
-
-class TimetableListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class TimetableDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
-
-class SyllabusTrackingListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = SyllabusTracking.objects.all()
-    serializer_class = SyllabusTrackingSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class ExamListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Exam.objects.all()
-    serializer_class = ExamSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class ResultListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Result.objects.all()
-    serializer_class = ResultSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
 
 
 class DisciplineLogListCreateView(SchoolBaseView, generics.ListCreateAPIView):
