@@ -6,7 +6,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 import uuid
 
-from .models import FeeStructure, StudentFeeInvoice, FeeReceipt, Expense, Payroll, Vendor, VendorPayment, ScholarshipDiscount
+from django.utils import timezone
+from .models import FeeStructure, StudentFeeInvoice, FeeReceipt, Expense, Payroll, Vendor, VendorPayment, ScholarshipDiscount, LegacyFee
 from apps.schools.models import Student
 from .serializers import (
     FeeStructureSerializer,
@@ -16,7 +17,8 @@ from .serializers import (
     PayrollSerializer,
     VendorSerializer,
     VendorPaymentSerializer,
-    ScholarshipDiscountSerializer
+    ScholarshipDiscountSerializer,
+    LegacyFeeSerializer
 )
 
 class FinanceBaseView:
@@ -37,7 +39,7 @@ class FeeStructureListCreateView(FinanceBaseView, generics.ListCreateAPIView):
         amount = request.data.get('amount')
         
         if class_id == 'ALL':
-            from apps.schools.models import Class
+            from apps.academics.models import Class
             classes = Class.objects.filter(school=school)
             with transaction.atomic():
                 for cls in classes:
@@ -220,3 +222,92 @@ class ScholarshipStatusUpdateView(APIView):
         
         serializer = ScholarshipDiscountSerializer(scholarship)
         return Response(serializer.data)
+
+class LegacyFeeListCreateView(FinanceBaseView, generics.ListCreateAPIView):
+    queryset = LegacyFee.objects.all()
+    serializer_class = LegacyFeeSerializer
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+
+class LegacyFeeRetrieveDestroyView(FinanceBaseView, generics.RetrieveDestroyAPIView):
+    queryset = LegacyFee.objects.all()
+    serializer_class = LegacyFeeSerializer
+
+class UnifiedStudentFeeListView(FinanceBaseView, APIView):
+    def get(self, request, studentId):
+        school = request.user.school
+        student = get_object_or_404(Student, user_id=studentId, school=school)
+        
+        legacy_fees = LegacyFee.objects.filter(student=student).order_by('-due_date')
+        new_invoices = StudentFeeInvoice.objects.filter(student=student).order_by('-created_at')
+        
+        results = []
+        for lf in legacy_fees:
+            results.append({
+                'id': f'old_{lf.id}',
+                'due_date': lf.due_date,
+                'description': 'General Fee',
+                'status': lf.status,
+                'amount': lf.amount,
+                'paid_date': lf.paid_date,
+                'payment_method': lf.payment_method,
+                'transaction_ref': lf.transaction_ref
+            })
+            
+        for nfi in new_invoices:
+            results.append({
+                'id': f'new_{nfi.id}',
+                'due_date': nfi.created_at,
+                'description': nfi.fee_structure.fee_type,
+                'status': nfi.status,
+                'amount': nfi.due_amount,
+                'paid_date': nfi.updated_at,
+                'payment_method': None,
+                'transaction_ref': None
+            })
+            
+        results.sort(key=lambda x: x['due_date'] if x['due_date'] else timezone.now(), reverse=True)
+        return Response(results)
+
+class UnifiedFeeUpdateView(FinanceBaseView, APIView):
+    def patch(self, request, fee_id_str):
+        school = request.user.school
+        
+        if str(fee_id_str).startswith('new_'):
+            actual_id = str(fee_id_str).replace('new_', '')
+            invoice = get_object_or_404(StudentFeeInvoice, id=actual_id, school=school)
+            
+            status_val = request.data.get('status')
+            if status_val:
+                invoice.status = status_val
+                if status_val == 'Paid':
+                    invoice.paid_amount = invoice.due_amount
+            invoice.save()
+            
+            return Response({'message': 'Fee updated successfully'})
+            
+        elif str(fee_id_str).startswith('old_'):
+            actual_id = str(fee_id_str).replace('old_', '')
+            legacy_fee = get_object_or_404(LegacyFee, id=actual_id, school=school)
+            
+            status_val = request.data.get('status')
+            if status_val:
+                legacy_fee.status = status_val
+            if 'paid_date' in request.data:
+                legacy_fee.paid_date = request.data['paid_date']
+            if 'payment_method' in request.data:
+                legacy_fee.payment_method = request.data['payment_method']
+            if 'transaction_ref' in request.data:
+                legacy_fee.transaction_ref = request.data['transaction_ref']
+                
+            legacy_fee.save()
+            return Response({'message': 'Fee updated successfully'})
+            
+        else:
+            # Fallback for standard integer IDs
+            legacy_fee = get_object_or_404(LegacyFee, id=fee_id_str, school=school)
+            status_val = request.data.get('status')
+            if status_val:
+                legacy_fee.status = status_val
+            legacy_fee.save()
+            return Response({'message': 'Fee updated successfully'})

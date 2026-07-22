@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import School, Class, Student, Teacher, Subject, Timetable, SyllabusTracking, Exam, Result, DisciplineLog, AdmissionRequest, Parent
+from .models import School, Student, Teacher, DisciplineLog, AdmissionRequest, Parent
 from apps.accounts.models import User
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -9,12 +9,6 @@ class SchoolSerializer(serializers.ModelSerializer):
         model = School
         fields = '__all__'
         read_only_fields = ('plan', 'subscription_start_date', 'subscription_end_date', 'subscription_status')
-
-class ClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Class
-        fields = '__all__'
-        read_only_fields = ('school',)
 
 class StudentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
@@ -35,58 +29,6 @@ class TeacherSerializer(serializers.ModelSerializer):
         model = Teacher
         fields = '__all__'
         read_only_fields = ('user', 'school')
-
-class SubjectSerializer(serializers.ModelSerializer):
-    class_name = serializers.CharField(source='class_id.name', read_only=True)
-    section = serializers.CharField(source='class_id.section', read_only=True)
-    teacher_name = serializers.CharField(source='teacher.user.name', read_only=True)
-    
-    class Meta:
-        model = Subject
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class TimetableSerializer(serializers.ModelSerializer):
-    class_name = serializers.CharField(source='class_id.name', read_only=True)
-    section = serializers.CharField(source='class_id.section', read_only=True)
-    subject_name = serializers.CharField(source='subject.name', read_only=True)
-    teacher_name = serializers.CharField(source='teacher.user.name', read_only=True)
-    
-    class Meta:
-        model = Timetable
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class SyllabusTrackingSerializer(serializers.ModelSerializer):
-    class_name = serializers.CharField(source='class_id.name', read_only=True)
-    section = serializers.CharField(source='class_id.section', read_only=True)
-    subject_name = serializers.CharField(source='subject.name', read_only=True)
-    teacher_name = serializers.CharField(source='teacher.user.name', read_only=True)
-    
-    class Meta:
-        model = SyllabusTracking
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class ExamSerializer(serializers.ModelSerializer):
-    class_name = serializers.CharField(source='class_id.name', read_only=True)
-    section = serializers.CharField(source='class_id.section', read_only=True)
-    subject_name = serializers.CharField(source='subject.name', read_only=True)
-    
-    class Meta:
-        model = Exam
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class ResultSerializer(serializers.ModelSerializer):
-    exam_name = serializers.CharField(source='exam.name', read_only=True)
-    subject_name = serializers.CharField(source='exam.subject.name', read_only=True)
-    total_marks = serializers.IntegerField(source='exam.total_marks', read_only=True)
-    
-    class Meta:
-        model = Result
-        fields = '__all__'
-
 
 class DisciplineLogSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.user.name', read_only=True)

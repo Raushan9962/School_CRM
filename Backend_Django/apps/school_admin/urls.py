@@ -9,4 +9,5 @@ urlpatterns = [
     path('leaves/<int:pk>/status/', views.LeaveStatusUpdateView.as_view(), name='admin-leave-status'),
     path('grievances/', views.GrievanceListCreateView.as_view(), name='admin-grievance-list'),
     path('events/', views.EventListCreateView.as_view(), name='admin-event-list'),
+    path('events/<int:pk>/', views.EventDetailView.as_view(), name='admin-event-detail'),
 ]

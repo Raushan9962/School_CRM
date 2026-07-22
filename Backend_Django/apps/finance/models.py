@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
-from apps.schools.models import School, Class, Student
+from apps.schools.models import School, Student
+from apps.academics.models import Class
 
 class FeeStructure(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='fee_structures')
@@ -11,6 +12,21 @@ class FeeStructure(models.Model):
     
     def __str__(self):
         return f"{self.fee_type} - {self.class_id.name}"
+
+class LegacyFee(models.Model):
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='legacy_fees')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='legacy_fees')
+    due_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=50, default='Pending') # Pending, Paid
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid_date = models.DateField(blank=True, null=True)
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
+    transaction_ref = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Legacy Fee {self.id} for {self.student.user.username}"
 
 class StudentFeeInvoice(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='fee_invoices')

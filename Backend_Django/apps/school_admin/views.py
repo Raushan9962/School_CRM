@@ -106,3 +106,7 @@ class EventListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     serializer_class = EventSerializer
     def perform_create(self, serializer):
         serializer.save(school=self.request.user.school)
+
+class EventDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer

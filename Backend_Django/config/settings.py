@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     'apps.certificates',
     'apps.school_admin',
     'apps.principal',
+    'apps.academics',
+    'apps.complaints',
 ]
 AUTH_USER_MODEL = "accounts.User"
 

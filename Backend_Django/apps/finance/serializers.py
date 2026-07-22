@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import FeeStructure, StudentFeeInvoice, FeeReceipt, Expense
+from .models import FeeStructure, StudentFeeInvoice, FeeReceipt, Expense, LegacyFee
+
+class LegacyFeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LegacyFee
+        fields = '__all__'
+        read_only_fields = ('school',)
 
 class FeeStructureSerializer(serializers.ModelSerializer):
     class Meta:
