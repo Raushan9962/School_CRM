@@ -123,40 +123,6 @@ class DisciplineLog(models.Model):
     incident_date = models.DateField()
     action_taken = models.CharField(max_length=255, default='Pending')
 
-class Leave(models.Model):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='leaves')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    leave_type = models.CharField(max_length=50, default='General')
-    start_date = models.DateField()
-    end_date = models.DateField()
-    reason = models.TextField()
-    status = models.CharField(max_length=50, default='Pending')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class PrincipalTask(models.Model):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principal_tasks')
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    priority = models.CharField(max_length=50, default='Medium')
-    status = models.CharField(max_length=50, default='Pending')
-    due_date = models.DateField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class Grievance(models.Model):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='grievances')
-    subject = models.CharField(max_length=255)
-    raised_by = models.CharField(max_length=255)
-    category = models.CharField(max_length=100)
-    status = models.CharField(max_length=50, default='Open')
-    date = models.DateField(auto_now_add=True)
-
-class Event(models.Model):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='events')
-    event_name = models.CharField(max_length=255)
-    event_type = models.CharField(max_length=100, default='General')
-    event_date = models.DateField()
-
 class AdmissionRequest(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='admission_requests')
     student_name = models.CharField(max_length=255)

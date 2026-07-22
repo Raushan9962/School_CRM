@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import School, Class, Student, Teacher, Subject, Timetable, SyllabusTracking, Exam, Result, DisciplineLog, Leave, PrincipalTask, Grievance, Event, AdmissionRequest, Parent
+from .models import School, Class, Student, Teacher, Subject, Timetable, SyllabusTracking, Exam, Result, DisciplineLog, AdmissionRequest, Parent
 from apps.accounts.models import User
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -98,36 +98,6 @@ class DisciplineLogSerializer(serializers.ModelSerializer):
         model = DisciplineLog
         fields = '__all__'
         read_only_fields = ('school', 'reported_by')
-
-class LeaveSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    role_name = serializers.CharField(source='user.role', read_only=True)
-    
-    class Meta:
-        model = Leave
-        fields = '__all__'
-        read_only_fields = ('school', 'user')
-
-class PrincipalTaskSerializer(serializers.ModelSerializer):
-    assignee_name = serializers.CharField(source='assigned_to.name', read_only=True)
-    assignee_role = serializers.CharField(source='assigned_to.role', read_only=True)
-    
-    class Meta:
-        model = PrincipalTask
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class GrievanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Grievance
-        fields = '__all__'
-        read_only_fields = ('school',)
-
-class EventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = '__all__'
-        read_only_fields = ('school',)
 
 class AdmissionRequestSerializer(serializers.ModelSerializer):
     class_name = serializers.CharField(source='class_applied_for.name', read_only=True)

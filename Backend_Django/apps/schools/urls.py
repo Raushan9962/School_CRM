@@ -3,8 +3,6 @@ from . import views
 
 urlpatterns = [
     # Dashboard & Profile
-    path('stats/', views.SchoolAdminStatsView.as_view(), name='school-stats'),
-    path('list/', views.SchoolAdminSchoolListView.as_view(), name='school-list'),
     path('profile/', views.SchoolProfileView.as_view(), name='school-profile'),
     
     path('classes/', views.ClassListCreateView.as_view(), name='class-list'),
@@ -29,15 +27,6 @@ urlpatterns = [
     path('results/', views.ResultListCreateView.as_view(), name='result-list'),
     
     path('discipline/', views.DisciplineLogListCreateView.as_view(), name='discipline-list'),
-    
-    path('leaves/', views.LeaveListCreateView.as_view(), name='leave-list'),
-    path('leaves/<int:pk>/status/', views.LeaveStatusUpdateView.as_view(), name='leave-status'),
-    
-    path('tasks/', views.PrincipalTaskListCreateView.as_view(), name='task-list'),
-    path('grievances/', views.GrievanceListCreateView.as_view(), name='grievance-list'),
-    path('events/', views.EventListCreateView.as_view(), name='event-list'),
-    
-    path('dashboard-alerts/', views.DashboardAlertsView.as_view(), name='dashboard-alerts'),
     
     path('admissions/apply/', views.AdmissionApplyView.as_view(), name='admission-apply'),
     path('admissions/', views.AdmissionRequestListView.as_view(), name='admission-list'),

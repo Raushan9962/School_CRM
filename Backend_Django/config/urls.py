@@ -50,6 +50,22 @@ urlpatterns = [
         "api/library/",
         include("apps.library.urls"),
     ),
+    path(
+        "api/transport/",
+        include("apps.transport.urls"),
+    ),
+    path(
+        "api/certificates/",
+        include("apps.certificates.urls"),
+    ),
+    path(
+        "api/school-admin/",
+        include("apps.school_admin.urls"),
+    ),
+    path(
+        "api/principal/",
+        include("apps.principal.urls"),
+    ),
 ]
 
 

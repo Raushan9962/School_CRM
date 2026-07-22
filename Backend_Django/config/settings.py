@@ -58,6 +58,10 @@ INSTALLED_APPS = [
     'apps.superadmin',
     'apps.attendance',
     'apps.library',
+    'apps.transport',
+    'apps.certificates',
+    'apps.school_admin',
+    'apps.principal',
 ]
 AUTH_USER_MODEL = "accounts.User"
 

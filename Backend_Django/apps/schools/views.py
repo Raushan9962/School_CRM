@@ -7,8 +7,7 @@ from django.db import transaction
 
 from .models import (
     School, Class, Student, Teacher, Subject, Timetable, SyllabusTracking, 
-    Exam, Result, DisciplineLog, Leave, 
-    PrincipalTask, Grievance, Event, AdmissionRequest, Parent
+    Exam, Result, DisciplineLog, AdmissionRequest, Parent
 )
 from apps.accounts.models import User
 from .serializers import (
@@ -17,9 +16,7 @@ from .serializers import (
     StudentSerializer,
     TeacherSerializer, SubjectSerializer, TimetableSerializer, 
     SyllabusTrackingSerializer, ExamSerializer, ResultSerializer, 
-    DisciplineLogSerializer, LeaveSerializer, 
-    PrincipalTaskSerializer, GrievanceSerializer, EventSerializer,
-    AdmissionRequestSerializer, ParentSerializer
+    DisciplineLogSerializer, AdmissionRequestSerializer, ParentSerializer
 )
 from apps.finance.models import FeeStructure, StudentFeeInvoice
 import uuid
@@ -57,67 +54,6 @@ class SchoolProfileView(APIView):
             return Response({"success": True, "message": "Profile updated successfully", "data": serializer.data})
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class SchoolAdminStatsView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
-    
-    def get(self, request, *args, **kwargs):
-        school = request.user.school
-        if not school:
-            return Response({"error": "No school associated"}, status=status.HTTP_404_NOT_FOUND)
-            
-        try:
-            # 1. Total Students in THIS school
-            total_students = Student.objects.filter(school=school).count()
-            
-            # 2. Monthly Revenue (Cost of their plan)
-            monthly_revenue = 0.0
-            if school.plan:
-                if school.billing_cycle == 'Monthly':
-                    monthly_revenue = school.plan.monthly_price
-                else:
-                    monthly_revenue = school.plan.yearly_price / 12.0
-                    
-            stats = {
-                "totalSchools": 1,  # They only have 1 school
-                "totalStudents": total_students,
-                "estimatedMonthlyRevenue": f"{monthly_revenue:.2f}"
-            }
-            
-            return Response({"success": True, "data": stats})
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-class SchoolAdminSchoolListView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
-    
-    def get(self, request, *args, **kwargs):
-        # Returns just their school in a list to match the getSchoolsList format
-        school = request.user.school
-        if not school:
-            return Response({"success": True, "data": []})
-            
-        student_count = Student.objects.filter(school=school).count()
-        
-        data = [{
-            "id": school.id,
-            "name": school.name,
-            "email": school.email,
-            "phone": school.phone_number,
-            "city": school.city,
-            "subscription_status": school.subscription_status,
-            "billing_cycle": school.billing_cycle,
-            "created_at": school.created_at,
-            "plan_name": school.plan.name if school.plan else None,
-            "max_students": school.plan.max_students if school.plan else None,
-            "monthly_price": school.plan.monthly_price if school.plan else None,
-            "yearly_price": school.plan.yearly_price if school.plan else None,
-            "current_students": student_count
-        }]
-        
-        return Response({"success": True, "data": data})
 
 class ClassListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     queryset = Class.objects.all()
@@ -262,60 +198,6 @@ class DisciplineLogListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     serializer_class = DisciplineLogSerializer
     def perform_create(self, serializer):
         serializer.save(school=self.request.user.school, reported_by=self.request.user)
-
-class LeaveListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Leave.objects.all()
-    serializer_class = LeaveSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school, user=self.request.user)
-
-class LeaveStatusUpdateView(SchoolBaseView, generics.UpdateAPIView):
-    queryset = Leave.objects.all()
-    serializer_class = LeaveSerializer
-
-class PrincipalTaskListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = PrincipalTask.objects.all()
-    serializer_class = PrincipalTaskSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class GrievanceListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Grievance.objects.all()
-    serializer_class = GrievanceSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class EventListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class DashboardAlertsView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
-
-    def get(self, request, *args, **kwargs):
-        school = request.user.school
-        
-        pending_leaves = Leave.objects.filter(school=school, status='Pending').order_by('-created_at')[:5]
-        leave_data = LeaveSerializer(pending_leaves, many=True).data
-        
-        grievance_count = Grievance.objects.filter(school=school).exclude(status='Resolved').count()
-        critical_alerts = []
-        if grievance_count > 0:
-            critical_alerts.append({
-                "id": "grievance",
-                "type": "Issue",
-                "severity": "high",
-                "message": f"{grievance_count} unresolved grievances.",
-                "time": "Today"
-            })
-            
-        if not critical_alerts:
-            critical_alerts.append({"id": "1", "type": "System", "severity": "low", "message": "School operations running smoothly.", "time": "Just now"})
-            
-        return Response({"success": True, "data": {"criticalAlerts": critical_alerts, "pendingLeaves": leave_data}})
 
 class StudentProfileDetailView(SchoolBaseView, APIView):
     def get(self, request, pk, *args, **kwargs):
