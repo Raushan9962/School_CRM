@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config 
+from decouple import config
+import dj_database_url
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,9 +29,11 @@ DEBUG = config("DEBUG",cast =bool)
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 
-# ALLOWED_HOSTS = []
+APPEND_SLASH = False
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'corsheaders',
+
 
     # Third Party Apps
     'rest_framework',
@@ -52,7 +56,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 
     # Local Apps
-    'apps.accounts',
+    'apps.authentication',
     'apps.schools',
     'apps.finance',
     'apps.superadmin',
@@ -64,10 +68,22 @@ INSTALLED_APPS = [
     'apps.principal',
     'apps.academics',
     'apps.complaints',
+    'apps.hostels',
+    'apps.inventory',
+    'apps.leaves',
+    'apps.notifications',
+    'apps.parents',
+    'apps.events',
+    'apps.admissions',
+    'apps.staff',
+    'apps.accountant',
+    'apps.users',
+    'apps.profiles',
 ]
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.User"  # 'accounts' is the app label (see authentication/apps.py)
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,6 +92,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -110,10 +129,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
 }
 
 

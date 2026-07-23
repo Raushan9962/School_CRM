@@ -13,3 +13,13 @@ class BusListCreateView(SchoolBaseView, generics.ListCreateAPIView):
 class BusDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
     queryset = Bus.objects.all()
     serializer_class = BusSerializer
+
+from .models import TransportRoute
+from .serializers import TransportRouteSerializer
+
+class TransportRouteListCreateView(SchoolBaseView, generics.ListCreateAPIView):
+    queryset = TransportRoute.objects.all()
+    serializer_class = TransportRouteSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)

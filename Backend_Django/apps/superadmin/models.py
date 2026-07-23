@@ -1,6 +1,9 @@
 from django.db import models
 
 class SubscriptionPlan(models.Model):
+    class Meta:
+        db_table = 'subscriptionplans'
+
     name = models.CharField(max_length=100)
     max_students = models.IntegerField(blank=True, null=True)
     monthly_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -10,6 +13,9 @@ class SubscriptionPlan(models.Model):
         return self.name
 
 class Transaction(models.Model):
+    class Meta:
+        db_table = 'transactions'
+
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='crm_transactions')
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -28,6 +34,9 @@ class Transaction(models.Model):
         return f"CRM Payment {self.invoice_no} for {self.school.name}"
 
 class PlatformSetting(models.Model):
+    class Meta:
+        db_table = 'platformsettings'
+
     setting_key = models.CharField(max_length=100, unique=True)
     setting_value = models.TextField()
     updated_at = models.DateTimeField(auto_now=True)

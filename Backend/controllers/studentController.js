@@ -43,7 +43,7 @@ exports.getStudentProfileByUserId = async (req, res) => {
             LEFT JOIN classes c ON s.class_id = c.id
             WHERE s.user_id = $1
         `, [userId]);
-        
+
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Student profile not found' });
         }
@@ -57,7 +57,7 @@ exports.getStudentProfileByUserId = async (req, res) => {
 exports.getStudentDashboardStats = async (req, res) => {
     try {
         const userId = req.params.userId;
-        
+
         // 1. Get student ID
         const studentRes = await pool.query(`SELECT id FROM students WHERE user_id = $1`, [userId]);
         if (studentRes.rows.length === 0) {
@@ -73,7 +73,7 @@ exports.getStudentDashboardStats = async (req, res) => {
             FROM attendance 
             WHERE student_id = $1
         `, [studentId]);
-        
+
         let attendancePercentage = 0;
         if (attRes.rows[0].total_days > 0) {
             attendancePercentage = Math.round((attRes.rows[0].present_days / attRes.rows[0].total_days) * 100);

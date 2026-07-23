@@ -4,6 +4,9 @@ from apps.schools.models import School, Student
 from apps.academics.models import Class
 
 class FeeStructure(models.Model):
+    class Meta:
+        db_table = 'feestructures'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='fee_structures')
     class_id = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='fee_structures')
     fee_type = models.CharField(max_length=100)
@@ -14,6 +17,9 @@ class FeeStructure(models.Model):
         return f"{self.fee_type} - {self.class_id.name}"
 
 class LegacyFee(models.Model):
+    class Meta:
+        db_table = 'legacyfees'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='legacy_fees')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='legacy_fees')
     due_date = models.DateField(blank=True, null=True)
@@ -29,6 +35,9 @@ class LegacyFee(models.Model):
         return f"Legacy Fee {self.id} for {self.student.user.username}"
 
 class StudentFeeInvoice(models.Model):
+    class Meta:
+        db_table = 'studentfeeinvoices'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='fee_invoices')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='invoices')
     fee_structure = models.ForeignKey(FeeStructure, on_delete=models.CASCADE)
@@ -42,6 +51,9 @@ class StudentFeeInvoice(models.Model):
         return f"Invoice {self.id} for {self.student.user.username}"
 
 class FeeReceipt(models.Model):
+    class Meta:
+        db_table = 'feereceipts'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='fee_receipts')
     receipt_number = models.CharField(max_length=50, unique=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='receipts')
@@ -59,6 +71,9 @@ class FeeReceipt(models.Model):
         return self.receipt_number
 
 class Expense(models.Model):
+    class Meta:
+        db_table = 'expenses'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='expenses')
     category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -73,6 +88,9 @@ class Expense(models.Model):
         return f"{self.category} - {self.amount}"
 
 class Vendor(models.Model):
+    class Meta:
+        db_table = 'vendors'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='vendors')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=100, blank=True, null=True)
@@ -90,6 +108,9 @@ class Vendor(models.Model):
         return self.name
 
 class VendorPayment(models.Model):
+    class Meta:
+        db_table = 'vendorpayments'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -102,6 +123,9 @@ class VendorPayment(models.Model):
         return f"Payment to {self.vendor.name} - {self.amount}"
 
 class Payroll(models.Model):
+    class Meta:
+        db_table = 'payrolls'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='payrolls')
     staff = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payrolls')
     month = models.IntegerField()
@@ -118,6 +142,9 @@ class Payroll(models.Model):
         return f"Payroll {self.staff.username} - {self.month}/{self.year}"
 
 class ScholarshipDiscount(models.Model):
+    class Meta:
+        db_table = 'scholarshipdiscounts'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='scholarships')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='scholarships')
     grant_type = models.CharField(max_length=100)
@@ -132,3 +159,21 @@ class ScholarshipDiscount(models.Model):
     
     def __str__(self):
         return f"{self.grant_type} for {self.student.user.username}"
+
+class CRMSubscriptionRecord(models.Model):
+    class Meta:
+        db_table = 'crmsubscriptionrecords'
+
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='crm_subscriptions')
+    plan = models.ForeignKey('superadmin.SubscriptionPlan', on_delete=models.SET_NULL, null=True, blank=True)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2)
+    payment_date = models.DateField(auto_now_add=True)
+    valid_until = models.DateField(blank=True, null=True)
+    receipt = models.FileField(upload_to='crm_receipts/', blank=True, null=True)
+    status = models.CharField(max_length=50, default='Pending') # Pending, Approved, Rejected
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"CRM Subscription - {self.school.name} on {self.payment_date}"
+

@@ -1,10 +1,6 @@
 from rest_framework import serializers
 from .models import SubscriptionPlan, Transaction, PlatformSetting
 
-class SubscriptionPlanSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubscriptionPlan
-        fields = '__all__'
 
 class TransactionSerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source='school.name', read_only=True)

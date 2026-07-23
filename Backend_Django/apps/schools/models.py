@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 
 class School(models.Model):
+    class Meta:
+        db_table = 'schools'
+
     name = models.CharField(max_length=255)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -23,6 +26,9 @@ class School(models.Model):
         return self.name
 
 class Student(models.Model):
+    class Meta:
+        db_table = 'students'
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student_profile')
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='students')
     class_id = models.ForeignKey('academics.Class', on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
@@ -55,6 +61,9 @@ class Student(models.Model):
         return f"{self.user.username} - {self.admission_no}"
 
 class Teacher(models.Model):
+    class Meta:
+        db_table = 'teachers'
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='teacher_profile')
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='teachers')
     employee_id = models.CharField(max_length=50, blank=True, null=True)
@@ -66,6 +75,9 @@ class Teacher(models.Model):
 
 
 class DisciplineLog(models.Model):
+    class Meta:
+        db_table = 'discipline_logs'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='discipline_logs')
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
@@ -75,6 +87,9 @@ class DisciplineLog(models.Model):
     action_taken = models.CharField(max_length=255, default='Pending')
 
 class AdmissionRequest(models.Model):
+    class Meta:
+        db_table = 'admission_requests'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='admission_requests')
     student_name = models.CharField(max_length=255)
     dob = models.DateField(blank=True, null=True)
@@ -117,9 +132,140 @@ class AdmissionRequest(models.Model):
         return f"Admission Request: {self.student_name}"
 
 class Parent(models.Model):
+    class Meta:
+        db_table = 'parents'
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='parent_profile')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='parents')
     relation = models.CharField(max_length=50, default='Father')
     
     def __str__(self):
         return f"{self.user.username} ({self.relation} of {self.student.user.username})"
+
+class StudentRemark(models.Model):
+    class Meta:
+        db_table = 'student_remarks'
+
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='remarks_given')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='remarks_received')
+    remark_type = models.CharField(max_length=50)
+    remark = models.TextField()
+    recommendation = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class PTMMeeting(models.Model):
+    class Meta:
+        db_table = 'ptm_meetings'
+
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='ptm_meetings')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='ptm_meetings')
+    meeting_date = models.DateField()
+    meeting_time = models.TimeField()
+    agenda = models.TextField()
+    status = models.CharField(max_length=50, default='Scheduled')
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Principal(models.Model):
+    class Meta:
+        db_table = 'principals'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='principal_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principals')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.IntegerField(default=0)
+    joining_date = models.DateField(blank=True, null=True)
+    department = models.CharField(max_length=100, blank=True, null=True)
+    
+class Accountant(models.Model):
+    class Meta:
+        db_table = 'accountants'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='accountant_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='accountants')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.IntegerField(default=0)
+    joining_date = models.DateField(blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+class Librarian(models.Model):
+    class Meta:
+        db_table = 'librarians'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='librarian_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='librarians')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.IntegerField(default=0)
+    joining_date = models.DateField(blank=True, null=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+class TransportManager(models.Model):
+    class Meta:
+        db_table = 'transport_managers'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transport_manager_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='transport_managers')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    vehicle_assigned = models.CharField(max_length=100, blank=True, null=True)
+    route_assigned = models.CharField(max_length=100, blank=True, null=True)
+    license_number = models.CharField(max_length=100, blank=True, null=True)
+    joining_date = models.DateField(blank=True, null=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+class Receptionist(models.Model):
+    class Meta:
+        db_table = 'receptionists'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='receptionist_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='receptionists')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    joining_date = models.DateField(blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+class HostelWarden(models.Model):
+    class Meta:
+        db_table = 'hostel_wardens'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hostel_warden_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='hostel_wardens')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    hostel_block_assigned = models.CharField(max_length=100, blank=True, null=True)
+    joining_date = models.DateField(blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+class HRManager(models.Model):
+    class Meta:
+        db_table = 'hr_managers'
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hr_manager_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='hr_managers')
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.IntegerField(default=0)
+    joining_date = models.DateField(blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    bank_account = models.CharField(max_length=50, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=20, blank=True, null=True)
+    basic_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

@@ -6,3 +6,10 @@ class BusSerializer(serializers.ModelSerializer):
         model = Bus
         fields = '__all__'
         read_only_fields = ('school',)
+
+from .models import TransportRoute
+class TransportRouteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransportRoute
+        fields = '__all__'
+        read_only_fields = ('school',)

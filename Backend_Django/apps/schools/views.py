@@ -8,15 +8,14 @@ from django.db import transaction
 from .models import (
     School, Student, Teacher, DisciplineLog, AdmissionRequest, Parent
 )
-from apps.accounts.models import User
+from apps.authentication.models import User
 from .serializers import (
     SchoolSerializer,
-    StudentSerializer,
-    TeacherSerializer, DisciplineLogSerializer, AdmissionRequestSerializer, ParentSerializer
+    DisciplineLogSerializer, AdmissionRequestSerializer, ParentSerializer
 )
 from apps.finance.models import FeeStructure, StudentFeeInvoice
 import uuid
-from apps.accounts.permissions import HasRole
+from apps.authentication.permissions import HasRole
 
 class SchoolBaseView:
     permission_classes = [IsAuthenticated]
@@ -51,93 +50,6 @@ class SchoolProfileView(APIView):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StudentListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
-    
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
-        phone_number = data.get('phone_number')
-        
-        if not username or not email or not password:
-            return Response({"error": "Username, email, and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        try:
-            with transaction.atomic():
-                # 1. Create the User record
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    phone_number=phone_number,
-                    role='STUDENT',
-                    school=request.user.school
-                )
-                
-                # 2. Create the Student record
-                student_data = data.copy()
-                student_data.pop('username', None)
-                student_data.pop('email', None)
-                student_data.pop('password', None)
-                student_data.pop('phone_number', None)
-                
-                serializer = self.get_serializer(data=student_data)
-                if serializer.is_valid():
-                    serializer.save(user=user, school=request.user.school)
-                    return Response({"success": True, "message": "Student created successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
-                else:
-                    raise Exception(str(serializer.errors))
-                    
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-class StudentDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
-
-class TeacherListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Teacher.objects.all()
-    serializer_class = TeacherSerializer
-    
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password', 'password123')
-        
-        if not username or not email:
-            return Response({"error": "Username and email required"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        try:
-            with transaction.atomic():
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    role='TEACHER',
-                    school=request.user.school,
-                    name=data.get('name', username)
-                )
-                
-                teacher_data = data.copy()
-                teacher_data.pop('username', None)
-                teacher_data.pop('email', None)
-                teacher_data.pop('password', None)
-                
-                serializer = self.get_serializer(data=teacher_data)
-                if serializer.is_valid():
-                    serializer.save(user=user, school=request.user.school)
-                    return Response({"success": True, "data": serializer.data}, status=status.HTTP_201_CREATED)
-                raise Exception(str(serializer.errors))
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-class TeacherDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Teacher.objects.all()
-    serializer_class = TeacherSerializer
 
 
 class DisciplineLogListCreateView(SchoolBaseView, generics.ListCreateAPIView):
@@ -146,30 +58,6 @@ class DisciplineLogListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(school=self.request.user.school, reported_by=self.request.user)
 
-class StudentProfileDetailView(SchoolBaseView, APIView):
-    def get(self, request, pk, *args, **kwargs):
-        student = get_object_or_404(Student, pk=pk, school=request.user.school)
-        data = {
-            "basic_info": {
-                "name": student.user.name or student.user.username,
-                "admission_number": student.admission_no,
-                "roll_number": student.roll_number,
-                "class": student.class_id.name if student.class_id else 'Unassigned',
-                "section": student.section,
-                "gender": "Male",
-                "blood_group": "O+",
-            },
-            "contact_info": {
-                "mobile": student.parent_phone,
-                "email": student.user.email,
-            },
-            "attendance_summary": {
-                "working_days": 120,
-                "present": 112,
-                "percentage": '93%'
-            }
-        }
-        return Response({"success": True, "data": data})
 
 class AdmissionApplyView(APIView):
     permission_classes = [IsAuthenticated]

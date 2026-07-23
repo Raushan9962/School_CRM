@@ -5,26 +5,17 @@ from django.db.models import Count, Sum, Q, F
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from datetime import timedelta
-from apps.accounts.permissions import IsSuperAdmin
+from apps.authentication.permissions import IsSuperAdmin
 from .models import SubscriptionPlan, Transaction, PlatformSetting
 from apps.schools.models import School
-from apps.accounts.models import User
+from apps.authentication.models import User
 from .serializers import (
-    SubscriptionPlanSerializer,
     TransactionSerializer,
     PlatformSettingSerializer
 )
 
 class SuperAdminBaseView:
     permission_classes = [IsSuperAdmin]
-
-class SubscriptionPlanListCreateView(SuperAdminBaseView, generics.ListCreateAPIView):
-    queryset = SubscriptionPlan.objects.all()
-    serializer_class = SubscriptionPlanSerializer
-
-class SubscriptionPlanDetailView(SuperAdminBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = SubscriptionPlan.objects.all()
-    serializer_class = SubscriptionPlanSerializer
 
 class TransactionListView(APIView):
     permission_classes = [IsSuperAdmin]
@@ -298,3 +289,26 @@ class SendRemindersView(APIView):
     
     def post(self, request, *args, **kwargs):
         return Response({"success": True, "message": "Reminders sent successfully to all expiring schools"})
+
+class AllSchoolAdminsListView(APIView):
+    permission_classes = [IsSuperAdmin]
+    
+    def get(self, request, *args, **kwargs):
+        admins = User.objects.filter(role='SCHOOL_ADMIN').select_related('school')
+        data = [{
+            "admin_id": a.id, "admin_name": a.get_full_name() or a.username,
+            "admin_email": a.email, "admin_phone": a.phone_number,
+            "school_name": a.school.name if a.school else None,
+            "school_email": a.school.email if a.school else None,
+            "registered_at": a.created_at
+        } for a in admins]
+        return Response({"success": True, "count": len(data), "data": data})
+
+class SeedRolesView(APIView):
+    # This is for testing/initialization, maybe restrict to superadmin
+    permission_classes = [IsSuperAdmin]
+    
+    def post(self, request, *args, **kwargs):
+        # In Django we use Enum on the User model `User.Role`, so seeding isn't technically required 
+        # in the DB unless we change to a dynamic Role model. Returning success to mock Node.js behavior.
+        return Response({"success": True, "message": "Roles seeded", "created": []})

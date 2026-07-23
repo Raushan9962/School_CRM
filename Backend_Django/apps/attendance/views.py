@@ -9,7 +9,7 @@ import datetime
 from .models import Attendance, DailyAttendanceQR, StaffAttendance
 from apps.schools.models import Student
 from .serializers import AttendanceSerializer, StaffAttendanceSerializer, DailyAttendanceQRSerializer
-from apps.accounts.permissions import HasRole
+from apps.authentication.permissions import HasRole
 
 class GenerateDailyQRView(APIView):
     permission_classes = [IsAuthenticated, HasRole]
@@ -108,3 +108,102 @@ class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AttendanceSerializer
     queryset = Attendance.objects.all()
+
+class StaffAttendanceListView(APIView):
+    permission_classes = [IsAuthenticated, HasRole]
+    required_roles = ['SCHOOL ADMIN']
+    
+    def get(self, request):
+        school = request.user.school
+        date_str = request.query_params.get('date', str(datetime.date.today()))
+        
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        staff_users = User.objects.filter(school=school).exclude(role__in=['STUDENT', 'PARENT', 'SUPER_ADMIN'])
+        
+        data = []
+        for u in staff_users:
+            att = StaffAttendance.objects.filter(user=u, date=date_str).first()
+            data.append({
+                'user_id': u.id,
+                'name': u.username,
+                'role': u.role,
+                'image': u.profile_image.url if u.profile_image else None,
+                'attendance_id': att.id if att else None,
+                'status': att.status if att else None,
+                'remarks': att.remarks if att else None
+            })
+            
+        return Response({'success': True, 'count': len(data), 'data': data})
+
+class MarkStaffAttendanceView(APIView):
+    permission_classes = [IsAuthenticated, HasRole]
+    required_roles = ['SCHOOL ADMIN']
+    
+    def post(self, request):
+        school = request.user.school
+        user_id = request.data.get('userId')
+        date_str = request.data.get('date')
+        status_val = request.data.get('status')
+        remarks = request.data.get('remarks', '')
+        
+        if not all([user_id, date_str, status_val]):
+            return Response({'success': False, 'message': 'userId, date, and status are required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        target_user = User.objects.filter(id=user_id, school=school).exclude(role__in=['STUDENT', 'PARENT', 'SUPER_ADMIN']).first()
+        
+        if not target_user:
+            return Response({'success': False, 'message': 'Staff not found in your school'}, status=status.HTTP_404_NOT_FOUND)
+            
+        att, created = StaffAttendance.objects.update_or_create(
+            user=target_user,
+            date=date_str,
+            defaults={'status': status_val, 'remarks': remarks}
+        )
+        
+        return Response({
+            'success': True, 
+            'message': 'Attendance marked' if created else 'Attendance updated',
+            'data': StaffAttendanceSerializer(att).data
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+class MyAttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        if user.role == 'STUDENT':
+            student = Student.objects.filter(user=user).first()
+            if not student:
+                return Response({'success': False, 'message': 'Student profile not found'}, status=404)
+            data = Attendance.objects.filter(student=student).order_by('-date').values('date', 'status', 'remarks')
+        else:
+            data = StaffAttendance.objects.filter(user=user).order_by('-date').values('date', 'status', 'remarks')
+            
+        return Response({'success': True, 'data': list(data)})
+
+class MarkMyAttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        today_str = str(datetime.date.today())
+        
+        if user.role == 'STUDENT':
+            student = Student.objects.filter(user=user).first()
+            if not student:
+                return Response({'success': False, 'message': 'Student profile not found'}, status=404)
+            if Attendance.objects.filter(student=student, date=today_str).exists():
+                return Response({'success': False, 'message': 'Attendance already marked for today'}, status=400)
+                
+            Attendance.objects.create(student=student, class_id=student.class_id, date=today_str, status='Present', remarks='Self marked')
+        else:
+            if StaffAttendance.objects.filter(user=user, date=today_str).exists():
+                return Response({'success': False, 'message': 'Attendance already marked for today'}, status=400)
+                
+            StaffAttendance.objects.create(user=user, date=today_str, status='Present', remarks='Self marked')
+            
+        return Response({'success': True, 'message': 'Attendance marked successfully'})

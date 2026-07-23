@@ -3,6 +3,9 @@ from django.conf import settings
 from apps.schools.models import School
 
 class Complaint(models.Model):
+    class Meta:
+        db_table = 'complaints'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='complaints')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='complaints')
     subject = models.CharField(max_length=255)

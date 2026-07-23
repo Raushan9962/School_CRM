@@ -3,6 +3,9 @@ from django.conf import settings
 from apps.schools.models import School
 
 class PrincipalTask(models.Model):
+    class Meta:
+        db_table = 'principaltasks'
+
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principal_tasks')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)

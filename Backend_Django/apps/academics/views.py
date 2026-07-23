@@ -1,8 +1,9 @@
 from rest_framework import generics
-from .models import Course, Class, Subject, Timetable, SyllabusTracking, Exam, Result, Homework
+from .models import Course, Class, Subject, Timetable, SyllabusTracking, Exam, Result, Homework, Lecture
 from .serializers import (
-    CourseSerializer, ClassSerializer, SubjectSerializer, TimetableSerializer, 
-    SyllabusTrackingSerializer, ExamSerializer, ResultSerializer, HomeworkSerializer
+    CourseSerializer, ClassSerializer, 
+    SyllabusTrackingSerializer, ExamSerializer, ResultSerializer, HomeworkSerializer,
+    LectureSerializer
 )
 from apps.schools.views import SchoolBaseView
 
@@ -26,26 +27,6 @@ class ClassDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 
-class SubjectListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class SubjectDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
-
-class TimetableListCreateView(SchoolBaseView, generics.ListCreateAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
-    def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
-
-class TimetableDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
-
 class SyllabusTrackingListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     queryset = SyllabusTracking.objects.all()
     serializer_class = SyllabusTrackingSerializer
@@ -66,7 +47,20 @@ class ResultListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
     def perform_create(self, serializer):
-        serializer.save(school=self.request.user.school)
+        serializer.save()
+
+class ResultDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Result.objects.all()
+    serializer_class = ResultSerializer
+
+class StudentResultListView(SchoolBaseView, generics.ListAPIView):
+    serializer_class = ResultSerializer
+    def get_queryset(self):
+        # Maps to getResultsByStudentId
+        from apps.schools.models import Student
+        from django.shortcuts import get_object_or_404
+        student = get_object_or_404(Student, user_id=self.kwargs.get('studentId'))
+        return Result.objects.filter(student=student, student__school=self.request.user.school).order_by('-exam__date')
 
 class HomeworkListCreateView(SchoolBaseView, generics.ListCreateAPIView):
     queryset = Homework.objects.all()
@@ -83,6 +77,7 @@ class ClassHomeworkListView(SchoolBaseView, generics.ListAPIView):
     def get_queryset(self):
         return Homework.objects.filter(school=self.request.user.school, class_id_id=self.kwargs.get('classId')).order_by('due_date')
 
+
 class StudentHomeworkListView(SchoolBaseView, generics.ListAPIView):
     serializer_class = HomeworkSerializer
     def get_queryset(self):
@@ -90,3 +85,13 @@ class StudentHomeworkListView(SchoolBaseView, generics.ListAPIView):
         from django.shortcuts import get_object_or_404
         student = get_object_or_404(Student, user_id=self.kwargs.get('userId'), school=self.request.user.school)
         return Homework.objects.filter(school=self.request.user.school, class_id=student.class_id).order_by('due_date')
+
+class LectureListCreateView(SchoolBaseView, generics.ListCreateAPIView):
+    queryset = Lecture.objects.all()
+    serializer_class = LectureSerializer
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+
+class LectureDetailView(SchoolBaseView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Lecture.objects.all()
+    serializer_class = LectureSerializer

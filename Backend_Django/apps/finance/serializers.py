@@ -69,3 +69,14 @@ class ScholarshipDiscountSerializer(serializers.ModelSerializer):
         model = ScholarshipDiscount
         fields = '__all__'
         read_only_fields = ('school', 'created_by')
+
+from .models import CRMSubscriptionRecord
+
+class CRMSubscriptionRecordSerializer(serializers.ModelSerializer):
+    plan_name = serializers.CharField(source='plan.name', read_only=True)
+    
+    class Meta:
+        model = CRMSubscriptionRecord
+        fields = '__all__'
+        read_only_fields = ('school', 'created_by')
+

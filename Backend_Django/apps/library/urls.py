@@ -1,9 +1,19 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import (
+    BookViewSet, BookCategoryViewSet, LibrarySettingsView,
+    DashboardStatsView, SearchMemberView, IssueBookView, ReturnBookView
+)
+
+router = DefaultRouter()
+router.register(r'books', BookViewSet, basename='book')
+router.register(r'categories', BookCategoryViewSet, basename='category')
 
 urlpatterns = [
-    path('books/', views.BookListCreateView.as_view(), name='book-list'),
-    path('books/<int:pk>/', views.BookDetailView.as_view(), name='book-detail'),
-    path('issue/', views.IssueBookView.as_view(), name='issue-book'),
-    path('user/<int:user_id>/', views.UserTransactionsView.as_view(), name='user-transactions'),
+    path('stats', DashboardStatsView.as_view(), name='library-stats'),
+    path('settings', LibrarySettingsView.as_view(), name='library-settings'),
+    path('search-member', SearchMemberView.as_view(), name='library-search-member'),
+    path('issue', IssueBookView.as_view(), name='library-issue'),
+    path('return', ReturnBookView.as_view(), name='library-return'),
+    path('', include(router.urls)),
 ]
