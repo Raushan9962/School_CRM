@@ -35,33 +35,41 @@ const TimetableManagement = () => {
     const fetchData = async () => {
         try {
             const [ttRes, clsRes, subRes, tchRes] = await Promise.all([
-                apiFetch('/principal/timetables'),
-                apiFetch('/principal/classes'),
-                apiFetch('/principal/subjects'),
-                apiFetch('/school-admin/teachers')
+                apiFetch('/timetables'),
+                apiFetch('/classes'),
+                apiFetch('/subjects'),
+                apiFetch('/teachers')
             ]);
             
             if (ttRes.ok) {
                 const ttData = await ttRes.json();
-                if (ttData.success) setTimetables(ttData.data);
+                if (Array.isArray(ttData)) setTimetables(ttData);
+                else if (ttData.success) setTimetables(ttData.data || []);
             }
             if (clsRes.ok) {
                 const clsData = await clsRes.json();
-                if (clsData.success) {
-                    setClasses(clsData.data);
-                    if (clsData.data.length > 0) setSelectedClass(clsData.data[0].id.toString());
+                let classArr = [];
+                if (Array.isArray(clsData)) classArr = clsData;
+                else if (clsData.success) classArr = clsData.data || [];
+                
+                if (classArr.length > 0) {
+                    setClasses(classArr);
+                    setSelectedClass(classArr[0].id.toString());
+                } else {
+                    setClasses([]);
                 }
             } else {
-                setClasses([{ id: 1, name: 'Class X', section: 'A' }]);
-                setSelectedClass('1');
+                setClasses([]);
             }
             if (subRes.ok) {
                 const subData = await subRes.json();
-                if (subData.success) setSubjects(subData.data);
+                if (Array.isArray(subData)) setSubjects(subData);
+                else if (subData.success) setSubjects(subData.data || []);
             }
             if (tchRes.ok) {
                 const tchData = await tchRes.json();
-                if (tchData.success) setTeachers(tchData.data);
+                if (Array.isArray(tchData)) setTeachers(tchData);
+                else if (tchData.success) setTeachers(tchData.data || []);
             }
         } catch (err) {
             console.error("Failed to fetch timetable data", err);
@@ -88,7 +96,7 @@ const TimetableManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await apiFetch('/principal/timetables', {
+            await apiFetch('/timetables', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -201,12 +209,22 @@ const TimetableManagement = () => {
                                         {uniqueTimeSlots.length > 0 ? (
                                             uniqueTimeSlots.map(timeSlot => {
                                                 const period = dayPeriods.find(t => `${t.start_time.substring(0,5)} - ${t.end_time.substring(0,5)}` === timeSlot);
+                                                let subjName = period ? period.subject_name : null;
+                                                let tchrName = period ? period.teacher_name : null;
+                                                if (period && !subjName && period.subject_id) {
+                                                    const s = subjects.find(x => x.id.toString() === period.subject_id.toString());
+                                                    if (s) subjName = s.name;
+                                                }
+                                                if (period && !tchrName && period.teacher_id) {
+                                                    const t = teachers.find(x => x.id.toString() === period.teacher_id.toString());
+                                                    if (t) tchrName = t.name || t.first_name + ' ' + t.last_name;
+                                                }
                                                 return (
                                                     <td key={timeSlot} className="border border-slate-200 p-2 text-center align-top min-w-[150px]">
                                                         {period ? (
                                                             <div className="bg-indigo-50 border border-indigo-100 rounded-md p-2 shadow-sm text-sm">
-                                                                <div className="font-bold text-indigo-700">{period.subject_name || 'Free/Activity'}</div>
-                                                                <div className="text-indigo-500 text-xs mt-1">{period.teacher_name || 'No Teacher'}</div>
+                                                                <div className="font-bold text-indigo-700">{subjName || 'Free/Activity'}</div>
+                                                                <div className="text-indigo-500 text-xs mt-1">{tchrName || 'No Teacher'}</div>
                                                             </div>
                                                         ) : (
                                                             <div className="text-slate-300 text-sm italic">-</div>
@@ -271,7 +289,7 @@ const TimetableManagement = () => {
                                 <label className={labelClass}>Teacher (Optional)</label>
                                 <select name="teacherId" value={formData.teacherId} onChange={handleInputChange} className={inputClass}>
                                     <option value="">Select Teacher...</option>
-                                    {teachers.map(t => <option key={t.id} value={t.teacher_id}>{t.name}</option>)}
+                                    {teachers.map(t => <option key={t.id} value={t.id}>{t.name || t.first_name + ' ' + t.last_name}</option>)}
                                 </select>
                             </div>
                             
@@ -303,7 +321,7 @@ const TimetableManagement = () => {
                                 <label className={labelClass}>Select Teacher</label>
                                 <select name="teacherId" value={assignData.teacherId} onChange={handleAssignChange} className={inputClass} required>
                                     <option value="">Choose Teacher...</option>
-                                    {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                    {teachers.map(t => <option key={t.id} value={t.id}>{t.name || t.first_name + ' ' + t.last_name}</option>)}
                                 </select>
                             </div>
                             

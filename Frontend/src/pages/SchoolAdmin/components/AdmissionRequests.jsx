@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, Eye } from 'lucide-react';
+import apiFetch from '../../../services/api';
 
 const AdmissionRequests = () => {
     const [requests, setRequests] = useState([]);
@@ -7,7 +8,7 @@ const AdmissionRequests = () => {
     const [credentialsModal, setCredentialsModal] = useState(null);
 
     const fetchRequests = () => {
-        fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/requests`)
+        apiFetch('/admission/requests')
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -27,7 +28,7 @@ const AdmissionRequests = () => {
 
     const handleApprove = async (id) => {
         try {
-            const res = await fetch(`\${import.meta.env.VITE_API_BASE_URL}/admission/approve/${id}`, {
+            const res = await apiFetch(`/admission/approve/${id}`, {
                 method: 'POST'
             });
             const data = await res.json();

@@ -1,239 +1,159 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Lock, Edit, CreditCard, BookOpen, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import apiFetch from '../../../services/api';
+import { User, Mail, Phone, MapPin, Briefcase, Calendar, Key, AlertTriangle, CheckCircle2, Award } from 'lucide-react';
 
 const TeacherProfile = () => {
-    const [activeTab, setActiveTab] = useState('personal');
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [msg, setMsg] = useState('');
 
-    const [userImage, setUserImage] = useState('https://ui-avatars.com/api/?name=Anita+Sharma&background=10B981&color=fff&size=128');
-    const fileInputRef = useRef(null);
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
 
     useEffect(() => {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-            const userObj = JSON.parse(userStr);
-            if (userObj.image) setUserImage(userObj.image);
-        }
+        apiFetch('/teacher-portal/profile', { headers })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    if (!d.data || Object.keys(d.data).length === 0) {
+                        const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+                        setProfile({
+                            name: localUser.name || 'Teacher',
+                            email: localUser.email || 'teacher@school.com',
+                            phone: '9876543210',
+                            address: '123 Education Lane, Learning City',
+                            designation: 'Senior Teacher',
+                            joined_date: '2020-05-15',
+                            department: 'Science & Mathematics',
+                            qualifications: 'M.Sc. Physics, B.Ed.'
+                        });
+                    } else {
+                        setProfile(d.data);
+                    }
+                }
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
     }, []);
 
-    const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            const res = await apiFetch('/users/profile-image', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                setUserImage(data.imageUrl);
-                const userObj = JSON.parse(localStorage.getItem('user'));
-                userObj.image = data.imageUrl;
-                localStorage.setItem('user', JSON.stringify(userObj));
-            } else {
-                alert(data.message || 'Error uploading image');
-            }
-        } catch (error) {
-            console.error("Error uploading image:", error);
-        }
+    const handleChangePassword = () => {
+        setMsg('error:Password change is currently disabled for demo purposes.');
+        setTimeout(() => setMsg(''), 3000);
     };
 
-    const handleRemoveImage = async () => {
-        try {
-            const res = await apiFetch('/users/profile-image', {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-            if (data.success) {
-                setUserImage(data.imageUrl);
-                const userObj = JSON.parse(localStorage.getItem('user'));
-                userObj.image = data.imageUrl;
-                localStorage.setItem('user', JSON.stringify(userObj));
-            } else {
-                alert(data.message || 'Error removing image');
-            }
-        } catch (error) {
-            console.error("Error removing image:", error);
-        }
-    };
+    const isError = msg.startsWith('error:');
+    const msgText = msg.replace(/^(error|success):/, '');
 
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const teacher = {
-        name: user.name || "Anita Sharma",
-        employeeId: "EMP-2023-045",
-        department: "Science",
-        designation: "Senior Science Teacher",
-        qualification: "M.Sc. Physics, B.Ed.",
-        experience: "8 Years",
-        dob: "15-Aug-1985",
-        gender: "Female",
-        bloodGroup: "O+",
-        contact: {
-            email: user.email || "anita.sharma@vidyasetu.edu",
-            phone: "+91 98765 43210",
-            address: "123, Rose Villa, Green Park Avenue, New Delhi - 110016"
-        },
-        documents: [
-            { name: 'Aadhar Card', status: 'Verified', date: '10-Jan-2023' },
-            { name: 'PAN Card', status: 'Verified', date: '10-Jan-2023' },
-            { name: 'Degree Certificates', status: 'Verified', date: '15-Jan-2023' },
-            { name: 'Experience Letter', status: 'Pending Review', date: '10-Oct-2026' }
-        ]
-    };
+    const containerStyle = { display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' };
+    const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+    const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
+    const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
+    const sectionTitleStyle = { fontSize: '16px', fontWeight: 'bold', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 };
+
+    if (loading) {
+        return <div style={{ textAlign: 'center', padding: '80px', color: '#64748b', fontWeight: 'bold' }}>Loading profile...</div>;
+    }
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h2 className="m-0 text-xl font-bold text-slate-900 tracking-tight">My Profile</h2>
-                <div className="flex gap-3 w-full sm:w-auto">
-                    <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm">
-                        <Lock size={16} /> Change Password
-                    </button>
-                    <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm">
-                        <Edit size={16} /> Update Profile
-                    </button>
+        <div style={containerStyle} className="animate-fade-in">
+            {/* Header */}
+            <div style={headerStyle}>
+                <div>
+                    <h2 style={titleStyle}>My Profile</h2>
+                    <p style={subTitleStyle}>Manage your personal and professional details</p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                {/* Banner */}
-                <div className="h-32 bg-gradient-to-r from-emerald-500 to-emerald-700 w-full"></div>
-                
-                <div className="px-6 sm:px-8 pb-8 relative">
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-end -mt-12 sm:-mt-16 mb-4 gap-4">
-                        <div className="flex flex-col sm:flex-row sm:items-end gap-5">
-                            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-md mx-auto sm:mx-0">
-                                <img src={userImage} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
-                                <button onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white flex items-center justify-center transition-colors shadow-sm cursor-pointer">
-                                    <Camera size={14} />
-                                </button>
+            {msg && (
+                <div style={{ padding: '12px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid', backgroundColor: isError ? '#fef2f2' : '#ecfdf5', color: isError ? '#b91c1c' : '#047857', borderColor: isError ? '#fecaca' : '#a7f3d0' }}>
+                    {isError ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />} {msgText}
+                </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                {/* Left Col: Profile Summary */}
+                <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                        <div style={{ width: '96px', height: '96px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', fontWeight: 'bold', marginBottom: '16px', border: '4px solid white', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                            {profile?.name?.[0]?.toUpperCase()}
+                        </div>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>{profile?.name}</h3>
+                        <p style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: '500', color: '#64748b' }}>{profile?.designation}</p>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', textAlign: 'left', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#475569' }}>
+                                <Mail size={16} color="#94a3b8" /> {profile?.email}
                             </div>
-                            <div className="text-center sm:text-left pb-1">
-                                <h1 className="m-0 mb-1.5 text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{teacher.name}</h1>
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-slate-500 text-sm font-semibold">
-                                    <span className="flex items-center gap-1.5"><CreditCard size={16} /> {teacher.employeeId}</span>
-                                    <span className="hidden sm:inline">•</span>
-                                    <span className="flex items-center gap-1.5"><BookOpen size={16} /> {teacher.department} Department</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#475569' }}>
+                                <Phone size={16} color="#94a3b8" /> {profile?.phone || 'Not provided'}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#475569' }}>
+                                <MapPin size={16} color="#94a3b8" /> {profile?.address || 'Not provided'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                        <h3 style={sectionTitleStyle}><Key size={18} color="#3b82f6" /> Security Settings</h3>
+                        <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>Keep your account secure by updating your password regularly.</p>
+                        <button onClick={handleChangePassword} style={{ width: '100%', padding: '10px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: 'bold', color: '#334155', cursor: 'pointer', transition: 'all 0.2s' }}>
+                            Change Password
+                        </button>
+                    </div>
+                </div>
+
+                {/* Right Col: Professional Details */}
+                <div style={{ flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                        <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#f8fafc' }}>
+                            <h3 style={sectionTitleStyle}><Briefcase size={18} color="#3b82f6" /> Professional Information</h3>
+                        </div>
+                        <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Department</label>
+                                <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#1e293b' }}>{profile?.department || 'General'}</div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Designation</label>
+                                <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#1e293b' }}>{profile?.designation || 'Teacher'}</div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Date of Joining</label>
+                                <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Calendar size={16} color="#64748b" /> {profile?.joined_date ? new Date(profile.joined_date).toLocaleDateString('en-IN') : '—'}
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Qualifications</label>
+                                <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Award size={16} color="#64748b" /> {profile?.qualifications || 'B.Ed'}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="border-b border-slate-200 mb-4 flex overflow-x-auto hide-scrollbar">
-                        <div className="flex gap-4 sm:gap-8">
-                            {['personal', 'documents'].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`py-3 text-[15px] font-semibold whitespace-nowrap border-b-2 transition-colors cursor-pointer ${
-                                        activeTab === tab ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
-                                    }`}
-                                >
-                                    {tab === 'personal' ? 'Professional & Personal Details' : 'Documents'}
-                                </button>
-                            ))}
+                    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                        <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#f8fafc' }}>
+                            <h3 style={sectionTitleStyle}><User size={18} color="#3b82f6" /> Edit Profile (Demo)</h3>
+                        </div>
+                        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Full Name</label>
+                                    <input type="text" value={profile?.name || ''} readOnly style={{ padding: '10px 12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#64748b', cursor: 'not-allowed' }} />
+                                </div>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Phone Number</label>
+                                    <input type="text" value={profile?.phone || ''} readOnly style={{ padding: '10px 12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#64748b', cursor: 'not-allowed' }} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Residential Address</label>
+                                <textarea rows={2} value={profile?.address || ''} readOnly style={{ padding: '10px 12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#64748b', cursor: 'not-allowed', resize: 'none' }} />
+                            </div>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#64748b', fontStyle: 'italic' }}>Note: Profile editing is restricted to School Admin only. Please contact administration to update these details.</p>
                         </div>
                     </div>
-
-                    {/* Tab Content */}
-                    {activeTab === 'personal' && (
-                        <div className="flex flex-col gap-8">
-                            <div>
-                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Professional Information</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Designation</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.designation}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Qualification</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.qualification}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Experience</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.experience}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr className="border-slate-100 m-0" />
-
-                            <div>
-                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Personal Information</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Date of Birth</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.dob}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Gender</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.gender}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Blood Group</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.bloodGroup}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr className="border-slate-100 m-0" />
-
-                            <div>
-                                <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Contact Details</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Email</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.contact.email}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Phone Number</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800">{teacher.contact.phone}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 md:col-span-2">
-                                        <p className="m-0 mb-1 text-[13px] font-semibold text-slate-400 uppercase tracking-wider">Residential Address</p>
-                                        <p className="m-0 text-[15px] font-bold text-slate-800 leading-relaxed">{teacher.contact.address}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'documents' && (
-                        <div>
-                            <h3 className="m-0 mb-4 text-sm font-bold text-slate-800">Uploaded Documents</h3>
-                            <div className="flex flex-col gap-3">
-                                {teacher.documents.map((doc, idx) => (
-                                    <div key={idx} className="flex flex-col sm:flex-row justify-between sm:items-center p-4 border border-slate-200 rounded-xl bg-slate-50 gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                                                <FileText size={20} />
-                                            </div>
-                                            <div>
-                                                <h4 className="m-0 mb-1 text-[15px] font-bold text-slate-800">{doc.name}</h4>
-                                                <p className="m-0 text-[13px] font-medium text-slate-500">Uploaded on: {doc.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between sm:justify-end gap-4 mt-2 sm:mt-0">
-                                            <span className={`px-3 py-1 rounded-full text-[12px] font-bold ${
-                                                doc.status === 'Verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                                            }`}>
-                                                {doc.status}
-                                            </span>
-                                            <button className="px-4 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold transition-colors cursor-pointer">
-                                                View
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

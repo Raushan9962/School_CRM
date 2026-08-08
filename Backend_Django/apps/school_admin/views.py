@@ -9,8 +9,7 @@ from apps.schools.views import SchoolBaseView
 from apps.authentication.permissions import HasRole
 
 class SchoolAdminStatsView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
+    permission_classes = [IsAuthenticated, HasRole('SCHOOL_ADMIN', 'PRINCIPAL')]
     
     def get(self, request, *args, **kwargs):
         school = request.user.school
@@ -74,8 +73,7 @@ class SchoolAdminStatsView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SchoolAdminSchoolListView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
+    permission_classes = [IsAuthenticated, HasRole('SCHOOL_ADMIN')]
     
     def get(self, request, *args, **kwargs):
         school = request.user.school
@@ -101,8 +99,7 @@ class SchoolAdminSchoolListView(APIView):
         return Response({"success": True, "data": data})
 
 class DashboardAlertsView(APIView):
-    permission_classes = [IsAuthenticated, HasRole]
-    required_roles = ['SCHOOL ADMIN']
+    permission_classes = [IsAuthenticated, HasRole('SCHOOL_ADMIN', 'PRINCIPAL')]
 
     def get(self, request, *args, **kwargs):
         school = request.user.school

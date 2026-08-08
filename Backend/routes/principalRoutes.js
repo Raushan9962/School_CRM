@@ -58,11 +58,13 @@ router.post('/students/:id/transfer', principalController.transferStudent);
 router.get('/teachers', principalController.getTeachers);
 router.get('/teachers/performance', auth, principalController.getTeacherPerformance);
 router.get('/attendance', principalController.getAttendance);
+router.get('/attendance/summary', auth, principalController.getAttendanceSummary);
 router.get('/exams', principalController.getExams);
 router.get('/fees', principalController.getFees);
 router.get('/admissions', principalController.getAdmissions);
 router.get('/staff', principalController.getStaff);
 router.get('/communications', principalController.getCommunications);
+router.post('/communications', auth, principalController.createCommunication);
 router.get('/events', principalController.getEvents);
 
 // GET specific student attendance and results

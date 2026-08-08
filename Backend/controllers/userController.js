@@ -64,8 +64,15 @@ exports.createUser = async (req, res) => {
 
         // 5. Create Core User
         const image = `https://api.dicebear.com/5.x/initials/svg?seed=${name}`;
+        let generatedUsername = admissionNo;
+        if (targetRoleName !== "Student" && targetRoleName !== "Parent") {
+            generatedUsername = employeeId || `EMP-${Date.now()}`;
+        } else if (targetRoleName === "Parent") {
+            generatedUsername = phone || email || `PAR-${Date.now()}`;
+        }
+
         const userData = { 
-            name, email, username: admissionNo, phone: phone || null, password: hashedPassword, roleName: targetRoleName, 
+            name, email, username: generatedUsername, phone: phone || null, password: hashedPassword, roleName: targetRoleName, 
             schoolId: finalSchoolId, image, gender, dob: dob || null, address,
             bloodGroup, aadhaarNumber, city, state, pincode, emergencyContact 
         };
@@ -130,7 +137,19 @@ exports.createUser = async (req, res) => {
                 return res.status(400).json({ success: false, message: "A referenced record (like Class or School) does not exist." });
             }
             if (err.code === '23505') {
-                return res.status(400).json({ success: false, message: "Duplicate record found. The employee ID, email, or admission number might already exist." });
+                if (err.detail && err.detail.includes('phone')) {
+                    return res.status(400).json({ success: false, message: "Ye mobile number pehle se kisi aur account me registered hai. Kripya dusra number use karein." });
+                }
+                if (err.detail && err.detail.includes('email')) {
+                    return res.status(400).json({ success: false, message: "Ye email ID pehle se registered hai. Kripya dusri email use karein." });
+                }
+                if (err.detail && err.detail.includes('username')) {
+                    return res.status(400).json({ success: false, message: "Ye ID/Username pehle se maujood hai. Kripya dusra use karein." });
+                }
+                if (err.detail && err.detail.includes('employee_id')) {
+                    return res.status(400).json({ success: false, message: "Ye Employee ID pehle se registered hai." });
+                }
+                return res.status(400).json({ success: false, message: "Duplicate record found. Ye data (jaise email, phone ya ID) pehle se exist karta hai." });
             }
 
             return res.status(400).json({ success: false, message: err.message || "Failed to create profile" });
@@ -413,6 +432,33 @@ exports.getSchoolLibrarians = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to fetch librarians' });
+    }
+};
+
+// Delete User
+exports.deleteUser = async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const userId = req.params.id;
+        
+        // Ensure the requester has permissions (e.g., School Admin or Super Admin)
+        if (req.user.role !== 'School Admin' && req.user.role !== 'Super Admin') {
+            await client.query('ROLLBACK');
+            return res.status(403).json({ success: false, message: 'Access denied' });
+        }
+        
+        // Delete from users table (cascading deletes will handle role-specific tables if configured, otherwise they are orphaned or we can manually delete)
+        await client.query('DELETE FROM users WHERE id = $1', [userId]);
+        
+        await client.query('COMMIT');
+        return res.status(200).json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Delete User Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to delete user' });
+    } finally {
+        client.release();
     }
 };
 

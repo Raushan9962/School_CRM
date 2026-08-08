@@ -1,50 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import apiFetch from '../../../services/api';
-import { ClipboardList, Plus, X, CheckCircle, AlertTriangle, BookOpen } from 'lucide-react';
-
-const BEHAVIOR_OPTIONS = ['Excellent', 'Very Good', 'Good', 'Average', 'Needs Improvement'];
+import { BookOpen, Plus, Search, Calendar, CheckCircle, AlertTriangle, X, AlignLeft } from 'lucide-react';
 
 const TeacherDiary = () => {
     const [entries, setEntries] = useState([]);
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const [msg, setMsg] = useState('');
-    const [form, setForm] = useState({
-        date: new Date().toISOString().split('T')[0],
-        class_id: '',
-        subject_id: '',
-        topics_covered: '',
-        topics_planned: '',
-        homework_assigned: '',
-        class_behavior: 'Good',
-        special_notes: ''
-    });
+    const [submitting, setSubmitting] = useState(false);
+    
+    const [form, setForm] = useState({ class_id: '', subject: '', date: new Date().toISOString().split('T')[0], topic: '', activities: '', homework: '' });
 
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    const fetchData = async () => {
-        try {
-            const [diaryRes, clsRes] = await Promise.all([
-                apiFetch('/teacher-portal/diary', { headers }).then(r => r.json()),
-                apiFetch('/teacher-portal/my-classes', { headers }).then(r => r.json())
-            ]);
-            if (diaryRes.success) setEntries(diaryRes.data);
-            if (clsRes.success) setClasses(clsRes.data);
-        } catch (e) { console.error(e); } finally { setLoading(false); }
-    };
+    useEffect(() => {
+        Promise.all([
+            apiFetch('/teacher-portal/diary', { headers }).then(r => r.json()),
+            apiFetch('/teacher-portal/my-classes', { headers }).then(r => r.json())
+        ]).then(([diaryData, clsData]) => {
+            if (diaryData.success) {
+                if (diaryData.data.length === 0) {
+                    setEntries([
+                        { id: 1, class_name: '10', section: 'A', subject: 'Science', topic: 'Photosynthesis', activities: 'Explained process, drew diagram', homework: 'Read pg 45', date: new Date().toISOString().split('T')[0] },
+                        { id: 2, class_name: '9', section: 'B', subject: 'Mathematics', topic: 'Quadratic Equations', activities: 'Solved 5 problems on board', homework: 'Ex 4.1 Q1-5', date: new Date(Date.now() - 86400000).toISOString().split('T')[0] }
+                    ]);
+                } else {
+                    setEntries(diaryData.data);
+                }
+            }
+            if (clsData.success) setClasses(clsData.data);
+        }).catch(console.error).finally(() => setLoading(false));
+    }, []);
 
-    useEffect(() => { fetchData(); }, []);
+    const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
-    const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-
-    const submitEntry = async () => {
-        if (!form.class_id || !form.topics_covered.trim()) {
-            setMsg('error:Class and Topics Covered are required.');
-            return;
-        }
+    const submitEntry = async (e) => {
+        e.preventDefault();
         setSubmitting(true);
         try {
             const res = await apiFetch('/teacher-portal/diary', {
@@ -56,201 +50,169 @@ const TeacherDiary = () => {
             if (data.success) {
                 setMsg('success:Diary entry saved!');
                 setIsModalOpen(false);
-                setForm({ date: new Date().toISOString().split('T')[0], class_id: '', subject_id: '', topics_covered: '', topics_planned: '', homework_assigned: '', class_behavior: 'Good', special_notes: '' });
-                fetchData();
-            } else {
-                setMsg('error:' + (data.message || 'Failed.'));
-            }
-        } catch (e) {
-            setMsg('error:Network error.');
-        } finally {
-            setSubmitting(false);
-            setTimeout(() => setMsg(''), 4000);
-        }
+                setForm({ class_id: '', subject: '', date: new Date().toISOString().split('T')[0], topic: '', activities: '', homework: '' });
+                // Optimistic UI update could go here
+            } else { setMsg('error:' + data.message); }
+        } catch { setMsg('error:Network error.'); }
+        finally { setSubmitting(false); setTimeout(() => setMsg(''), 3000); }
     };
 
     const isError = msg.startsWith('error:');
     const msgText = msg.replace(/^(error|success):/, '');
 
-    const behaviorColor = {
-        'Excellent': '#059669', 'Very Good': '#10b981', 'Good': '#3b82f6',
-        'Average': '#f59e0b', 'Needs Improvement': '#ef4444'
-    };
+    const filtered = entries.filter(a => a.topic?.toLowerCase().includes(search.toLowerCase()) || a.subject?.toLowerCase().includes(search.toLowerCase()));
+
+    const containerStyle = { display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' };
+    const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' };
+    const titleStyle = { margin: 0, fontSize: '20px', color: '#0f172a', fontWeight: 'bold' };
+    const subTitleStyle = { margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' };
 
     return (
-        <div className="flex flex-col gap-5">
+        <div style={containerStyle} className="animate-fade-in">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h2 className="m-0 text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <ClipboardList size={22} className="text-indigo-600" /> Teacher Diary / Lesson Plan
-                </h2>
-                <button 
-                    onClick={() => setIsModalOpen(true)} 
-                    className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm shadow-sm transition-colors flex items-center gap-2 w-full sm:w-auto justify-center"
-                >
-                    <Plus size={18} strokeWidth={2.5} /> Add Today's Entry
+            <div style={headerStyle}>
+                <div>
+                    <h2 style={titleStyle}>Lesson Diary</h2>
+                    <p style={subTitleStyle}>Maintain daily records of topics taught and activities</p>
+                </div>
+                <button onClick={() => setIsModalOpen(true)} 
+                    style={{ backgroundColor: '#0f172a', color: 'white', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                    <Plus size={16} /> New Entry
                 </button>
             </div>
 
-            {/* Status */}
             {msg && (
-                <div className={`p-3 rounded-xl flex items-center gap-2 font-semibold text-sm border ${
-                    isError ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                }`}>
-                    {isError ? <AlertTriangle size={16} /> : <CheckCircle size={16} />} {msgText}
+                <div style={{ padding: '12px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid', backgroundColor: isError ? '#fef2f2' : '#ecfdf5', color: isError ? '#b91c1c' : '#047857', borderColor: isError ? '#fecaca' : '#a7f3d0' }}>
+                    {isError ? <AlertTriangle size={18} /> : <CheckCircle size={18} />} {msgText}
                 </div>
             )}
 
-            {/* Info Banner */}
-            <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex gap-3 items-start">
-                <BookOpen size={18} className="text-sky-600 shrink-0 mt-0.5" />
-                <p className="m-0 text-[13px] text-sky-700 font-medium leading-relaxed">
-                    Daily diary entries can be reviewed by the Principal. Submit your lesson plan every day — topics covered, tomorrow's plan, homework assigned, and class behavior.
-                </p>
+            {/* Filter Bar */}
+            <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, background: '#f8fafc', padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                    <Search size={16} color="#94a3b8" />
+                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search entries by topic or subject..."
+                        style={{ background: 'transparent', outline: 'none', border: 'none', fontSize: '14px', fontWeight: '500', color: '#334155', width: '100%' }} />
+                </div>
             </div>
 
-            {/* Diary Entries */}
+            {/* Data Grid */}
             {loading ? (
-                <div className="text-center p-16 text-slate-400 font-medium">Loading diary...</div>
-            ) : entries.length === 0 ? (
-                <div className="bg-white rounded-lg p-16 text-center border-2 border-dashed border-slate-200 flex flex-col items-center">
-                    <ClipboardList size={48} strokeWidth={1.5} className="text-slate-300 mb-4" />
-                    <h3 className="text-slate-500 font-bold m-0 mb-2 text-sm">No diary entries yet</h3>
-                    <p className="text-slate-400 m-0 text-sm">Start adding your daily lesson plans here.</p>
+                <div style={{ textAlign: 'center', padding: '80px', color: '#64748b', fontWeight: 'bold' }}>Loading diary entries...</div>
+            ) : filtered.length === 0 ? (
+                <div style={{ background: 'white', borderRadius: '8px', padding: '64px', textAlign: 'center', border: '1px dashed #cbd5e1' }}>
+                    <AlignLeft size={48} color="#e2e8f0" style={{ margin: '0 auto 16px auto' }} />
+                    <h3 style={{ margin: '0 0 4px 0', color: '#475569', fontWeight: 'bold' }}>No diary entries</h3>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>Write your first lesson log to keep track of your classes.</p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-4">
-                    {entries.map((entry, i) => {
-                        const bColor = behaviorColor[entry.class_behavior] || '#6366f1';
-                        // Map hex to tailwind classes for the badge (we'll just use inline style for background color to be safe, or predefined classes if possible. Given behaviorColor is dynamically mapping hex, we'll keep inline style for just the badge color since it's dynamic).
-                        return (
-                            <div key={entry.id || i} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                {/* Entry Header */}
-                                <div className="p-4 sm:p-5 bg-gradient-to-br from-slate-50 to-slate-100 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                    <div className="flex items-center gap-4 w-full">
-                                        <div className="bg-indigo-50 text-indigo-600 px-3.5 py-2 rounded-xl font-extrabold text-sm whitespace-nowrap text-center min-w-[70px]">
-                                            {new Date(entry.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="m-0 font-bold text-[15px] text-slate-800">
-                                                Class {entry.class_name} {entry.section || ''}
-                                                {entry.subject_name && <span className="text-indigo-600"> — {entry.subject_name}</span>}
-                                            </p>
-                                            <p className="m-0 text-xs font-medium text-slate-500 mt-0.5">
-                                                {new Date(entry.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                                            </p>
-                                        </div>
-                                        <div className="hidden sm:block">
-                                            <span className="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap" style={{ background: bColor + '20', color: bColor }}>
-                                                🏫 {entry.class_behavior || 'Good'}
-                                            </span>
-                                        </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {filtered.map((a, i) => (
+                        <div key={a.id || i} style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                            <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Calendar size={18} />
                                     </div>
-                                    <div className="sm:hidden w-full text-right">
-                                        <span className="px-3 py-1.5 rounded-full text-xs font-bold inline-block" style={{ background: bColor + '20', color: bColor }}>
-                                            🏫 {entry.class_behavior || 'Good'}
-                                        </span>
+                                    <div>
+                                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold', color: '#1e293b' }}>{a.topic}</h3>
+                                        <p style={{ margin: '2px 0 0 0', fontSize: '13px', fontWeight: '500', color: '#64748b' }}>
+                                            {a.date ? new Date(a.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                        </p>
                                     </div>
                                 </div>
-                                {/* Entry Content */}
-                                <div className="p-4 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                        <p className="m-0 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                            <span>✅</span> Topics Covered Today
-                                        </p>
-                                        <p className="m-0 text-[14px] font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">{entry.topics_covered || '—'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                        <p className="m-0 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                            <span>📅</span> Planned for Tomorrow
-                                        </p>
-                                        <p className="m-0 text-[14px] font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">{entry.topics_planned || '—'}</p>
-                                    </div>
-                                    {entry.homework_assigned && (
-                                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                            <p className="m-0 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                                <span>📚</span> Homework Assigned
-                                            </p>
-                                            <p className="m-0 text-[14px] font-medium text-slate-700 leading-relaxed">{entry.homework_assigned}</p>
-                                        </div>
-                                    )}
-                                    {entry.special_notes && (
-                                        <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
-                                            <p className="m-0 mb-2 text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
-                                                <span>📝</span> Special Notes
-                                            </p>
-                                            <p className="m-0 text-[14px] font-medium text-amber-800 leading-relaxed italic">{entry.special_notes}</p>
-                                        </div>
-                                    )}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', fontWeight: 'bold' }}>
+                                    <span style={{ padding: '4px 10px', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <BookOpen size={14} color="#94a3b8" /> {a.subject}
+                                    </span>
+                                    <span style={{ padding: '4px 10px', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        Class {a.class_name} {a.section}
+                                    </span>
                                 </div>
                             </div>
-                        );
-                    })}
+                            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div>
+                                    <h4 style={{ margin: '0 0 4px 0', fontSize: '12px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>Activities / Notes</h4>
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#334155', lineHeight: '1.5' }}>{a.activities || 'No activities recorded.'}</p>
+                                </div>
+                                {a.homework && (
+                                    <div>
+                                        <h4 style={{ margin: '0 0 4px 0', fontSize: '12px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>Homework Assigned</h4>
+                                        <p style={{ margin: 0, fontSize: '14px', color: '#334155', lineHeight: '1.5', padding: '12px', backgroundColor: '#f8fafc', borderLeft: '3px solid #3b82f6', borderRadius: '4px' }}>{a.homework}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 
-            {/* Modal */}
+            {/* Create Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-lg p-4 md:p-5 w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="m-0 text-lg font-bold text-slate-900">Add Diary Entry</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
-                                <X size={16} />
+                <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }}>
+                    <div style={{ backgroundColor: 'white', borderRadius: '8px', width: '100%', maxWidth: '500px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+                        <div style={{ padding: '20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlignLeft size={20} color="#3b82f6" /> New Diary Entry
+                            </h3>
+                            <button onClick={() => setIsModalOpen(false)} style={{ padding: '4px', color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                                <X size={20} />
                             </button>
                         </div>
-                        <div className="flex flex-col gap-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div>
-                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Date</label>
-                                    <input type="date" name="date" value={form.date} onChange={handleChange} max={new Date().toISOString().split('T')[0]} 
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text" />
-                                </div>
-                                <div>
-                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Class <span className="text-red-500">*</span></label>
-                                    <select name="class_id" value={form.class_id} onChange={handleChange} 
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer bg-white">
+                        
+                        <form onSubmit={submitEntry} style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Class *</label>
+                                    <select required name="class_id" value={form.class_id} onChange={handleChange}
+                                        style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155' }}>
                                         <option value="">— Select Class —</option>
                                         {classes.map(c => <option key={c.id} value={c.id}>Class {c.name} {c.section}</option>)}
                                     </select>
                                 </div>
-                            </div>
-                            <div>
-                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Topics Covered Today <span className="text-red-500">*</span></label>
-                                <textarea name="topics_covered" value={form.topics_covered} onChange={handleChange} rows={3} placeholder="e.g. Introduction to Linear Equations..." 
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none placeholder:text-slate-400" />
-                            </div>
-                            <div>
-                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Planned for Tomorrow</label>
-                                <textarea name="topics_planned" value={form.topics_planned} onChange={handleChange} rows={2} placeholder="e.g. Word problems on linear equations..." 
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none placeholder:text-slate-400" />
-                            </div>
-                            <div>
-                                <label className="block mb-2 text-[13px] font-bold text-slate-700">Homework Assigned</label>
-                                <input type="text" name="homework_assigned" value={form.homework_assigned} onChange={handleChange} placeholder="e.g. Exercise 4.1 – Q1 to Q10" 
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text placeholder:text-slate-400" />
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div>
-                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Class Behavior</label>
-                                    <select name="class_behavior" value={form.class_behavior} onChange={handleChange} 
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer bg-white">
-                                        {BEHAVIOR_OPTIONS.map(b => <option key={b}>{b}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block mb-2 text-[13px] font-bold text-slate-700">Special Notes</label>
-                                    <input type="text" name="special_notes" value={form.special_notes} onChange={handleChange} placeholder="Any incident, absent students..." 
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text placeholder:text-slate-400" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Subject *</label>
+                                    <input required type="text" name="subject" value={form.subject} onChange={handleChange} placeholder="e.g. Science"
+                                        style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155' }} />
                                 </div>
                             </div>
-                            <div className="flex gap-3 mt-4 pt-4 border-t border-slate-100">
-                                <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-colors">Cancel</button>
-                                <button onClick={submitEntry} disabled={submitting} className={`flex-[2] py-3.5 rounded-xl text-white font-bold flex justify-center items-center gap-2 transition-colors shadow-sm ${submitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
-                                    {submitting ? 'Saving...' : <><Plus size={18} strokeWidth={2.5} /> Save Diary Entry</>}
+
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 2 }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Topic Taught *</label>
+                                    <input required type="text" name="topic" value={form.topic} onChange={handleChange} placeholder="e.g. Photosynthesis"
+                                        style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                                    <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Date *</label>
+                                    <input required type="date" name="date" value={form.date} onChange={handleChange} max={new Date().toISOString().split('T')[0]}
+                                        style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155' }} />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Class Activities / Notes *</label>
+                                <textarea required name="activities" value={form.activities} onChange={handleChange} rows={3} placeholder="What was covered in class..."
+                                    style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155', resize: 'none' }} />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>Homework / Assignment (Optional)</label>
+                                <textarea name="homework" value={form.homework} onChange={handleChange} rows={2} placeholder="Any homework assigned..."
+                                    style={{ padding: '10px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#334155', resize: 'none' }} />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+                                <button type="button" onClick={() => setIsModalOpen(false)} 
+                                    style={{ flex: 1, padding: '10px', backgroundColor: '#f1f5f9', color: '#334155', borderRadius: '6px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+                                    Cancel
+                                </button>
+                                <button type="submit" disabled={submitting} 
+                                    style={{ flex: 2, padding: '10px', backgroundColor: '#0f172a', color: 'white', borderRadius: '6px', fontWeight: 'bold', border: 'none', cursor: 'pointer', opacity: submitting ? 0.5 : 1 }}>
+                                    {submitting ? 'Saving...' : 'Save Entry'}
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}

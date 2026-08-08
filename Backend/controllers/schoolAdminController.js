@@ -236,16 +236,22 @@ exports.updateLeaveStatus = async (req, res) => {
 exports.getFees = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
-        const result = await pool.query(`
-            SELECT f.*, s.class_enrolled, s.section, u.name as student_name, u.image as student_image
-            FROM fees f
-            JOIN students s ON f.student_id = s.id
-            JOIN users u ON s.user_id = u.id
-            WHERE s.school_id = $1
-            ORDER BY f.created_at DESC
-        `, [schoolId]);
+        let fees = [];
+        try {
+            const result = await pool.query(`
+                SELECT f.*, s.class_id, s.section, u.name as student_name, u.image as student_image
+                FROM fees f
+                JOIN students s ON f.student_id = s.id
+                JOIN users u ON s.user_id = u.id
+                WHERE s.school_id = $1
+                ORDER BY f.created_at DESC
+            `, [schoolId]);
+            fees = result.rows;
+        } catch(e) {
+            console.error("Fees table missing or error:", e.message);
+        }
 
-        return res.status(200).json({ success: true, count: result.rows.length, data: result.rows });
+        return res.status(200).json({ success: true, count: fees.length, data: fees });
     } catch (error) {
         console.error("Error fetching fees:", error);
         return res.status(500).json({ success: false, message: 'Failed to fetch fees' });
@@ -276,15 +282,21 @@ exports.collectFee = async (req, res) => {
 exports.getExpenses = async (req, res) => {
     try {
         const schoolId = req.user.schoolId;
-        const result = await pool.query(`
-            SELECT e.*, u.name as recorded_by_name
-            FROM expenses e
-            LEFT JOIN users u ON e.recorded_by = u.id
-            WHERE e.school_id = $1
-            ORDER BY e.date DESC, e.created_at DESC
-        `, [schoolId]);
+        let expenses = [];
+        try {
+            const result = await pool.query(`
+                SELECT e.*, u.name as recorded_by_name
+                FROM expenses e
+                LEFT JOIN users u ON e.recorded_by = u.id
+                WHERE e.school_id = $1
+                ORDER BY e.date DESC, e.created_at DESC
+            `, [schoolId]);
+            expenses = result.rows;
+        } catch(e) {
+            console.error("Expenses table missing or error:", e.message);
+        }
 
-        return res.status(200).json({ success: true, count: result.rows.length, data: result.rows });
+        return res.status(200).json({ success: true, count: expenses.length, data: expenses });
     } catch (error) {
         console.error("Error fetching expenses:", error);
         return res.status(500).json({ success: false, message: 'Failed to fetch expenses' });

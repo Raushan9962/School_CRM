@@ -12,7 +12,6 @@ const AttendanceManagement = () => {
     useEffect(() => {
         const fetchAttendance = async () => {
             try {
-                // Replace with actual class-wise attendance summary API when available
                 const res = await apiFetch('/principal/attendance/summary?date=' + date);
                 if (res.ok) {
                     const data = await res.json();
@@ -40,11 +39,47 @@ const AttendanceManagement = () => {
         filteredData = filteredData.filter(d => d.status === 'Critical' || d.status === 'Needs Review');
     }
 
+    // Calculate Dynamic KPIs
+    let overallAvg = 0;
+    let highestAttendance = { value: '-', sublabel: '-' };
+    let requiresAttention = { value: '-', sublabel: '-' };
+
+    if (classData.length > 0) {
+        let totalStudents = 0;
+        let totalPresent = 0;
+        let maxRate = -1;
+        let minRate = 101;
+        let maxClass = '';
+        let minClass = '';
+
+        classData.forEach(d => {
+            totalStudents += d.totalStudents;
+            totalPresent += d.present;
+            if (d.attendanceRate > maxRate) {
+                maxRate = d.attendanceRate;
+                maxClass = `${d.className}-${d.section}`;
+            }
+            if (d.attendanceRate < minRate) {
+                minRate = d.attendanceRate;
+                minClass = `${d.className}-${d.section}`;
+            }
+        });
+
+        overallAvg = totalStudents > 0 ? Math.round((totalPresent / totalStudents) * 100) : 0;
+        
+        if (maxRate !== -1) {
+            highestAttendance = { value: maxClass, sublabel: `${maxRate}% Present` };
+        }
+        if (minRate !== 101) {
+            requiresAttention = { value: minClass, sublabel: `${minRate}% Present` };
+        }
+    }
+
     const kpiCards = [
-        { label: 'Overall Student Avg', value: '91.5%', active: activeKpi === 'All', onClick: () => setActiveKpi('All'), sublabel: 'vs 89.2% last week' },
-        { label: 'Staff/Teacher Avg', value: '96.2%', active: false, sublabel: 'Consistent' },
-        { label: 'Highest Attendance', value: 'Class VIII-A', active: activeKpi === 'Highest', onClick: () => setActiveKpi('Highest'), sublabel: '100% Present' },
-        { label: 'Requires Attention', value: 'Class VIII-B', active: activeKpi === 'Attention', onClick: () => setActiveKpi('Attention'), sublabel: '79.4% Present' }
+        { label: 'Overall Student Avg', value: `${overallAvg}%`, active: activeKpi === 'All', onClick: () => setActiveKpi('All'), sublabel: 'Today' },
+        { label: 'Staff/Teacher Avg', value: '96.2%', active: false, sublabel: 'Consistent' }, // Static for now
+        { label: 'Highest Attendance', value: highestAttendance.value, active: activeKpi === 'Highest', onClick: () => setActiveKpi('Highest'), sublabel: highestAttendance.sublabel },
+        { label: 'Requires Attention', value: requiresAttention.value, active: activeKpi === 'Attention', onClick: () => setActiveKpi('Attention'), sublabel: requiresAttention.sublabel }
     ];
 
     const columns = [

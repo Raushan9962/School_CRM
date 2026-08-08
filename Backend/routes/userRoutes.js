@@ -9,6 +9,7 @@ router.post('/seed-roles', userController.seedRoles);
 // Protected user creation route
 // `auth` verifies the JWT. The controller handles the specific role hierarchy checks.
 router.post('/create', auth, userController.createUser);
+router.delete('/:id', auth, userController.deleteUser);
 
 // Super Admin: Get all registered School Admins with full details
 router.get('/school-admins', auth, userController.getAllSchoolAdmins);

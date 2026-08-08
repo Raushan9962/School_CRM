@@ -34,22 +34,22 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+            <div className="bg-white rounded shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
                 <div className="px-4 py-2 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                     <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                        <Camera size={20} className="text-blue-600" /> 
+                        <Camera size={20} className="text-slate-700" /> 
                         Scan Attendance QR
                     </h3>
                     <button 
                         onClick={onClose} 
-                        className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1.5 rounded-lg transition-colors"
+                        className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1.5 rounded transition-colors"
                     >
                         <X size={20} />
                     </button>
                 </div>
                 
                 <div className="p-4 flex flex-col items-center justify-center min-h-[300px]">
-                    <div id="reader" className="w-full border-none rounded-xl overflow-hidden shadow-inner"></div>
+                    <div id="reader" className="w-full border-none rounded overflow-hidden shadow-inner"></div>
                     <p className="text-sm text-slate-500 mt-4 text-center">
                         Align the Principal's daily QR code within the frame to mark your attendance.
                     </p>

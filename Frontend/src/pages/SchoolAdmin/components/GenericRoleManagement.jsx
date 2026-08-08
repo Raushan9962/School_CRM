@@ -58,10 +58,29 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
                         <ArrowLeft size={16} /> Back to List
                     </button>
                 </div>
-                <StaffForm onSave={() => setView('list')} onCancel={() => setView('list')} initialRole={roleName} />
+                <StaffForm onSave={() => { setView('list'); fetchStaff(); }} onCancel={() => setView('list')} initialRole={roleName} />
             </div>
         );
     }
+
+    const handleDelete = async (id) => {
+        if (window.confirm(`Are you sure you want to delete this ${roleName}?`)) {
+            try {
+                const res = await apiFetch(`/users/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    setView('list');
+                    setSelectedStaff(null);
+                    fetchStaff();
+                } else {
+                    alert(data.message || 'Failed to delete');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error deleting user');
+            }
+        }
+    };
 
     if (view === 'profile' && selectedStaff) {
         return (
@@ -71,9 +90,14 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
                         <h2 style={titleStyle}>{selectedStaff.name}'s Profile</h2>
                         <p style={subTitleStyle}>{selectedStaff.role} Details</p>
                     </div>
-                    <button onClick={() => { setView('list'); setSelectedStaff(null); }} style={btnSecondary}>
-                        <ArrowLeft size={16} /> Back to List
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={() => handleDelete(selectedStaff.id)} style={{ ...btnSecondary, color: '#ef4444', borderColor: '#fca5a5' }}>
+                            Delete {roleName}
+                        </button>
+                        <button onClick={() => { setView('list'); setSelectedStaff(null); }} style={btnSecondary}>
+                            <ArrowLeft size={16} /> Back to List
+                        </button>
+                    </div>
                 </div>
                 
                 <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden', maxWidth: '800px' }}>
@@ -125,6 +149,8 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
         u.phone?.toLowerCase().includes(search.toLowerCase())
     );
 
+    const showAddButton = roleName !== 'Principal' || staff.length === 0;
+
     return (
         <div style={containerStyle} className="animate-fade-in">
             <div style={headerStyle}>
@@ -132,9 +158,11 @@ const GenericRoleManagement = ({ roleName, title, description }) => {
                     <h2 style={titleStyle}>{title}</h2>
                     <p style={subTitleStyle}>{description}</p>
                 </div>
-                <button onClick={() => setView('create')} style={btnPrimary}>
-                    <Plus size={16} /> Add {roleName}
-                </button>
+                {showAddButton && (
+                    <button onClick={() => setView('create')} style={btnPrimary}>
+                        <Plus size={16} /> Add {roleName}
+                    </button>
+                )}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>

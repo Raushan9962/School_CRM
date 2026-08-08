@@ -57,7 +57,7 @@ const DashboardLayout = ({
                         setActiveTab(item.id);
                         if (isMobile) setIsSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 mb-0.5 font-medium text-[13px] transition-colors ${
+                    className={`w-full flex items-center cursor-pointer gap-3 px-4 py-3 mb-0.5 font-medium text-[13px] transition-colors ${
                         isSelected 
                         ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-800 font-bold' 
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent'

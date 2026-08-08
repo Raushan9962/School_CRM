@@ -19,26 +19,29 @@ const SubjectManagement = () => {
     const fetchData = async () => {
         try {
             const [subRes, clsRes, tchrRes] = await Promise.all([
-                apiFetch('/principal/subjects'),
-                apiFetch('/principal/classes'),
-                apiFetch('/school-admin/teachers') // using school admin's teacher list for simplicity
+                apiFetch('/subjects'),
+                apiFetch('/classes'),
+                apiFetch('/teachers')
             ]);
             
             if (subRes.ok) {
                 const subData = await subRes.json();
-                if (subData.success) setSubjects(subData.data || []);
+                if (Array.isArray(subData)) setSubjects(subData);
+                else if (subData.success) setSubjects(subData.data || []);
             } else {
                 setSubjects([]);
             }
 
             if (clsRes.ok) {
                 const clsData = await clsRes.json();
-                if (clsData.success) setClasses(clsData.data);
+                if (Array.isArray(clsData)) setClasses(clsData);
+                else if (clsData.success) setClasses(clsData.data);
             }
 
             if (tchrRes.ok) {
                 const tchrData = await tchrRes.json();
-                if (tchrData.success) setTeachers(tchrData.data);
+                if (Array.isArray(tchrData)) setTeachers(tchrData);
+                else if (tchrData.success) setTeachers(tchrData.data);
             }
         } catch (err) {
             console.error("Failed to fetch subjects data", err);
@@ -64,13 +67,24 @@ const SubjectManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await apiFetch('/principal/subjects', {
+            const payload = { ...formData };
+            if (!payload.classId) payload.classId = null;
+            if (!payload.teacherId) payload.teacherId = null;
+
+            const res = await apiFetch('/subjects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
             });
-            setIsModalOpen(false);
-            fetchData();
+            
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchData();
+            } else {
+                const data = await res.json();
+                console.error("Failed to save subject", data.error, data.details);
+                alert("Failed to save subject: " + (data.details || data.error || 'Unknown error'));
+            }
         } catch (err) {
             console.error("Failed to save subject", err);
         }
@@ -100,7 +114,11 @@ const SubjectManagement = () => {
                 {subjects.length === 0 ? (
                     <div className="col-span-full p-5 text-center bg-white rounded-lg border border-slate-200 text-slate-500">No subjects created yet.</div>
                 ) : (
-                    subjects.map(sub => (
+                    subjects.map(sub => {
+                        const assignedClass = classes.find(c => c.id === sub.class_id);
+                        const assignedTeacher = teachers.find(t => t.id === sub.teacher_id);
+                        
+                        return (
                         <div key={sub.id} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow flex flex-col">
                             <div className="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
                                 <div className="flex items-center gap-3">
@@ -117,15 +135,15 @@ const SubjectManagement = () => {
                             <div className="space-y-3 flex-1">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">Class</span>
-                                    <span className="font-semibold text-slate-700">{sub.class_name ? `${sub.class_name} (${sub.section})` : 'Unassigned'}</span>
+                                    <span className="font-semibold text-slate-700">{assignedClass ? `${assignedClass.name} (${assignedClass.section})` : 'Unassigned'}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">Teacher</span>
-                                    <span className="font-semibold text-slate-700">{sub.teacher_name || 'Unassigned'}</span>
+                                    <span className="font-semibold text-slate-700">{assignedTeacher ? (assignedTeacher.name || assignedTeacher.first_name + ' ' + assignedTeacher.last_name) : 'Unassigned'}</span>
                                 </div>
                             </div>
                         </div>
-                    ))
+                    )})
                 )}
             </div>
 
@@ -156,7 +174,7 @@ const SubjectManagement = () => {
                                 <select name="teacherId" value={formData.teacherId} onChange={handleInputChange} className={inputClass}>
                                     <option value="">Select a teacher...</option>
                                     {teachers.map(t => (
-                                        <option key={t.id} value={t.teacher_id}>{t.name}</option>
+                                        <option key={t.id} value={t.id}>{t.name || t.first_name + ' ' + t.last_name}</option>
                                     ))}
                                 </select>
                             </div>

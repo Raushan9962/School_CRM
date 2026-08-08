@@ -20,12 +20,17 @@ import GenericRoleManagement from './components/GenericRoleManagement';
 import AdmissionRequests from './components/AdmissionRequests';
 import FeeSettings from './components/FeeSettings';
 import { Briefcase, Building2, UserPlus } from "lucide-react";
+import apiFetch from '../../services/api';
 
 const SchoolAdminDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
+    const [stats, setStats] = useState({
+        totalStudents: '...',
+        totalTeachers: '...'
+    });
 
     useEffect(() => {
         const checkAuth = () => {
@@ -39,6 +44,7 @@ const SchoolAdminDashboard = () => {
                         return;
                     }
                     setCurrentUser(userObj);
+                    fetchStats();
                 } catch (e) {
                     console.error("Error parsing user data:", e);
                 }
@@ -46,6 +52,25 @@ const SchoolAdminDashboard = () => {
                 navigate('/login/student');
             }
         };
+
+        const fetchStats = async () => {
+            try {
+                const res = await apiFetch('/school-admin/dashboard-stats');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success) {
+                        setStats(prev => ({
+                            ...prev,
+                            totalStudents: data.data.totalStudents?.toString() || '0',
+                            totalTeachers: data.data.totalTeachers?.toString() || '0'
+                        }));
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching stats:", err);
+            }
+        };
+
         checkAuth();
     }, [navigate]);
 
@@ -58,6 +83,7 @@ const SchoolAdminDashboard = () => {
 
     const navItems = [
         { id: 'overview', label: 'Dashboard Overview', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+        { id: 'principal', label: 'Principal Mgmt', icon: <School size={20} strokeWidth={1.5} /> },
         { id: 'admissions', label: 'Admission Requests', icon: <FileText size={20} strokeWidth={1.5} /> },
         { id: 'fees', label: 'Fee Settings', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
         { id: 'student', label: 'Student Management', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
@@ -81,7 +107,7 @@ const SchoolAdminDashboard = () => {
 
         if (activeTab === 'student') {
             const tabs = [
-                { id: 'sa_stu_list', label: 'Student Records', count: '850' },
+                { id: 'sa_stu_list', label: 'Student Records', count: stats.totalStudents },
                 { id: 'sa_stu_att', label: 'Attendance' },
                 { id: 'sa_stu_acad', label: 'Academics' },
                 { id: 'sa_stu_trans', label: 'Transport Info' },
@@ -99,7 +125,7 @@ const SchoolAdminDashboard = () => {
 
         if (activeTab === 'teacher') {
             const tabs = [
-                { id: 'sa_tea_list', label: 'Teacher Directory', count: '45' },
+                { id: 'sa_tea_list', label: 'Teacher Directory', count: stats.totalTeachers },
                 { id: 'sa_tea_perf', label: 'Performance' },
                 { id: 'sa_tea_att', label: 'Attendance' },
                 { id: 'sa_tea_leave', label: 'Leave Requests' },
@@ -220,7 +246,7 @@ const SchoolAdminDashboard = () => {
                 { id: 'sa_prin_comm', label: 'Communications' }
             ];
             const contentMap = {
-                'sa_prin_det': <PrincipalDetails />,
+                'sa_prin_det': <GenericRoleManagement roleName="Principal" title="Principal Management" description="Manage school principal accounts." />,
                 'sa_prin_att': <StaffAttendance roleFilter="Principal" />,
                 'sa_prin_leave': <LeaveManagement roleFilter="Principal" />,
                 'sa_prin_payroll': <PayrollManagement roleFilter="Principal" />,

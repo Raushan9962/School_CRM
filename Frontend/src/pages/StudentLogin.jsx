@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiFetch from '../services/api';
 
@@ -6,10 +6,39 @@ const StudentLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is already logged in, redirect them back to their dashboard so they don't see the login page if they click back
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        const rawRole = user?.role || user?.roleName || '';
+        const role = rawRole.toLowerCase().replace(/\s+/g, '');
+        
+        if (role === 'superadmin') navigate('/SuperAdmin', { replace: true });
+        else if (role === 'schooladmin') navigate('/SchoolAdminDashboard', { replace: true });
+        else if (role === 'principal') navigate('/PrincipalDashboard', { replace: true });
+        else if (role === 'student') navigate('/StudentDashboard', { replace: true });
+        else if (role === 'teacher') navigate('/TeacherDashboard', { replace: true });
+        else if (role === 'accountant') navigate('/AccountantDashboard', { replace: true });
+        else if (role === 'transport') navigate('/TransportDashboard', { replace: true });
+        else if (role === 'librarian') navigate('/LibrarianDashboard', { replace: true });
+        else if (role === 'receptionist') navigate('/ReceptionistDashboard', { replace: true });
+        else if (role === 'labassistant') navigate('/LabAssistantDashboard', { replace: true });
+        else if (role === 'parent') navigate('/ParentDashboard', { replace: true });
+      } catch(e) {}
+    }
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     try {
       // Connects to the backend we built earlier
       const response = await apiFetch('/auth/login', {
@@ -30,33 +59,35 @@ const StudentLogin = () => {
         const role = rawRole.toLowerCase().replace(/\s+/g, '');
         // Route based on role
         if (role === 'superadmin') {
-          navigate('/SuperAdmin');
+          navigate('/SuperAdmin', { replace: true });
         } else if (role === 'schooladmin') {
-          navigate('/SchoolAdminDashboard');
+          navigate('/SchoolAdminDashboard', { replace: true });
         } else if (role === 'principal') {
-          navigate('/PrincipalDashboard');
+          navigate('/PrincipalDashboard', { replace: true });
         } else if (role === 'student') {
-          navigate('/StudentDashboard');
+          navigate('/StudentDashboard', { replace: true });
         } else if (role === 'teacher') {
-          navigate('/TeacherDashboard');
+          navigate('/TeacherDashboard', { replace: true });
         } else if (role === 'accountant') {
-          navigate('/AccountantDashboard');
+          navigate('/AccountantDashboard', { replace: true });
         } else if (role === 'transport') {
-          navigate('/TransportDashboard');
+          navigate('/TransportDashboard', { replace: true });
         } else if (role === 'librarian') {
-          navigate('/LibrarianDashboard');
+          navigate('/LibrarianDashboard', { replace: true });
         } else if (role === 'receptionist') {
-          navigate('/ReceptionistDashboard');
+          navigate('/ReceptionistDashboard', { replace: true });
         } else if (role === 'labassistant') {
-          navigate('/LabAssistantDashboard');
+          navigate('/LabAssistantDashboard', { replace: true });
         } else if (role === 'parent') {
-          navigate('/ParentDashboard');
+          navigate('/ParentDashboard', { replace: true });
         } else {
-          navigate('/'); // fallback
+          navigate('/', { replace: true }); // fallback
         }
       }
     } catch (err) {
       setError(err.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,10 +123,11 @@ const StudentLogin = () => {
             />
           </div>
           <button 
-            type="submit" 
-            className="w-full bg-orange-500 text-white font-bold py-2 rounded hover:bg-orange-600 transition-colors mt-2"
+            type="submit"
+            disabled={isLoading} 
+            className={`w-full bg-orange-500 text-white font-bold py-2 rounded transition-colors mt-2 ${isLoading ? 'opacity-70 cursor-wait' : 'hover:bg-orange-600 cursor-pointer'}`}
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

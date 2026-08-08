@@ -6,7 +6,7 @@ exports.createSubject = async (req, res) => {
         res.status(201).json({ message: 'Subject created successfully', data: result });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error creating subject' });
+        res.status(500).json({ error: 'Error creating subject', details: error.message, stack: error.stack });
     }
 };
 

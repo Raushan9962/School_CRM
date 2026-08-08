@@ -21,8 +21,8 @@ const SyllabusTracking = () => {
         try {
             const [sylRes, clsRes, subRes] = await Promise.all([
                 apiFetch('/principal/syllabus'),
-                apiFetch('/principal/classes'),
-                apiFetch('/principal/subjects')
+                apiFetch('/classes'),
+                apiFetch('/subjects')
             ]);
             
             const sylData = await sylRes.json();

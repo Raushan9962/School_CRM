@@ -6,23 +6,30 @@ const ExaminationManagement = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [classes, setClasses] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const res = await apiFetch('/principal/exams', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error('API not ready');
-                const json = await res.json();
-                setExams(json.data);
-            } catch (err) {
-                // Fallback to Hardcoded Data
-                setExams([
-                    { id: 1, name: 'Term 1 Final', classes: '1 to 12', date: '15 Oct 2026', status: 'Completed' },
-                    { id: 2, name: 'Term 2 Unit Test', classes: '9 to 12', date: '20 Nov 2026', status: 'Upcoming' },
-                    { id: 3, name: 'Pre-Boards', classes: '10, 12', date: '05 Jan 2027', status: 'Scheduled' }
+                const [exRes, clsRes] = await Promise.all([
+                    apiFetch('/exams'),
+                    apiFetch('/classes')
                 ]);
+                
+                const exData = await exRes.json();
+                const clsData = await clsRes.json();
+                
+                if (Array.isArray(exData)) setExams(exData);
+                else if (exData.success) setExams(exData.data || []);
+                else setExams([]);
+                
+                if (Array.isArray(clsData)) setClasses(clsData);
+                else if (clsData.success) setClasses(clsData.data || []);
+                else setClasses([]);
+                
+            } catch (err) {
+                console.error("Failed to fetch exams for marks status", err);
+                setExams([]);
             } finally {
                 setLoading(false);
             }
@@ -107,30 +114,37 @@ const ExaminationManagement = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {exams.map(e => (
-                                    <tr key={e.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover:bg-slate-50 transition-colors">
-                                        <td style={{ padding: '12px 16px' }}>
-                                            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{e.name}</p>
-                                        </td>
-                                        <td style={{ padding: '12px 16px', fontSize: '13px', color: '#475569' }}>
-                                            {e.classes}
-                                        </td>
-                                        <td style={{ padding: '12px 16px', fontSize: '13px', color: '#475569' }}>
-                                            {e.date}
-                                        </td>
-                                        <td style={{ padding: '12px 16px' }}>
-                                            <span style={{ 
-                                                display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase',
-                                                background: e.status === 'Completed' ? '#dcfce7' : (e.status === 'Upcoming' ? '#fef3c7' : '#e0f2fe'),
-                                                color: e.status === 'Completed' ? '#166534' : (e.status === 'Upcoming' ? '#92400e' : '#075985'),
-                                                border: `1px solid ${e.status === 'Completed' ? '#bbf7d0' : (e.status === 'Upcoming' ? '#fde68a' : '#bae6fd')}`
-                                            }}>
-                                                {e.status === 'Completed' ? <CheckCircle2 size={12} /> : (e.status === 'Upcoming' ? <Clock size={12} /> : <AlertCircle size={12} />)}
-                                                {e.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {exams.length === 0 ? (
+                                    <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>No exams found.</td></tr>
+                                ) : (
+                                    exams.map(e => {
+                                        const cls = classes.find(c => c.id === e.class_id);
+                                        const status = e.status || 'Upcoming';
+                                        return (
+                                        <tr key={e.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover:bg-slate-50 transition-colors">
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>{e.name}</p>
+                                            </td>
+                                            <td style={{ padding: '12px 16px', fontSize: '13px', color: '#475569' }}>
+                                                {cls ? `${cls.name} (${cls.section})` : 'All Classes'}
+                                            </td>
+                                            <td style={{ padding: '12px 16px', fontSize: '13px', color: '#475569' }}>
+                                                {e.date ? new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                                            </td>
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <span style={{ 
+                                                    display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase',
+                                                    background: status === 'Completed' ? '#dcfce7' : (status === 'Upcoming' ? '#fef3c7' : '#e0f2fe'),
+                                                    color: status === 'Completed' ? '#166534' : (status === 'Upcoming' ? '#92400e' : '#075985'),
+                                                    border: `1px solid ${status === 'Completed' ? '#bbf7d0' : (status === 'Upcoming' ? '#fde68a' : '#bae6fd')}`
+                                                }}>
+                                                    {status === 'Completed' ? <CheckCircle2 size={12} /> : (status === 'Upcoming' ? <Clock size={12} /> : <AlertCircle size={12} />)}
+                                                    {status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )})
+                                )}
                             </tbody>
                         </table>
                     </div>

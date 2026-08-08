@@ -13,7 +13,10 @@ const StaffForm = ({ onSave, onCancel, initialRole }) => {
         hostelBlockAssigned: '', vehicleAssigned: '', routeAssigned: '', licenseNumber: ''
     });
 
-    const roles = ['Accountant', 'Librarian', 'Receptionist', 'Transport Manager', 'Hostel Warden', 'HR Manager'];
+    let roles = ['Accountant', 'Librarian', 'Receptionist', 'Transport Manager', 'Hostel Warden', 'HR Manager'];
+    if (initialRole && !roles.includes(initialRole)) {
+        roles.unshift(initialRole);
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;

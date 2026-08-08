@@ -4,12 +4,12 @@ from apps.schools.models import School
 
 class PrincipalTask(models.Model):
     class Meta:
-        db_table = 'principaltasks'
+        db_table = 'tasks'
 
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principal_tasks')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    assigned_to = models.CharField(max_length=255, null=True, blank=True)
     priority = models.CharField(max_length=50, default='Medium')
     status = models.CharField(max_length=50, default='Pending')
     due_date = models.DateField(blank=True, null=True)

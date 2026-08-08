@@ -134,8 +134,8 @@ const DashboardOverview = ({ setActiveTab }) => {
                             setActiveTab(card.targetTab);
                         }
                     }}
-                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s', cursor: card.targetTab ? 'pointer' : 'default' }}
-                    className={`hover:border-slate-300 hover:shadow-md ${card.targetTab ? 'active:scale-[0.98]' : ''}`}
+                    style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s', cursor: 'pointer' }}
+                    className={`hover:border-slate-300 hover:shadow-md ${card.targetTab ? 'active:scale-[0.98]' : 'active:scale-[0.98]'}`}
                 >
                     <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {card.icon}

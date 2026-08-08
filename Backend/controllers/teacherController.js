@@ -10,10 +10,16 @@ exports.createTeacher = async (req, res) => {
     }
 };
 
+const pool = require('../config/db');
+
 exports.getAllTeachers = async (req, res) => {
     try {
-        const results = await Teacher.findAll();
-        res.status(200).json(results);
+        const result = await pool.query(`
+            SELECT t.*, u.name, u.email, u.phone 
+            FROM teachers t 
+            JOIN users u ON t.user_id = u.id
+        `);
+        res.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching records' });

@@ -6,6 +6,7 @@ const { auth, restrictTo } = require('../middleware/auth');
 const isTeacher = [auth, restrictTo('Teacher')];
 
 // Phase 1
+router.get('/profile', ...isTeacher, ctrl.getProfile);
 router.get('/dashboard-stats', ...isTeacher, ctrl.getDashboardStats);
 router.get('/my-classes', ...isTeacher, ctrl.getMyClasses);
 router.get('/class-students/:classId', ...isTeacher, ctrl.getClassStudents);
