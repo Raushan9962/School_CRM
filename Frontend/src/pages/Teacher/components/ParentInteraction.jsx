@@ -18,40 +18,48 @@ const ParentInteraction = () => {
     const teacherName = user.name || 'Teacher';
 
     useEffect(() => {
-        // Fetch all parents mapped to this teacher's students
-        apiFetch('/teacher-portal/parents', { headers })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    if (d.data.length === 0) {
-                        setParents([
-                            { parent_id: 1, parent_name: 'Mr. Gupta', student_name: 'Rohan Gupta', class_name: '10', section: 'A', email: 'gupta@example.com', phone: '9876543210' },
-                            { parent_id: 2, parent_name: 'Mrs. Sharma', student_name: 'Diya Sharma', class_name: '10', section: 'A', email: 'sharma@example.com', phone: '9876543211' }
-                        ]);
-                    } else {
-                        setParents(d.data);
-                    }
+        const fetchParents = async () => {
+            try {
+                const res = await apiFetch('/teacher-portal/parents');
+                if (res && res.success && res.data.length > 0) {
+                    setParents(res.data);
+                } else {
+                    setParents([
+                        { parent_id: 1, parent_name: 'Mr. Gupta', student_name: 'Rohan Gupta', class_name: '10', section: 'A', email: 'gupta@example.com', phone: '9876543210' },
+                        { parent_id: 2, parent_name: 'Mrs. Sharma', student_name: 'Diya Sharma', class_name: '10', section: 'A', email: 'sharma@example.com', phone: '9876543211' }
+                    ]);
                 }
-            })
-            .catch(console.error)
-            .finally(() => setLoading(false));
+            } catch (error) {
+                console.error("Error fetching parents:", error);
+                setParents([
+                    { parent_id: 1, parent_name: 'Mr. Gupta', student_name: 'Rohan Gupta', class_name: '10', section: 'A', email: 'gupta@example.com', phone: '9876543210' },
+                    { parent_id: 2, parent_name: 'Mrs. Sharma', student_name: 'Diya Sharma', class_name: '10', section: 'A', email: 'sharma@example.com', phone: '9876543211' }
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchParents();
     }, []);
 
-    const fetchMessages = (parentId) => {
-        apiFetch(`/teacher-portal/messages/${parentId}`, { headers })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    if (d.data.length === 0) {
-                        setMessages([
-                            { id: 1, sender_type: 'teacher', message: 'Hello, Rohan is doing well in Science.', sent_at: new Date(Date.now() - 86400000).toISOString() },
-                            { id: 2, sender_type: 'parent', message: 'Thank you for the update!', sent_at: new Date(Date.now() - 40000000).toISOString() }
-                        ]);
-                    } else {
-                        setMessages(d.data);
-                    }
-                }
-            });
+    const fetchMessages = async (parentId) => {
+        try {
+            const res = await apiFetch(`/teacher-portal/messages/${parentId}`);
+            if (res && res.success && res.data.length > 0) {
+                setMessages(res.data);
+            } else {
+                setMessages([
+                    { id: 1, sender_type: 'teacher', message: 'Hello, Rohan is doing well in Science.', sent_at: new Date(Date.now() - 86400000).toISOString() },
+                    { id: 2, sender_type: 'parent', message: 'Thank you for the update!', sent_at: new Date(Date.now() - 40000000).toISOString() }
+                ]);
+            }
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+            setMessages([
+                { id: 1, sender_type: 'teacher', message: 'Hello, Rohan is doing well in Science.', sent_at: new Date(Date.now() - 86400000).toISOString() },
+                { id: 2, sender_type: 'parent', message: 'Thank you for the update!', sent_at: new Date(Date.now() - 40000000).toISOString() }
+            ]);
+        }
     };
 
     const selectParent = (parent) => {
@@ -66,16 +74,15 @@ const ParentInteraction = () => {
         try {
             const res = await apiFetch('/teacher-portal/messages', {
                 method: 'POST',
-                headers: { ...headers, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ parent_id: selectedParent.parent_id, message: messageInput })
             });
-            const data = await res.json();
-            if (data.success) {
+            if (res && res.success) {
                 setMessageInput('');
                 fetchMessages(selectedParent.parent_id);
                 setMsg('success:Message sent');
-            } else { setMsg('error:' + data.message); }
-        } catch { setMsg('error:Network error'); }
+            } else { setMsg('error:' + (res?.message || 'Failed')); }
+        } catch (err) { setMsg('error:Network error'); }
         finally { setSending(false); setTimeout(() => setMsg(''), 3000); }
     };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, BookOpen, GraduationCap, CalendarCheck, CalendarDays, BarChart3, Settings, Bell, FileText, Bus, CheckSquare, AlertTriangle, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, GraduationCap, CalendarCheck, CalendarDays, BarChart3, Settings, Bell, FileText, Bus, CheckSquare, AlertTriangle, MessageSquare, ClipboardList } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ModuleContainer from '../../components/layout/ModuleContainer';
 import PlaceholderView from './components/PlaceholderView';
@@ -22,6 +22,7 @@ import DisciplineManagement from './components/DisciplineManagement';
 import CommunicationCenter from './components/CommunicationCenter';
 import TaskDelegation from './components/TaskDelegation';
 import GrievanceSystem from './components/GrievanceSystem';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 
 // Reusing some School Admin components for Principal's view
 import ParentManagement from '../SchoolAdmin/components/ParentManagement';
@@ -75,7 +76,8 @@ const PrincipalDashboard = () => {
         { id: 'transport', label: 'Transport Management', icon: <Bus size={20} /> },
         { id: 'tasks', label: 'Task Delegation', icon: <CheckSquare size={20} /> },
         { id: 'grievances', label: 'Grievances & Complaints', icon: <AlertTriangle size={20} /> },
-        { id: 'leave', label: 'Leave Management', icon: <CalendarDays size={20} strokeWidth={1.5} /> },
+        { id: 'leave', label: 'Staff Leaves (Approval)', icon: <CalendarDays size={20} strokeWidth={1.5} /> },
+        { id: 'hr_leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
         { id: 'communication', label: 'Communication Center', icon: <MessageSquare size={20} /> },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
     ];
@@ -222,6 +224,8 @@ const PrincipalDashboard = () => {
                 />
             );
         }
+
+        if (activeTab === 'hr_leaves') return <LeaveModule />;
 
         if (activeTab === 'tasks') {
             return <TaskDelegation />;

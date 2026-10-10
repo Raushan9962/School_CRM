@@ -66,5 +66,6 @@ router.use('/admission', require('./admission'));
 router.use('/parent', parentRoutes);
 router.use('/librarian', require('./librarianRoutes'));
 router.use('/staff', require('./staffRoutes'));
+router.use('/academic', require('./academicRoutes'));
 
 module.exports = router;

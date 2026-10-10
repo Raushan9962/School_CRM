@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, UserCheck, BookOpen, FileText, ClipboardList, Calendar, User, TrendingUp, NotebookPen, BarChart2, ShieldAlert, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Users, UserCheck, BookOpen, FileText, ClipboardList, Calendar, User, TrendingUp, NotebookPen, BarChart2, ShieldAlert, MessageSquare, GraduationCap } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import DashboardOverview from './components/DashboardOverview';
 import ClassManagement from './components/ClassManagement';
@@ -8,13 +8,14 @@ import AttendanceManagement from './components/AttendanceManagement';
 import ExamManagement from './components/ExamManagement';
 import AssignmentManagement from './components/AssignmentManagement';
 import TeacherProfile from './components/TeacherProfile';
-import LeaveManagement from './components/LeaveManagement';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 import TeacherTimetable from './components/TeacherTimetable';
 import SyllabusTracking from './components/SyllabusTracking';
 import TeacherDiary from './components/TeacherDiary';
 import StudentPerformance from './components/StudentPerformance';
 import BehaviorTracking from './components/BehaviorTracking';
 import ParentInteraction from './components/ParentInteraction';
+import AcademicModule from './components/Academic/AcademicModule';
 
 const TeacherDashboard = () => {
     const navigate = useNavigate();
@@ -53,8 +54,7 @@ const TeacherDashboard = () => {
 
     const navItems = [
         { id: 'overview', label: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
-        { id: 'classes', label: 'My Classes', icon: <Users size={20} strokeWidth={1.5} /> },
-        { id: 'timetable', label: 'Timetable', icon: <Calendar size={20} strokeWidth={1.5} /> },
+        { id: 'academic', label: 'Academic', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
         { id: 'attendance', label: 'Attendance', icon: <UserCheck size={20} strokeWidth={1.5} /> },
         { id: 'assignments', label: 'Assignments', icon: <BookOpen size={20} strokeWidth={1.5} /> },
         { id: 'exams', label: 'Exams & Marks', icon: <FileText size={20} strokeWidth={1.5} /> },
@@ -63,15 +63,14 @@ const TeacherDashboard = () => {
         { id: 'performance', label: 'Student Analytics', icon: <BarChart2 size={20} strokeWidth={1.5} /> },
         { id: 'behavior', label: 'Behavior Tracking', icon: <ShieldAlert size={20} strokeWidth={1.5} /> },
         { id: 'parents', label: 'Parent & PTM', icon: <MessageSquare size={20} strokeWidth={1.5} /> },
-        { id: 'leaves', label: 'Leave Requests', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+        { id: 'leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
         { id: 'profile', label: 'My Profile', icon: <User size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
         switch (activeTab) {
             case 'overview': return <DashboardOverview />;
-            case 'classes': return <ClassManagement />;
-            case 'timetable': return <TeacherTimetable />;
+            case 'academic': return <AcademicModule />;
             case 'attendance': return <AttendanceManagement />;
             case 'assignments': return <AssignmentManagement />;
             case 'exams': return <ExamManagement />;
@@ -80,7 +79,7 @@ const TeacherDashboard = () => {
             case 'performance': return <StudentPerformance />;
             case 'behavior': return <BehaviorTracking />;
             case 'parents': return <ParentInteraction />;
-            case 'leaves': return <LeaveManagement />;
+            case 'leaves': return <LeaveModule />;
             case 'profile': return <TeacherProfile />;
             default: return <DashboardOverview />;
         }

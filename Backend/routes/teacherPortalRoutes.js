@@ -36,4 +36,9 @@ router.get('/ptm-meetings', ...isTeacher, ctrl.getPTMMeetings);
 router.post('/ptm-meetings', ...isTeacher, ctrl.schedulePTM);
 router.get('/students-by-class', ...isTeacher, ctrl.getStudentsByClass);
 
+// Parent Interaction
+router.get('/parents', ...isTeacher, ctrl.getParents);
+router.get('/messages/:parentId', ...isTeacher, ctrl.getMessages);
+router.post('/messages', ...isTeacher, ctrl.sendMessage);
+
 module.exports = router;

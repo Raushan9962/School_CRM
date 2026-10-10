@@ -17,7 +17,7 @@ import AuditLogs from './components/AuditLogs';
 import AccountantProfile from './components/AccountantProfile';
 import CRMSubscription from './components/CRMSubscription';
 import StaffAttendance from '../../components/staff/StaffAttendance';
-import StaffLeave from '../../components/staff/StaffLeave';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 import StaffSalary from '../../components/staff/StaffSalary';
 import { UserCheck, Wallet } from 'lucide-react';
 
@@ -80,7 +80,7 @@ const AccountantDashboard = () => {
         { id: 'crm_subscription', label: 'CRM Subscription', icon: <MonitorPlay size={20} strokeWidth={1.5} /> },
         { id: 'audit', label: 'Audit Logs', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
         { id: 'my_attendance', label: 'My Attendance & ID', icon: <UserCheck size={20} strokeWidth={1.5} /> },
-        { id: 'my_leaves', label: 'My Leave Requests', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+        { id: 'my_leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
         { id: 'my_salary', label: 'My Salary Slips', icon: <Wallet size={20} strokeWidth={1.5} /> },
         { id: 'profile', label: 'My Profile', icon: <User size={20} strokeWidth={1.5} /> }
     ];
@@ -101,7 +101,7 @@ const AccountantDashboard = () => {
             case 'crm_subscription': return <CRMSubscription />;
             case 'audit': return <AuditLogs />;
             case 'my_attendance': return <StaffAttendance />;
-            case 'my_leaves': return <StaffLeave />;
+            case 'my_leaves': return <LeaveModule />;
             case 'my_salary': return <StaffSalary />;
             case 'profile': return <AccountantProfile />;
             default: return <FinanceOverview />;

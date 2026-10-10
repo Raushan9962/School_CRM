@@ -7,11 +7,11 @@ exports.getDashboardStats = async (req, res) => {
 
         // 1. Total Students
         const studentsRes = await pool.query(`SELECT COUNT(*) FROM users WHERE role_name = 'Student' AND school_id = $1`, [schoolId]);
-        const totalStudents = parseInt(studentsRes.rows[0].count);
+        const totalStudents = parseInt(studentsRes.rows[0].count) || 0;
 
         // 2. Total Teachers
         const teachersRes = await pool.query(`SELECT COUNT(*) FROM users WHERE role_name = 'Teacher' AND school_id = $1`, [schoolId]);
-        const totalTeachers = parseInt(teachersRes.rows[0].count);
+        const totalTeachers = parseInt(teachersRes.rows[0].count) || 0;
 
         // 3. Specific Staff Roles
         const roles = ['Accountant', 'Librarian', 'Receptionist', 'Transport Staff', 'Hostel Warden', 'HR'];
@@ -27,12 +27,12 @@ exports.getDashboardStats = async (req, res) => {
         };
 
         staffRes.rows.forEach(row => {
-            if (row.role_name === 'Accountant') staffCounts.totalAccountants = parseInt(row.count);
-            if (row.role_name === 'Librarian') staffCounts.totalLibrarians = parseInt(row.count);
-            if (row.role_name === 'Receptionist') staffCounts.totalReceptionists = parseInt(row.count);
-            if (row.role_name === 'Transport Staff') staffCounts.totalTransportStaff = parseInt(row.count);
-            if (row.role_name === 'Hostel Warden') staffCounts.totalWardens = parseInt(row.count);
-            if (row.role_name === 'HR') staffCounts.totalHR = parseInt(row.count);
+            if (row.role_name === 'Accountant' && parseInt(row.count) > 0) staffCounts.totalAccountants = parseInt(row.count);
+            if (row.role_name === 'Librarian' && parseInt(row.count) > 0) staffCounts.totalLibrarians = parseInt(row.count);
+            if (row.role_name === 'Receptionist' && parseInt(row.count) > 0) staffCounts.totalReceptionists = parseInt(row.count);
+            if (row.role_name === 'Transport Staff' && parseInt(row.count) > 0) staffCounts.totalTransportStaff = parseInt(row.count);
+            if (row.role_name === 'Hostel Warden' && parseInt(row.count) > 0) staffCounts.totalWardens = parseInt(row.count);
+            if (row.role_name === 'HR' && parseInt(row.count) > 0) staffCounts.totalHR = parseInt(row.count);
         });
 
         // 4. Today Attendance (Students Present %)
@@ -44,7 +44,7 @@ exports.getDashboardStats = async (req, res) => {
         `, [schoolId]);
         const presentCount = parseInt(attendanceRes.rows[0].count);
         let todayAttendancePercent = 0;
-        if (totalStudents > 0) {
+        if (totalStudents > 0 && presentCount > 0) {
             todayAttendancePercent = Math.round((presentCount / totalStudents) * 100);
         }
 
@@ -66,8 +66,8 @@ exports.getDashboardStats = async (req, res) => {
         `, [schoolId]);
         const pendingFees = parseInt(pendingFeesRes.rows[0].total) || 0;
 
-        // Mock data for Phase 1 where tables don't exist yet
-        const upcomingExams = 15; // Mock: Next exam in 15 days
+        // Exam logic pending real table schema, showing 0 for now
+        const upcomingExams = 0;
         const newAdmissions = 12; // Mock: 12 new admissions this month
         const notifications = 5;  // Mock: 5 pending approvals
         const birthdayToday = 2;  // Mock: 2 birthdays today
