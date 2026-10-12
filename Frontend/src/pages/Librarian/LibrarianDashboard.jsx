@@ -8,7 +8,7 @@ import BookIssueReturn from './components/BookIssueReturn';
 import FineManagement from './components/FineManagement';
 import LibrarySettings from './components/LibrarySettings';
 import LibrarianAttendance from '../../components/staff/StaffAttendance';
-import LibrarianLeave from '../../components/staff/StaffLeave';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 import LibrarianSalary from '../../components/staff/StaffSalary';
 import { Settings, UserCheck, ClipboardList, Wallet } from 'lucide-react';
 
@@ -62,7 +62,7 @@ const LibrarianDashboard = () => {
         { id: 'issuereturn', label: 'Issue / Return', icon: <Repeat size={20} strokeWidth={1.5} /> },
         { id: 'fines', label: 'Fine Tracking', icon: <IndianRupee size={20} strokeWidth={1.5} /> },
         { id: 'attendance', label: 'My Attendance & ID', icon: <UserCheck size={20} strokeWidth={1.5} /> },
-        { id: 'leaves', label: 'Leave Requests', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+        { id: 'leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
         { id: 'salary', label: 'Salary Details', icon: <Wallet size={20} strokeWidth={1.5} /> },
         { id: 'settings', label: 'Library Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
     ];
@@ -74,7 +74,7 @@ const LibrarianDashboard = () => {
             case 'issuereturn': return <BookIssueReturn />;
             case 'fines': return <FineManagement />;
             case 'attendance': return <LibrarianAttendance />;
-            case 'leaves': return <LibrarianLeave />;
+            case 'leaves': return <LeaveModule />;
             case 'salary': return <LibrarianSalary />;
             case 'settings': return <LibrarySettings />;
             default: return <LibrarianOverview />;

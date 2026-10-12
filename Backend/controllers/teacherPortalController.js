@@ -281,7 +281,17 @@ exports.getMyLeaves = async (req, res) => {
         let leaves = [];
         try {
             const leavesRes = await pool.query(
-                `SELECT id, leave_type, start_date, end_date, reason, status, created_at
+                `SELECT id, 
+                        type as leave_type, 
+                        type, 
+                        from_date as start_date, 
+                        from_date, 
+                        to_date as end_date, 
+                        to_date, 
+                        days, 
+                        reason, 
+                        status, 
+                        created_at
                  FROM leaves
                  WHERE user_id = $1
                  ORDER BY created_at DESC
@@ -289,7 +299,10 @@ exports.getMyLeaves = async (req, res) => {
                 [userId]
             );
             leaves = leavesRes.rows;
-        } catch(e) { leaves = []; }
+        } catch(e) { 
+            console.error('Error querying teacher leaves:', e.message);
+            leaves = []; 
+        }
 
         return res.status(200).json({ success: true, data: leaves });
     } catch (error) {
@@ -302,31 +315,27 @@ exports.getMyLeaves = async (req, res) => {
 exports.applyLeave = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { leave_type, start_date, end_date, reason } = req.body;
+        const { leave_type, type, start_date, from_date, end_date, to_date, reason } = req.body;
 
-        if (!leave_type || !start_date || !end_date || !reason) {
+        const selectedType = leave_type || type;
+        const startDate = start_date || from_date;
+        const endDate = end_date || to_date;
+
+        if (!selectedType || !startDate || !endDate || !reason) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
-        let newLeave;
-        try {
-            const result = await pool.query(
-                `INSERT INTO leaves (user_id, leave_type, start_date, end_date, reason, status)
-                 VALUES ($1, $2, $3, $4, $5, 'Pending')
-                 RETURNING *`,
-                [userId, leave_type, start_date, end_date, reason]
-            );
-            newLeave = result.rows[0];
-        } catch(e) {
-            // Table might have different column names
-            const result = await pool.query(
-                `INSERT INTO leaves (user_id, type, from_date, to_date, reason, status)
-                 VALUES ($1, $2, $3, $4, $5, 'Pending')
-                 RETURNING *`,
-                [userId, leave_type, start_date, end_date, reason]
-            );
-            newLeave = result.rows[0];
-        }
+        const sDate = new Date(startDate);
+        const eDate = new Date(endDate);
+        const days = Math.max(1, Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1);
+
+        const result = await pool.query(
+            `INSERT INTO leaves (user_id, type, from_date, to_date, days, reason, status)
+             VALUES ($1, $2, $3, $4, $5, $6, 'Pending')
+             RETURNING id, type as leave_type, type, from_date as start_date, from_date, to_date as end_date, to_date, days, reason, status, created_at`,
+            [userId, selectedType, startDate, endDate, days, reason]
+        );
+        const newLeave = result.rows[0];
 
         return res.status(201).json({ success: true, message: 'Leave application submitted.', data: newLeave });
     } catch (error) {

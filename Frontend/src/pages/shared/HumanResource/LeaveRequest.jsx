@@ -4,7 +4,7 @@ import { Paperclip, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const LEAVE_TYPES = ['Sick Leave', 'Casual Leave', 'Earned Leave', 'Maternity Leave', 'Other'];
 
-const LeaveRequest = () => {
+const LeaveRequest = ({ onSuccess }) => {
     const [submitting, setSubmitting] = useState(false);
     const [msg, setMsg] = useState('');
     
@@ -30,7 +30,7 @@ const LeaveRequest = () => {
                 body: JSON.stringify(form)
             });
             
-            if(res.status === 404) {
+            if (res.status === 404) {
                 // Fallback to teacher portal if staff route doesn't work for this user yet
                 res = await apiFetch('/teacher-portal/leaves', {
                     method: 'POST',
@@ -46,8 +46,9 @@ const LeaveRequest = () => {
                 // Reset file input if needed
                 const fileInput = document.getElementById('leaveAttachment');
                 if (fileInput) fileInput.value = '';
+                if (onSuccess) onSuccess();
             } else { 
-                setMsg('error:' + data.message); 
+                setMsg('error:' + (data.message || 'Failed to submit leave.')); 
             }
         } catch (err) { 
             setMsg('error:Network error while submitting leave.'); 

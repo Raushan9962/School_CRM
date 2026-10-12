@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Microscope, FlaskConical, Wrench } from 'lucide-react';
+import { Microscope, FlaskConical, Wrench, ClipboardList } from 'lucide-react';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 
 import LabAssistantOverview from './components/LabAssistantOverview';
 
@@ -51,7 +52,8 @@ const LabAssistantDashboard = () => {
     const navItems = [
         { id: 'overview', label: 'Lab Overview', icon: <Microscope size={20} strokeWidth={1.5} /> },
         { id: 'inventory', label: 'Lab Inventory', icon: <FlaskConical size={20} strokeWidth={1.5} /> },
-        { id: 'maintenance', label: 'Equipment Maintenance', icon: <Wrench size={20} strokeWidth={1.5} /> }
+        { id: 'maintenance', label: 'Equipment Maintenance', icon: <Wrench size={20} strokeWidth={1.5} /> },
+        { id: 'leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
@@ -59,6 +61,7 @@ const LabAssistantDashboard = () => {
             case 'overview': return <LabAssistantOverview />;
             case 'inventory': return <PlaceholderView title="Lab Inventory" />;
             case 'maintenance': return <PlaceholderView title="Equipment Maintenance" />;
+            case 'leaves': return <LeaveModule />;
             default: return <LabAssistantOverview />;
         }
     };

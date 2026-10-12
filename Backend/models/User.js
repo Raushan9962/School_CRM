@@ -6,7 +6,7 @@ class User {
             `SELECT u.*, u.role_name as "roleName", s.name as "schoolName"
              FROM users u 
              LEFT JOIN schools s ON u.school_id = s.id
-             WHERE u.email = $1 OR u.username = $1`,
+             WHERE LOWER(u.email) = LOWER($1) OR u.username = $1`,
             [email]
         );
         return res.rows[0];

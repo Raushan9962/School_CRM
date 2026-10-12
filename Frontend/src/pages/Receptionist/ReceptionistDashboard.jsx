@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Monitor, FileText, PhoneCall, Pin } from 'lucide-react';
+import { Monitor, FileText, PhoneCall, Pin, ClipboardList } from 'lucide-react';
+import LeaveModule from '../shared/HumanResource/LeaveModule';
 
 import ReceptionistOverview from './components/ReceptionistOverview';
 
@@ -52,7 +53,8 @@ const ReceptionistDashboard = () => {
         { id: 'overview', label: 'Front Desk Overview', icon: <Monitor size={20} strokeWidth={1.5} /> },
         { id: 'visitors', label: 'Visitor Log', icon: <FileText size={20} strokeWidth={1.5} /> },
         { id: 'enquiries', label: 'Admission Enquiries', icon: <PhoneCall size={20} strokeWidth={1.5} /> },
-        { id: 'notices', label: 'Front Desk Notices', icon: <Pin size={20} strokeWidth={1.5} /> }
+        { id: 'notices', label: 'Front Desk Notices', icon: <Pin size={20} strokeWidth={1.5} /> },
+        { id: 'leaves', label: 'Human Resource (Leave)', icon: <ClipboardList size={20} strokeWidth={1.5} /> }
     ];
 
     const renderContent = () => {
@@ -61,6 +63,7 @@ const ReceptionistDashboard = () => {
             case 'visitors': return <PlaceholderView title="Visitor Log" />;
             case 'enquiries': return <PlaceholderView title="Admission Enquiries" />;
             case 'notices': return <PlaceholderView title="Front Desk Notices" />;
+            case 'leaves': return <LeaveModule />;
             default: return <ReceptionistOverview />;
         }
     };

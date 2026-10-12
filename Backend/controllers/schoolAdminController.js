@@ -163,14 +163,20 @@ exports.markStaffAttendance = async (req, res) => {
 
 exports.getLeaveRequests = async (req, res) => {
     try {
-        const schoolId = req.user.schoolId;
+        const schoolId = req.user.schoolId || req.user.school_id;
 
         const result = await pool.query(`
             SELECT 
-                l.id, l.type, l.from_date, l.to_date, l.days, l.reason, l.status, l.created_at,
-                u.name as applicant_name, u.role_name as applicant_role, u.image as applicant_image
+                l.id, l.type, l.type as leave_type, 
+                l.from_date, l.from_date as start_date, 
+                l.to_date, l.to_date as end_date, 
+                l.days, l.reason, l.status, l.created_at,
+                u.name as applicant_name, 
+                COALESCE(u.role_name, r.name, 'Staff') as applicant_role, 
+                u.image as applicant_image
             FROM leaves l
             JOIN users u ON l.user_id = u.id
+            LEFT JOIN roles r ON u.role_id = r.id
             WHERE u.school_id = $1
             ORDER BY l.created_at DESC
         `, [schoolId]);
