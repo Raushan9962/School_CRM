@@ -16,14 +16,26 @@ import {
   BookOpen, 
   FileText, 
   TrendingUp, 
+  NotebookPen,
+  BarChart2,
+  ShieldAlert,
+  MessageSquare,
   ClipboardList, 
   User 
 } from 'lucide-react-native';
 import DashboardLayout, { NavItem } from '../../components/layout/DashboardLayout';
 import DashboardOverview from './components/DashboardOverview';
 import AttendanceManagement from './components/AttendanceManagement';
-import TeacherProfile from './components/TeacherProfile';
+import ExamManagement from './components/ExamManagement';
+import AssignmentManagement from './components/AssignmentManagement';
+import TeacherDiary from './components/TeacherDiary';
+import StudentPerformance from './components/StudentPerformance';
+import BehaviorTracking from './components/BehaviorTracking';
+import ParentInteraction from './components/ParentInteraction';
+import AcademicTimetable from './components/AcademicTimetable';
+import LeaveManagement from './components/LeaveManagement';
 import SyllabusTracking from './components/SyllabusTracking';
+import TeacherProfile from './components/TeacherProfile';
 import { apiFetch } from '../../services/api';
 
 export default function TeacherDashboard() {
@@ -102,6 +114,7 @@ export default function TeacherDashboard() {
     ]);
   };
 
+  // NavItems matching 100% with the web teacher portal
   const navItems: NavItem[] = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'academic', label: 'Academic', icon: GraduationCap },
@@ -109,6 +122,10 @@ export default function TeacherDashboard() {
     { id: 'assignments', label: 'Assignments', icon: BookOpen },
     { id: 'exams', label: 'Exams & Marks', icon: FileText },
     { id: 'syllabus', label: 'Syllabus Tracking', icon: TrendingUp },
+    { id: 'diary', label: 'Lesson Diary', icon: NotebookPen },
+    { id: 'performance', label: 'Student Analytics', icon: BarChart2 },
+    { id: 'behavior', label: 'Behavior Tracking', icon: ShieldAlert },
+    { id: 'parents', label: 'Parent & PTM', icon: MessageSquare },
     { id: 'leaves', label: 'Human Resource (Leave)', icon: ClipboardList, isSpecial: true },
     { id: 'profile', label: 'My Profile', icon: User },
   ];
@@ -129,17 +146,29 @@ export default function TeacherDashboard() {
             user={user} 
             stats={stats} 
             classes={classes} 
-            onNavigateTab={(tab) => {
-              if (tab === 'leaves') router.push('/leaves');
-              else setActiveTab(tab);
-            }} 
+            onNavigateTab={(tab) => setActiveTab(tab)} 
           />
         );
+      case 'academic':
+        return <AcademicTimetable />;
       case 'attendance':
         return <AttendanceManagement />;
+      case 'assignments':
+        return <AssignmentManagement />;
+      case 'exams':
+        return <ExamManagement />;
       case 'syllabus':
-      case 'academic':
         return <SyllabusTracking />;
+      case 'diary':
+        return <TeacherDiary />;
+      case 'performance':
+        return <StudentPerformance />;
+      case 'behavior':
+        return <BehaviorTracking />;
+      case 'parents':
+        return <ParentInteraction />;
+      case 'leaves':
+        return <LeaveManagement />;
       case 'profile':
         return <TeacherProfile user={user} profile={profile} />;
       default:
@@ -148,10 +177,7 @@ export default function TeacherDashboard() {
             user={user} 
             stats={stats} 
             classes={classes} 
-            onNavigateTab={(tab) => {
-              if (tab === 'leaves') router.push('/leaves');
-              else setActiveTab(tab);
-            }} 
+            onNavigateTab={(tab) => setActiveTab(tab)} 
           />
         );
     }
@@ -171,15 +197,20 @@ export default function TeacherDashboard() {
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       handleLogout={handleLogout}
-      onSpecialNav={(tabId) => {
-        if (tabId === 'leaves') router.push('/leaves');
-      }}
+      onSpecialNav={(tabId) => setActiveTab(tabId)}
       drawerOpen={drawerOpen}
       setDrawerOpen={setDrawerOpen}
     >
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#ea580c']} />}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            colors={['#ea580c']} 
+            tintColor="#ea580c" 
+          />
+        }
       >
         {renderContent()}
       </ScrollView>
@@ -192,7 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fff7ed',
   },
   scrollContent: {
     padding: 16,

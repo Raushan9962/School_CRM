@@ -184,9 +184,14 @@ export default function DashboardOverview({
         <View style={styles.shortcutGrid}>
           {[
             { id: 'attendance', label: 'Attendance', icon: Users },
-            { id: 'academic', label: 'Academic', icon: BookOpen },
+            { id: 'academic', label: 'Timetable', icon: BookOpen },
             { id: 'assignments', label: 'Assignments', icon: Briefcase },
             { id: 'exams', label: 'Exams & Marks', icon: Clock },
+            { id: 'syllabus', label: 'Syllabus', icon: Sparkles },
+            { id: 'diary', label: 'Lesson Diary', icon: Calendar },
+            { id: 'performance', label: 'Analytics', icon: QrCode },
+            { id: 'behavior', label: 'Behavior', icon: Users },
+            { id: 'parents', label: 'Parent Chat', icon: Users },
             { id: 'leaves', label: 'HR Leaves', icon: CalendarCheck, isSpecial: true },
             { id: 'profile', label: 'My Profile', icon: Users },
           ].map((item) => {
